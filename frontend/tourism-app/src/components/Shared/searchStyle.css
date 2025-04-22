@@ -1,0 +1,68 @@
+/* Center the search bar */
+.search-container {
+    display: flex;
+    justify-content: center;
+    margin: 30px auto;
+    max-width: 700px;
+  }
+  
+  /* Ensure the form takes the full width of the container */
+  .search-form {
+    width: 100%;
+  }
+  
+  /* Default state of the search bar */
+  .custom-search-group {
+    border: 1px solid #d1d1d1; /* Light gray border (unfocused state) */
+    border-radius: 8px; /* Slightly rounded corners */
+    overflow: hidden;
+    background-color: white;
+    transition: border-color 0.3s ease, border-width 0.3s ease; /* Smooth transition for border color and width */
+  }
+  
+  /* Focused state - thicker border and darker color */
+  .custom-search-group.focused {
+
+    border-color: #1a73e8;
+    border-width: 2px;
+    box-shadow: 0 0 5px rgba(26, 115, 232, 0.3);
+  }
+  
+  /* Style the input field */
+  .custom-search-input {
+    font-size: 16px;
+    padding: 10px 18px;
+    border: none;
+    box-shadow: none;
+    color: #333;
+  }
+  
+  /* Placeholder text styling */
+  .custom-search-input::placeholder {
+    color: #a8a8a8; /* Light gray placeholder text */
+  }
+  
+  /* Remove default focus outline and border */
+  .custom-search-input:focus {
+    outline: none;
+    border: none;
+    box-shadow: none;
+  }
+  
+  /* Style the search icon */
+  .custom-search-icon {
+    background-color: transparent;
+    border: none;
+    color: #1a73e8; /* Blue icon color to match the design */
+    padding-right: 15px;
+    font-size: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: color 0.3s ease; /* Smooth transition for icon color (optional) */
+  }
+  
+  /* Ensure the icon color remains the same when focused */
+  .custom-search-group.focused .custom-search-icon {
+    color: #1a73e8; /* Keep the icon color the same when focused */
+  }

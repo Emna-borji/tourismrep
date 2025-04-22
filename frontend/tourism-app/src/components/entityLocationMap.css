@@ -1,0 +1,7 @@
+/* src/components/EntityLocationMap.css */
+.entity-location-map-container {
+    margin-top: 20px;
+    margin-bottom: 20px;
+    height: 200px;
+    width: 100%;
+  }

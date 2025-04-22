@@ -1,0 +1,34 @@
+.class-filter-container {
+    margin: 20px auto;
+    max-width: 700px;
+  }
+  
+  .class-filter-label {
+    font-size: 16px;
+    font-weight: bold;
+    color: #333;
+    margin-bottom: 10px;
+    display: block;
+  }
+  
+  .checkbox-group {
+    display: flex;
+    gap: 20px;
+  }
+  
+  .class-checkbox {
+    display: flex;
+    align-items: center;
+  }
+  
+  .class-checkbox span {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 16px;
+    color: #333;
+  }
+  
+  .class-checkbox input {
+    margin-right: 10px;
+  }

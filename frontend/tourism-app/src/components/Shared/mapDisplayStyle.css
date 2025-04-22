@@ -1,0 +1,13 @@
+.map-container {
+    margin: 20px auto;
+    max-width: 700px;
+    text-align: center;
+  }
+  
+  .map-image {
+    width: 100%;
+    max-width: 300px; /* Match the width in the image */
+    height: auto;
+    border-radius: 8px;
+    border: 1px solid #d1d1d1; /* Light gray border to match the design */
+  }

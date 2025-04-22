@@ -1,0 +1,61 @@
+/* src/pages/Shared/GuestHouseCategoryFilter.css */
+.category-filter-container {
+    display: inline-block;
+    margin-right: 15px;
+    margin-bottom: 15px;
+  }
+  
+  .category-label {
+    display: block;
+    font-size: 14px;
+    color: #333;
+    margin-bottom: 5px;
+  }
+  
+  .custom-category-dropdown .custom-category-toggle {
+    background-color: #fff;
+    border: 1px solid #ced4da;
+    color: #333;
+    padding: 8px 30px 8px 12px;
+    border-radius: 5px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    min-width: 200px;
+  }
+  
+  .custom-category-dropdown .custom-category-toggle:hover,
+  .custom-category-dropdown .custom-category-toggle:focus {
+    background-color: #f8f9fa;
+    border-color: #80bdff;
+    box-shadow: 0 0 5px rgba(0, 123, 255, 0.3);
+  }
+  
+  .custom-category-dropdown.focused .custom-category-toggle {
+    border-color: #80bdff;
+    box-shadow: 0 0 5px rgba(0, 123, 255, 0.3);
+  }
+  
+  .custom-category-dropdown .chevron-icon {
+    margin-left: 10px;
+  }
+  
+  .custom-category-menu {
+    min-width: 200px;
+    border-radius: 5px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  }
+  
+  .custom-category-menu .dropdown-item {
+    padding: 8px 12px;
+    color: #333;
+  }
+  
+  .custom-category-menu .dropdown-item:hover {
+    background-color: #f8f9fa;
+  }
+  
+  .custom-category-menu .dropdown-item.selected {
+    background-color: #e9ecef;
+    font-weight: bold;
+  }

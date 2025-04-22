@@ -1,0 +1,80 @@
+/* Container for the sort dropdown */
+.sort-container {
+    display: flex;
+    align-items: center;
+    margin: 20px auto;
+    max-width: 700px;
+  }
+  
+  /* Label styling */
+  .sort-label {
+    margin-right: 10px;
+    font-size: 16px;
+    color: #333;
+  }
+  
+  /* Default state of the dropdown */
+  .custom-sort-dropdown {
+    border: 1px solid #d1d1d1; /* Light gray border (unfocused state) */
+    border-radius: 8px; /* Slightly rounded corners */
+    background-color: white;
+    transition: border-color 0.3s ease, border-width 0.3s ease; /* Smooth transition for border */
+  }
+  
+  /* Focused state - thicker border and darker color */
+  .custom-sort-dropdown.focused {
+    border-color: #1a73e8; /* Darker blue border (focused state) */
+    border-width: 2px; /* Thicker border for more prominent highlighting */
+  }
+  
+  /* Style the toggle button (the part that shows the selected option) */
+  .custom-sort-toggle {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 16px;
+    padding: 10px 18px;
+    border: none;
+    background-color: transparent;
+    color: #333;
+    width: 200px; /* Fixed width to match the design */
+  }
+  
+  /* Remove default bootstrap focus outline */
+  .custom-sort-toggle:focus {
+    outline: none;
+    box-shadow: none;
+  }
+  
+  /* Style the chevron icon */
+  .chevron-icon {
+    margin-left: 10px;
+    color: #1a73e8; /* Blue icon color to match the design */
+  }
+  
+  /* Style the dropdown menu */
+  .custom-sort-menu {
+    border-radius: 8px;
+    border: 1px solid #d1d1d1;
+    margin-top: 5px;
+    width: 200px; /* Match the toggle width */
+  }
+  
+  /* Style each dropdown item */
+  .custom-sort-menu .dropdown-item {
+    font-size: 16px;
+    padding: 10px 18px;
+    color: #333;
+  }
+  
+  /* Highlight the selected item */
+  .custom-sort-menu .dropdown-item.selected {
+    background-color: #1a73e8; /* Blue background for selected item */
+    color: white; /* White text for contrast */
+  }
+  
+  /* Hover effect for dropdown items */
+  .custom-sort-menu .dropdown-item:hover {
+    background-color: #f1f1f1; /* Light gray background on hover */
+    color: #333;
+  }

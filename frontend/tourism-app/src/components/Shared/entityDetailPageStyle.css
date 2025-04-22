@@ -1,0 +1,13 @@
+/* src/pages/EntityDetailPage.css */
+.entity-detail-page img {
+    border-radius: 10px;
+  }
+  
+  .entity-detail-page .btn-primary {
+    background-color: #007bff;
+    border: none;
+  }
+  
+  .entity-detail-page .text-muted {
+    font-size: 1rem;
+  }

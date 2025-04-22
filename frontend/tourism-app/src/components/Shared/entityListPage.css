@@ -1,0 +1,16 @@
+/* src/pages/EntityListPage.css */
+.search-sort-destination-container {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 2rem;
+  }
+  
+  .map-class-container {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 2rem;
+  }
+  
+  .cuisine-filter {
+    flex: 1;
+  }

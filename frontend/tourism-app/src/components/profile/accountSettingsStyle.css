@@ -1,0 +1,39 @@
+.account-settings-container {
+    padding: 0;
+  }
+  
+  .account-settings-content {
+    padding: 40px;
+  }
+  
+  .account-settings-content h1 {
+    font-size: 24px;
+    margin-bottom: 30px;
+  }
+  
+  .form-label {
+    font-weight: 500;
+    color: #495057;
+  }
+  
+  .form-control {
+    border-radius: 5px;
+    border: 1px solid #ced4da;
+    padding: 10px;
+  }
+  
+  .form-control:disabled {
+    background-color: #e9ecef;
+  }
+  
+  .btn-primary {
+    background-color: #007bff;
+    border-color: #007bff;
+    padding: 10px 20px;
+    font-size: 16px;
+  }
+  
+  .btn-primary:hover {
+    background-color: #0056b3;
+    border-color: #0056b3;
+  }
