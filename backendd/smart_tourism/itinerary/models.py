@@ -15,6 +15,25 @@ from django.core.exceptions import ValidationError
 alphanumeric_validator = RegexValidator(r'^[0-9a-zA-Z\s\-]+$', 'Only alphanumeric characters and dashes are allowed.')
 
 
+
+class Guide(models.Model):
+    id = models.AutoField(primary_key=True)
+    num_gd = models.CharField(max_length=100, blank=True, null=True)
+    descatl = models.CharField(max_length=255, blank=True, null=True)
+    nom_gui = models.CharField(max_length=255)  # Keep as required
+    pre_guide = models.CharField(max_length=255, blank=True)  # Make optional
+    sexe = models.CharField(max_length=1, choices=[('M', 'Male'), ('F', 'Female')], blank=True, null=True)
+    adresse = models.TextField(blank=True, null=True)
+    tel = models.CharField(max_length=20, blank=True, null=True)
+    dat_deb_activ = models.DateField(blank=True, null=True)
+
+    class Meta:
+        db_table = 'guide'
+        managed = False  # Since the table is already created in the database
+
+    def __str__(self):
+        return f"{self.pre_guide} {self.nom_gui}"
+
 class Circuit(models.Model):
     name = models.CharField(
         max_length=255,

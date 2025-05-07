@@ -1,102 +1,468 @@
-/* Ensure parent containers don't collapse */
+/* Import Google Fonts for modern typography (from latest CSS, but we'll override the font in body) */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+/* Global Reset (from latest CSS) */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/* Body styles (from old CSS) */
+body {
+  font-family: 'Poppins', sans-serif;
+  background-color: #f8faff;
+}
+
+/* Intro Section Styling (from old CSS, for Step 1) */
+.intro-section {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #ffffff;
+  border-radius: 1rem;
+  padding: 2rem 3rem;
+  gap: 2.5rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  margin-bottom: 2rem;
+  flex-wrap: wrap;
+}
+
+.intro-image {
+  flex: 0 0 220px;
+  max-width: 220px;
+}
+
+.intro-image img {
+  width: 100%;
+  height: auto;
+  border-radius: 50%;
+}
+
+.intro-text {
+  flex: 1;
+  min-width: 280px;
+}
+
+.intro-text h1 {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #2b4c7e;
+  margin-bottom: 1rem;
+}
+
+.intro-text p {
+  font-size: 1rem;
+  color: #111827;
+  line-height: 1.7;
+}
+
+.intro-text strong {
+  font-weight: 600;
+  color: #2b4c7e;
+}
+
+.intro-text span.step {
+  display: block;
+  font-weight: 600;
+  color: #3b82f6;
+  margin-bottom: 0.25rem;
+}
+
+@media (max-width: 768px) {
+  .intro-section {
+    flex-direction: column;
+    text-align: center;
+    padding: 1.5rem;
+  }
+
+  .intro-image {
+    margin-bottom: 1rem;
+  }
+}
+
+/* Form container (from old CSS, for Step 1) */
+.step1-form {
+  background-color: #eef4ff;
+  padding: 2rem;
+  border-radius: 1.5rem;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.05);
+  max-width: 850px;
+  margin: auto;
+}
+
+/* Group inputs in rows (from old CSS, for Step 1) */
+.input-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.input-row .input-group {
+  flex: 1 1 45%;
+  min-width: 220px;
+}
+
+/* Label + input spacing (from old CSS, for Step 1) */
+.input-group label {
+  display: block;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+  color: #2b4c7e;
+}
+
+.input-group input,
+.input-group select {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  border-radius: 0.75rem;
+  border: 1px solid #cbd5e1;
+  font-size: 1rem;
+  background: white;
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+
+.input-group input:focus,
+.input-group select:focus {
+  outline: none;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+}
+
+@media (max-width: 768px) {
+  .input-row {
+    flex-direction: column;
+  }
+}
+
+/* Titles and section headings (from old CSS) */
+h1, h2, h3, h4 {
+  color: #2b4c7e;
+  font-weight: bold;
+}
+
+h1 {
+  font-size: 2rem;
+}
+
+h2 {
+  font-size: 1.5rem;
+  margin-bottom: 1rem;
+}
+
+/* Error messages (from old CSS) */
+.text-red-500 {
+  color: #ef4444;
+}
+
+/* Compose button (from old CSS) */
+button {
+  font-size: 1rem;
+  font-weight: 600;
+  border-radius: 0.75rem;
+  padding: 0.75rem 2rem;
+  transition: all 0.2s ease-in-out;
+}
+
+button:disabled {
+  cursor: not-allowed;
+  background-color: #93c5fd !important;
+}
+
+button:not(:disabled) {
+  background: #3b82f6;
+  color: white;
+  border: none;
+}
+
+button:hover:not(:disabled) {
+  background: #2563eb;
+}
+
+/* Destination cards, days, and entity selection steps (from old CSS) */
+.bg-white {
+  background-color: #ffffff;
+  border-radius: 1.25rem;
+  padding: 1.5rem;
+  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.06);
+  transition: transform 0.2s ease;
+}
+
+.bg-white:hover {
+  transform: scale(1.01);
+}
+
+/* Custom checkbox style (from old CSS) */
+input[type="checkbox"] {
+  accent-color: #3b82f6;
+}
+
+/* Light info text (from old CSS) */
+.text-sm.text-gray-500 {
+  color: #6b7280;
+  font-style: italic;
+}
+
+/* Clean spacing (from old CSS) */
+.mt-1 { margin-top: 0.25rem; }
+.mt-2 { margin-top: 0.5rem; }
+.mt-4 { margin-top: 1rem; }
+.mt-6 { margin-top: 1.5rem; }
+.mb-4 { margin-bottom: 1rem; }
+.space-y-6 > * + * {
+  margin-top: 1.5rem;
+}
+
+/* General container (from current CSS, needed for layout) */
 .max-w-7xl {
-    min-height: 100vh; /* Ensure the parent has enough height */
-  }
-  
-  /* Ensure the flex container allows children to take full height */
-  .flex {
-    min-height: 0; /* Prevent flex shrinking issues */
-  }
-  
-  /* Ensure the map container takes up the full specified height and width */
+  max-width: 80rem;
+  margin-left: auto;
+  margin-right: auto;
+  padding: 1.5rem;
+}
+
+/* Additional styles needed for other steps (from current CSS) */
+h3 {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #374151;
+}
+
+h4 {
+  font-size: 1.125rem;
+  font-weight: 500;
+  color: #4b5563;
+}
+
+/* Step 2 specific styles (from current CSS) */
+select:not([multiple]), /* For dropdowns like "Add Intermediate Destination" */
+input[type="number"] /* For day inputs in Step 2 */ {
+  width: 100%;
+  padding: 0.75rem; /* p-3 */
+  border: 1px solid #d1d5db; /* border border-gray-300 */
+  border-radius: 0.375rem; /* rounded-md */
+  transition: all 0.2s ease-in-out;
+}
+
+select:not([multiple]):focus,
+input[type="number"]:focus {
+  outline: none;
+  border-color: #6366f1; /* focus:border-indigo-500 */
+  box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.5); /* focus:ring-2 focus:ring-indigo-500 */
+}
+
+/* Specific width for day input in Step 2 (from current CSS) */
+input[type="number"] {
+  width: 5rem; /* w-20 */
+  padding: 0.5rem; /* p-2 */
+}
+
+/* Itinerary item details (Step 4) (from current CSS) */
+.bg-gray-100 {
+  background-color: #f3f4f6; /* bg-gray-100 */
+  padding: 0.75rem; /* p-3 */
+  border-radius: 0.375rem; /* rounded-md */
+}
+
+/* Additional button styles (from current CSS) */
+button.bg-gray-500 {
+  background-color: #6b7280; /* bg-gray-500 */
+  color: #ffffff; /* text-white */
+}
+
+button.bg-gray-500:hover {
+  background-color: #4b5563; /* hover:bg-gray-600 */
+}
+
+button.bg-indigo-500 {
+  background-color: #6366f1; /* bg-indigo-500 */
+  color: #ffffff; /* text-white */
+}
+
+button.bg-indigo-500:hover {
+  background-color: #4f46e5; /* hover:bg-indigo-600 */
+}
+
+button.bg-indigo-300 {
+  background-color: #a5b4fc; /* bg-indigo-300 */
+  color: #ffffff; /* text-white */
+}
+
+/* Remove button in Step 2 (from current CSS) */
+button.text-red-500 {
+  color: #ef4444; /* text-red-500 */
+}
+
+button.text-red-500:hover {
+  color: #dc2626; /* hover:text-red-700 */
+}
+
+/* Expand button in Step 4 (from current CSS) */
+button.text-blue-500 {
+  color: #3b82f6; /* text-blue-500 */
+}
+
+button.text-blue-500:hover {
+  color: #2563eb; /* hover:text-blue-700 */
+}
+
+/* SVG icon in Step 4 (from current CSS) */
+button svg.w-5.h-5 {
+  width: 1.25rem; /* w-5 */
+  height: 1.25rem; /* h-5 */
+}
+
+/* Additional text colors (from current CSS) */
+.text-gray-600 {
+  color: #4b5563; /* text-gray-600 */
+}
+
+.text-green-600 {
+  color: #16a34a; /* text-green-600 */
+}
+
+.text-gray-500 {
+  color: #6b7280; /* text-gray-500 */
+}
+
+.text-gray-700 {
+  color: #374151; /* text-gray-700 */
+}
+
+.text-gray-800 {
+  color: #1f2937; /* text-gray-800 */
+}
+
+/* Additional spacing utilities (from current CSS) */
+.space-y-4 > * + * {
+  margin-top: 1rem; /* space-y-4 */
+}
+
+.space-x-4 > * + * {
+  margin-left: 1rem; /* space-x-4 */
+}
+
+.mt-8 { margin-top: 2rem; }
+.ml-4 { margin-left: 1rem; }
+.pt-40 { padding-top: 10rem; }
+
+/* Flex utilities (from current CSS) */
+.flex {
+  display: flex;
+}
+
+.items-center {
+  align-items: center;
+}
+
+.justify-between {
+  justify-content: space-between;
+}
+
+.text-center {
+  text-align: center;
+}
+
+.ml-auto {
+  margin-left: auto;
+}
+
+/* Map container (Step 4) (integrated from latest and current CSS to make map visible) */
+.circuit-wizard-map-container {
+  position: relative; /* Critical for Leaflet to render correctly */
+  width: 100%;
+  height: 24rem; /* h-96, from current CSS */
+  border-radius: 0.5rem; /* From latest CSS */
+  overflow: hidden; /* From latest CSS */
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); /* From latest CSS */
+  background-color: #e2e8f0; /* From latest CSS */
+}
+
+@media (min-width: 768px) {
   .circuit-wizard-map-container {
-    height: 600px !important; /* Hardcode height for debugging */
-    width: 100% !important;
-    position: relative !important;
-    overflow: visible !important;
-    background-color: #f0f0f0; /* Fallback background to debug visibility */
+    width: 50%; /* md:w-1/2, from current CSS */
+    height: 37.5rem; /* md:h-[600px], from current CSS */
   }
-  
-  /* Ensure the map itself takes up the full container size */
-  .circuit-wizard-map {
-    height: 100% !important;
-    width: 100% !important;
-    z-index: 1 !important;
-    position: absolute !important;
-    top: 0 !important;
-    left: 0 !important;
-  }
-  
-  /* Ensure Leaflet's internal container is correctly sized and visible */
-  .leaflet-container {
-    height: 100% !important;
-    width: 100% !important;
-    z-index: 1 !important;
-    position: absolute !important;
-    top: 0 !important;
-    left: 0 !important;
-    display: block !important;
-    visibility: visible !important;
-    opacity: 1 !important;
-  }
-  
-  /* Ensure all Leaflet panes are visible */
-  .leaflet-pane {
-    position: absolute !important;
-    z-index: inherit !important;
-    display: block !important;
-    visibility: visible !important;
-    opacity: 1 !important;
-  }
-  
-  /* Layer ordering for map elements */
-  .leaflet-overlay-pane {
-    z-index: 400 !important; /* Route lines above tiles */
-  }
-  
-  .leaflet-tile-pane {
-    z-index: 200 !important; /* Tiles below route lines */
-  }
-  
-  .leaflet-marker-pane {
-    z-index: 600 !important; /* Markers above route lines */
-  }
-  
-  /* Ensure tiles have correct dimensions and are visible */
-  .leaflet-tile {
-    width: 256px !important;
-    height: 256px !important;
-    display: block !important;
-    visibility: visible !important;
-    opacity: 1 !important;
-  }
-  
-  /* Ensure tile container is visible */
-  .leaflet-tile-container {
-    position: absolute !important;
-    z-index: 200 !important;
-    display: block !important;
-    visibility: visible !important;
-    opacity: 1 !important;
-  }
-  
-  /* Popup styling */
-  .leaflet-popup-content-wrapper {
-    border-radius: 8px;
-    padding: 8px;
-  }
-  
-  .leaflet-popup-content {
-    margin: 0;
-  }
-  
-  .leaflet-popup-tip {
-    background: white;
-    border: none;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-  }
-  
-  /* Debugging: Add a border to see the map container */
+}
+
+@media (max-width: 767px) {
   .circuit-wizard-map-container {
-    border: 2px solid red !important; /* Temporary border to debug visibility */
+    height: 400px; /* From latest CSS, slightly taller than 24rem for better visibility */
   }
+}
+
+.circuit-wizard-map {
+  width: 100%;
+  height: 100%;
+}
+
+/* Leaflet Popup Customization (from latest CSS) */
+.leaflet-popup-content-wrapper {
+  border-radius: 0.375rem;
+  padding: 0.5rem;
+}
+
+.leaflet-popup-content {
+  margin: 0.5rem;
+  font-size: 0.875rem;
+  color: #2d3748;
+}
+
+.leaflet-popup-tip {
+  background-color: #ffffff;
+}
+
+/* Itinerary section (Step 4) (from current CSS) */
+.overflow-y-auto {
+  overflow-y: auto;
+}
+
+@media (min-width: 768px) {
+  .md\:max-h-\[600px\] {
+    max-height: 37.5rem; /* md:max-h-[600px] */
+  }
+}
+
+/* Responsive flex for Step 4 (from current CSS) */
+@media (min-width: 768px) {
+  .md\:flex-row {
+    flex-direction: row;
+  }
+  .md\:space-y-0 {
+    margin-top: 0;
+  }
+  .md\:space-x-6 > * + * {
+    margin-left: 1.5rem;
+  }
+  .md\:w-1\/2 {
+    width: 50%;
+  }
+  .md\:h-\[600px\] {
+    height: 600px;
+  }
+}
+
+/* Italic text for "No suggestions available" (from current CSS) */
+.text-sm.text-gray-500.italic {
+  font-size: 0.875rem; /* text-sm */
+  color: #6b7280; /* text-gray-500 */
+  font-style: italic;
+}
+
+/* Accessibility Enhancements (from latest CSS) */
+:focus-visible {
+  outline: 2px solid #3b82f6;
+  outline-offset: 2px;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  border: 0;
+}

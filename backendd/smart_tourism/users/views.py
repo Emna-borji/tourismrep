@@ -30,6 +30,8 @@ from rest_framework import viewsets, permissions
 from .models import Preference
 from .serializers import PreferenceSerializer
 from .permissions import IsAdminOrCreateOnly  # your custom permission
+from rest_framework.exceptions import PermissionDenied, NotFound
+
 
 
 
@@ -272,9 +274,45 @@ class PreferenceViewSet(viewsets.ModelViewSet):
     queryset = Preference.objects.all()
     serializer_class = PreferenceSerializer
     permission_classes = [IsAuthenticated, IsAdminOrCreateOnly]
+    lookup_field = 'user_id'
+    lookup_url_kwarg = 'user_id'
 
     def get_queryset(self):
         # Only admin can list all, others can't see any
-        if self.request.user.role=="admin":
+        if self.request.user.role == "admin":
             return Preference.objects.all()
-        return Preference.objects.none()
+        # Non-admins can only see their own preferences
+        return Preference.objects.filter(user=self.request.user) if self.request.user.is_authenticated else Preference.objects.none()
+
+    def retrieve(self, request, *args, **kwargs):
+        user_id = self.kwargs.get('user_id')
+        # Admins can retrieve any user's preference, non-admins can only retrieve their own
+        if not request.user.role == "admin" and str(request.user.id) != str(user_id):
+            raise PermissionDenied("You do not have permission to access this preference.")
+
+        # Fetch the most recent preference for the given user_id
+        try:
+            preference = Preference.objects.filter(user_id=user_id).latest('id')
+        except Preference.DoesNotExist:
+            raise NotFound("No preference found for this user.")
+
+        serializer = self.get_serializer(preference)
+        return Response(serializer.data)
+
+    def create(self, request, *args, **kwargs):
+        # Check if a preference already exists for the authenticated user
+        existing_preference = Preference.objects.filter(user=request.user).first()
+
+        if existing_preference:
+            # If a preference exists, update it instead of creating a new one
+            serializer = self.get_serializer(existing_preference, data=request.data, partial=True)
+            serializer.is_valid(raise_exception=True)
+            self.perform_update(serializer)
+            return Response(serializer.data)
+        else:
+            # If no preference exists, create a new one
+            serializer = self.get_serializer(data=request.data)
+            serializer.is_valid(raise_exception=True)
+            self.perform_create(serializer)
+            headers = self.get_success_headers(serializer.data)
+            return Response(serializer.data, status=201, headers=headers)

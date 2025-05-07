@@ -1,15 +1,15 @@
 import React from 'react';
 import { Nav } from 'react-bootstrap';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { FaTachometerAlt, FaUser, FaLock, FaSignOutAlt } from 'react-icons/fa';
+import { FaTachometerAlt, FaUser, FaLock, FaSignOutAlt, FaHistory } from 'react-icons/fa';
 import { useSelector, useDispatch } from 'react-redux';
-import { logout } from '../../redux/actions/authActions'; // Updated import
+import { logout } from '../../redux/actions/authActions';
 import './sidebarStyle.css';
 
 const Sidebar = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const { userInfo } = useSelector((state) => state.auth); // Updated to use state.auth.userInfo
+  const { userInfo } = useSelector((state) => state.auth);
   const location = useLocation();
 
   const handleLogout = () => {
@@ -33,8 +33,13 @@ const Sidebar = () => {
           </Link>
         </Nav.Item>
         <Nav.Item>
-          <Link to="/account-settings" className={`nav-link ${location.pathname === '/account-settings' ? 'active' : ''}`}>
+          <Link to="/account-settings" className={`nav-link ${location.pathname === '/account-settings' && !location.search.includes('tab=history') ? 'active' : ''}`}>
             <FaUser className="nav-icon" /> Détails du compte
+          </Link>
+        </Nav.Item>
+        <Nav.Item>
+          <Link to="/account-settings?tab=history" className={`nav-link ${location.search.includes('tab=history') ? 'active' : ''}`}>
+            <FaHistory className="nav-icon" /> Historique des circuits
           </Link>
         </Nav.Item>
         <Nav.Item>

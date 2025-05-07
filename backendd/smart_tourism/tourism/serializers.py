@@ -545,10 +545,37 @@ class GuestHouseSerializer(serializers.ModelSerializer):
 #         fields = ['id', 'entity_type', 'entity_id', 'user', 'rating', 'comment', 'image', 'created_at', 'updated_at']
 
 class ReviewSerializer(serializers.ModelSerializer):
+    user = serializers.SerializerMethodField()
+
+    def get_user(self, obj):
+        from users.serializers import AdminUserSerializer
+        return AdminUserSerializer(obj.user).data
+
     class Meta:
         model = Review
         fields = ['id', 'entity_type', 'entity_id', 'user', 'rating', 'comment', 'image', 'created_at', 'updated_at']
         read_only_fields = ['id', 'user', 'created_at', 'updated_at']
+        extra_kwargs = {
+            'entity_type': {'required': False},
+            'entity_id': {'required': False},
+        }
+
+    def validate(self, data):
+        # Ensure entity_type and entity_id are provided only for POST requests
+        if self.context['request'].method == 'POST':
+            if 'entity_type' not in data or not data['entity_type']:
+                raise serializers.ValidationError("entity_type is required.")
+            if 'entity_id' not in data or data['entity_id'] is None:
+                raise serializers.ValidationError("entity_id is required and cannot be null.")
+        # For PUT/PATCH, validate only if provided and ensure they match the instance
+        elif self.context['request'].method in ['PUT', 'PATCH']:
+            instance = getattr(self, 'instance', None)
+            if instance:
+                if 'entity_type' in data and data['entity_type'] != instance.entity_type:
+                    raise serializers.ValidationError("entity_type cannot be updated.")
+                if 'entity_id' in data and data['entity_id'] != instance.entity_id:
+                    raise serializers.ValidationError("entity_id cannot be updated.")
+        return data
 
     def validate_rating(self, value):
         if value not in [1, 2, 3, 4, 5]:
@@ -559,6 +586,14 @@ class ReviewSerializer(serializers.ModelSerializer):
         if value and not value.startswith('data:image/'):
             raise serializers.ValidationError("Image must be a valid base64-encoded image string (e.g., starting with 'data:image/').")
         return value
+
+    def validate_entity_type(self, value):
+        valid_types = [choice[0] for choice in Review.ENTITY_TYPES]
+        if value not in valid_types:
+            raise serializers.ValidationError(f"Invalid entity_type. Must be one of: {valid_types}")
+        return value
+    
+
 
 class FavoriteSerializer(serializers.ModelSerializer):
     class Meta:

@@ -7,6 +7,12 @@ import {
   CREATE_REVIEW_SUCCESS,
   CREATE_REVIEW_FAIL,
   CLEAR_REVIEW_SUCCESS,
+  DELETE_REVIEW_REQUEST,
+  DELETE_REVIEW_SUCCESS,
+  DELETE_REVIEW_FAIL,
+  UPDATE_REVIEW_REQUEST,
+  UPDATE_REVIEW_SUCCESS,
+  UPDATE_REVIEW_FAIL,
 } from '../constants/reviewConstants';
 
 const initialState = {
@@ -16,6 +22,10 @@ const initialState = {
   createLoading: false,
   createError: null,
   createSuccess: false,
+  deleteLoading: false,
+  deleteError: null,
+  updateLoading: false,
+  updateError: null,
 };
 
 export const reviewReducer = (state = initialState, action) => {
@@ -40,6 +50,31 @@ export const reviewReducer = (state = initialState, action) => {
       return { ...state, createLoading: false, createError: action.payload, createSuccess: false };
     case CLEAR_REVIEW_SUCCESS:
       return { ...state, createSuccess: false };
+
+      case DELETE_REVIEW_REQUEST:
+        return { ...state, deleteLoading: true, deleteError: null };
+      case DELETE_REVIEW_SUCCESS:
+        return {
+          ...state,
+          deleteLoading: false,
+          deleteError: null,
+          reviews: state.reviews.filter(review => review.id !== action.payload),
+        };
+      case DELETE_REVIEW_FAIL:
+        return { ...state, deleteLoading: false, deleteError: action.payload };
+      case UPDATE_REVIEW_REQUEST:
+        return { ...state, updateLoading: true, updateError: null };
+      case UPDATE_REVIEW_SUCCESS:
+        return {
+          ...state,
+          updateLoading: false,
+          updateError: null,
+          reviews: state.reviews.map(review =>
+            review.id === action.payload.id ? action.payload : review
+          ),
+        };
+      case UPDATE_REVIEW_FAIL:
+        return { ...state, updateLoading: false, updateError: action.payload };
     default:
       return state;
   }

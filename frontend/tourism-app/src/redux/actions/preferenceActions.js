@@ -46,29 +46,7 @@ export const fetchCuisines = () => async (dispatch) => {
   }
 };
 
-// Save preference
-// export const savePreference = (preferenceData) => async (dispatch) => {
-//   dispatch({ type: SAVE_PREFERENCE_REQUEST });
-//   try {
-//     console.log('Saving preference with data:', preferenceData);
-//     const response = await axios.post('/api/preferences/', preferenceData, {
-//       headers: {
-//         Authorization: `Bearer ${localStorage.getItem('token')}`,
-//       },
-//     });
-//     dispatch({ type: SAVE_PREFERENCE_SUCCESS, payload: response.data });
-//     console.log(response.data)
-//     return response.data;
-//   } catch (error) {
-//     const errorMessage = error.response?.data || error.message;
-//     console.error('Preference save error:', errorMessage);
-//     dispatch({
-//       type: SAVE_PREFERENCE_FAILURE,
-//       payload: errorMessage,
-//     });
-//     throw error;
-//   }
-// };
+
 export const savePreference = createAsyncThunk(
   'preference/savePreference',
   async (preferenceData, { rejectWithValue }) => {
@@ -76,6 +54,7 @@ export const savePreference = createAsyncThunk(
       const response = await axios.post('/api/preferences/', preferenceData, {
         validateStatus: status => status >= 200 && status < 300, // Treat 2xx as success
       });
+      console.log(response.data)
       return response.data;
     } catch (error) {
       return rejectWithValue(error.response?.data || { message: 'Unknown error occurred' });
@@ -87,7 +66,7 @@ export const savePreference = createAsyncThunk(
 export const fetchPreference = (userId) => async (dispatch) => {
   dispatch({ type: FETCH_PREFERENCE_REQUEST });
   try {
-    const response = await axios.get(`/api/tourism/preferences/${userId}/`, {
+    const response = await axios.get(`/api/preferences/${userId}/`, {
       headers: {
         Authorization: `Bearer ${localStorage.getItem('token')}`,
       },

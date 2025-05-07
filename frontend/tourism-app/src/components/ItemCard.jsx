@@ -1,28 +1,60 @@
 import React from 'react';
-import { Card, CardContent, CardActions, Typography, Button } from '@mui/material';
+import { Card, CardContent, CardActions, Typography, Button, Box } from '@mui/material';
 
 const ItemCard = ({ item, onClick }) => {
-  console.log('ItemCard props:', { item, onClick }); // Debug
   return (
-    <Card sx={{ maxWidth: 345, m: 1, position: 'relative', zIndex: 1 }}>
+    <Card
+      sx={{
+        maxWidth: 360,
+        m: 2,
+        borderRadius: 3,
+        boxShadow: '0 4px 20px rgba(0, 0, 0, 0.08)',
+        transition: 'transform 0.2s ease-in-out',
+        '&:hover': {
+          transform: 'scale(1.02)',
+          boxShadow: '0 6px 24px rgba(0, 0, 0, 0.1)',
+        },
+      }}
+    >
       <CardContent>
-        <Typography variant="h6">{item?.name || 'Unknown'}</Typography>
-        <Typography variant="body2" color="text.secondary">
-          {item?.description || 'No details available'}
+        <Typography variant="h6" fontWeight={600} gutterBottom>
+          {item?.name || 'Inconnu'}
         </Typography>
-        {item?.price && <Typography>Prix: {item.price} TND</Typography>}
-        {item?.stars && <Typography>Étoiles: {item.stars}</Typography>}
+
+        <Typography variant="body2" color="text.secondary" mb={1.5}>
+          {item?.description || 'Aucune description disponible.'}
+        </Typography>
+
+        {item?.price && (
+          <Typography color="primary" fontWeight={500}>
+            Prix: {item.price} TND
+          </Typography>
+        )}
+
+        {item?.stars && (
+          <Typography fontSize={14} color="text.secondary">
+            Étoiles: {item.stars} ⭐
+          </Typography>
+        )}
+
         {item?.category_id && (
-          <Typography>Catégorie: {item.category_id}</Typography>
+          <Typography fontSize={14} color="text.secondary">
+            Catégorie: {item.category_id}
+          </Typography>
         )}
       </CardContent>
+
       {onClick && (
-        <CardActions>
+        <CardActions sx={{ px: 2, pb: 2 }}>
           <Button
+            variant="outlined"
+            color="primary"
             size="small"
-            onClick={() => {
-              console.log('Select button clicked for:', item.name); // Debug
-              onClick();
+            onClick={() => onClick()}
+            sx={{
+              fontWeight: 500,
+              textTransform: 'none',
+              borderRadius: 2,
             }}
           >
             Sélectionner

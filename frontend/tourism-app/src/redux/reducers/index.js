@@ -13,6 +13,9 @@ import { reviewReducer } from './reviewReducer';
 import { saveSearchReducer, trackClickReducer } from './searchReducer';
 import circuitReducer from './circuitReducer';
 import preferenceReducer from './preferenceReducer';
+import circuitHistoryReducer from './circuitHistoryReducer';
+import { guideReducer } from './guideReducer';
+import recommendationsReducer from './recommendationsReducer';
 
 
 export const rootReducer = combineReducers({
@@ -30,6 +33,9 @@ export const rootReducer = combineReducers({
   trackClick: trackClickReducer,
   circuit: circuitReducer,
   preference: preferenceReducer,
+  circuitHistory: circuitHistoryReducer,
+  guides: guideReducer,
+  recommendations: recommendationsReducer,
 });
 
 export default rootReducer;

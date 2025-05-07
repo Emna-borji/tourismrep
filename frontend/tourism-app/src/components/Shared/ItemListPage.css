@@ -1,57 +1,78 @@
-/* Existing styles (unchanged) */
+/* --- Global --- */
+.add-entity-btn {
+  font-size: 0.95rem;
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-weight: 500;
+}
+
+/* --- Card Styling --- */
 .custom-card {
-  border-radius: 15px;
+  border-radius: 20px;
   overflow: hidden;
-  transition: transform 0.2s ease-in-out;
+  position: relative;
+  transition: all 0.3s ease-in-out;
+  border: none;
 }
 
 .custom-card:hover {
-  transform: translateY(-5px);
+  transform: scale(1.02);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
 }
 
+/* --- Card Image --- */
 .custom-card-img {
-  height: 220px;
+  height: 200px;
   object-fit: cover;
 }
 
+/* --- Card Title --- */
 .custom-title {
-  font-weight: 600;
-  font-size: 18px;
-  margin-bottom: 8px;
+  font-size: 1.2rem;
+  font-weight: bold;
+  color: #343a40;
+  margin-bottom: 0.5rem;
 }
 
+/* --- Location & Region --- */
 .custom-location,
 .custom-region {
-  font-size: 14px;
-  color: #555;
+  font-size: 0.9rem;
+  color: #6c757d;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.25rem;
 }
 
+/* --- Price & Button Row --- */
 .custom-price {
-  font-size: 15px;
-  color: #333;
+  color: #007bff;
+  font-weight: 600;
+  font-size: 0.95rem;
 }
 
 .custom-details-btn {
-  background-color: #2c4785;
-  border: none;
-  padding: 5px 15px;
-  border-radius: 8px;
-  font-size: 14px;
+  padding: 5px 10px;
+  font-size: 0.85rem;
+  font-weight: 500;
+  border-radius: 6px;
 }
 
-.custom-details-btn:hover {
-  background-color: #1a2f5a;
-}
-
-/* New styles for the favorite icon */
+/* --- Favorite Icon --- */
 .favorite-icon {
   position: absolute;
-  top: 10px;
-  right: 10px;
-  cursor: pointer;
-  z-index: 1; /* Ensure the icon is above the card image */
+  top: 12px;
+  right: 12px;
+  z-index: 2;
+  background: #fff;
+  border-radius: 50%;
+  padding: 6px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+  transition: background 0.2s ease;
 }
 
 .favorite-icon:hover {
-  opacity: 0.8; /* Slight opacity change on hover for better UX */
+  background-color: #ffeded;
+  cursor: pointer;
 }

@@ -424,21 +424,78 @@ class ReviewViewSet(viewsets.ModelViewSet):
 
         return queryset
 
+    def create(self, request, *args, **kwargs):
+        logger.info(f"Incoming review creation data: {request.data}")
+        try:
+            return super().create(request, *args, **kwargs)
+        except serializers.ValidationError as e:
+            logger.error(f"Validation error creating review: {str(e)}")
+            raise
+        except Exception as e:
+            logger.error(f"Error creating review: {str(e)}", exc_info=True)
+            return Response(
+                {"error": "An unexpected error occurred while creating the review."},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
+
+    def update(self, request, *args, **kwargs):
+        logger.info(f"Incoming review update data for review {kwargs.get('pk')}: {request.data}")
+        try:
+            return super().update(request, *args, **kwargs)
+        except serializers.ValidationError as e:
+            logger.error(f"Validation error updating review: {str(e)}")
+            raise
+        except Exception as e:
+            logger.error(f"Error updating review: {str(e)}", exc_info=True)
+            return Response(
+                {"error": "An unexpected error occurred while updating the review."},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
+
     def perform_create(self, serializer):
         user = self.request.user
         today = timezone.now().date()
 
-        logger.info(f"Checking block status for {user.email}: {user.blockstartdate} - {user.blockenddate}, Today: {today}")
+        logger.info(f"Checking block status for {user.username}: {user.blockstartdate} - {user.blockenddate}, Today: {today}")
 
         if user.blockstartdate and user.blockenddate:
             if user.blockstartdate.date() <= today <= user.blockenddate.date():
-                logger.warning(f"User {user.email} is blocked from posting reviews!")
-                return Response(
-                    {"error": f"You are blocked from posting reviews until {user.blockenddate.date()}."},
-                    status=status.HTTP_403_FORBIDDEN
+                logger.warning(f"User {user.username} is blocked from posting reviews!")
+                raise serializers.ValidationError(
+                    f"You are blocked from posting reviews until {user.blockenddate.date()}."
                 )
 
         serializer.save(user=user)
+
+    def perform_update(self, serializer):
+        user = self.request.user
+        today = timezone.now().date()
+
+        logger.info(f"Checking block status for {user.username} on update: {user.blockstartdate} - {user.blockenddate}, Today: {today}")
+
+        if user.blockstartdate and user.blockenddate:
+            if user.blockstartdate.date() <= today <= user.blockenddate.date():
+                logger.warning(f"User {user.username} is blocked from updating reviews!")
+                raise serializers.ValidationError(
+                    f"You are blocked from updating reviews until {user.blockenddate.date()}."
+                )
+
+        serializer.save()
+
+    def perform_destroy(self, instance):
+        user = self.request.user
+        today = timezone.now().date()
+
+        logger.info(f"Checking block status for {user.username} on delete: {user.blockstartdate} - {user.blockenddate}, Today: {today}")
+
+        if user.blockstartdate and user.blockenddate:
+            if user.blockstartdate.date() <= today <= user.blockenddate.date():
+                logger.warning(f"User {user.username} is blocked from deleting reviews!")
+                raise serializers.ValidationError(
+                    f"You are blocked from deleting reviews until {user.blockenddate.date()}."
+                )
+
+        instance.delete()
 
 class FavoriteViewSet(ListModelMixin, viewsets.GenericViewSet):
     permission_classes = [IsAuthenticated]

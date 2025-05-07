@@ -195,24 +195,133 @@ class PreferenceCuisineSerializer(serializers.ModelSerializer):
         fields = ['cuisine']
 
 
+# class PreferenceSerializer(serializers.ModelSerializer):
+#     activities = PreferenceActivityCategorySerializer(many=True, write_only=True)
+#     cuisines = PreferenceCuisineSerializer(many=True, write_only=True)
+
+#     class Meta:
+#         model = Preference
+#         fields = '__all__'
+
+#     def create(self, validated_data):
+#         activities_data = validated_data.pop('activities')
+#         cuisines_data = validated_data.pop('cuisines')
+#         preference = Preference.objects.create(**validated_data)
+
+#         for activity in activities_data:
+#             PreferenceActivityCategory.objects.create(preference=preference, **activity)
+
+#         for cuisine in cuisines_data:
+#             PreferenceCuisine.objects.create(preference=preference, **cuisine)
+
+#         return preference
+
+
 class PreferenceSerializer(serializers.ModelSerializer):
-    activities = PreferenceActivityCategorySerializer(many=True, write_only=True)
-    cuisines = PreferenceCuisineSerializer(many=True, write_only=True)
+    cuisines = PreferenceCuisineSerializer(many=True, required=False)
+    activities = PreferenceActivityCategorySerializer(many=True, required=False)
 
     class Meta:
         model = Preference
-        fields = '__all__'
+        fields = [
+            'id',
+            'budget',
+            'accommodation',
+            'stars',
+            'guest_house_category',
+            'forks',
+            'cuisines',
+            'activities',
+            'departure_city',
+            'arrival_city',
+            'departure_date',
+            'arrival_date',
+            'user'
+        ]
+        read_only_fields = ['id']
+
+    def validate_cuisines(self, value):
+        # Ensure each cuisine entry has a 'cuisine' field
+        for item in value:
+            if 'cuisine' not in item:
+                raise serializers.ValidationError("Each cuisine entry must have a 'cuisine' field.")
+        return value
+
+    def validate_activities(self, value):
+        # Ensure each activity entry has an 'activity_category' field
+        for item in value:
+            if 'activity_category' not in item:
+                raise serializers.ValidationError("Each activity entry must have an 'activity_category' field.")
+        return value
 
     def create(self, validated_data):
-        activities_data = validated_data.pop('activities')
-        cuisines_data = validated_data.pop('cuisines')
+        # Pop cuisines and activities from validated_data
+        cuisines_data = validated_data.pop('cuisines', [])
+        activities_data = validated_data.pop('activities', [])
+
+        # Set the user from the request context (authenticated user)
+        user = self.context['request'].user
+        if not user.is_authenticated:
+            raise serializers.ValidationError("User must be authenticated to create a preference.")
+        validated_data['user'] = user
+
+        # Create the Preference instance
         preference = Preference.objects.create(**validated_data)
 
-        for activity in activities_data:
-            PreferenceActivityCategory.objects.create(preference=preference, **activity)
+        # Create related PreferenceCuisine objects
+        for cuisine_item in cuisines_data:
+            # Extract the cuisine ID from the cuisine object
+            cuisine = cuisine_item.get('cuisine')
+            if not cuisine:
+                continue
+            cuisine_id = cuisine.id if hasattr(cuisine, 'id') else cuisine  # Handle case where cuisine might already be an ID
+            PreferenceCuisine.objects.create(preference=preference, cuisine_id=cuisine_id)
 
-        for cuisine in cuisines_data:
-            PreferenceCuisine.objects.create(preference=preference, **cuisine)
+        # Create related PreferenceActivityCategory objects
+        for activity_item in activities_data:
+            # Extract the activity_category ID from the activity_category object
+            activity_category = activity_item.get('activity_category')
+            if not activity_category:
+                continue
+            activity_category_id = activity_category.id if hasattr(activity_category, 'id') else activity_category
+            PreferenceActivityCategory.objects.create(preference=preference, activity_category_id=activity_category_id)
 
         return preference
+
+    def update(self, instance, validated_data):
+        cuisines_data = validated_data.pop('cuisines', [])
+        activities_data = validated_data.pop('activities', [])
+
+        # Update Preference fields
+        instance.budget = validated_data.get('budget', instance.budget)
+        instance.accommodation = validated_data.get('accommodation', instance.accommodation)
+        instance.stars = validated_data.get('stars', instance.stars)
+        instance.guest_house_category = validated_data.get('guest_house_category', instance.guest_house_category)
+        instance.forks = validated_data.get('forks', instance.forks)
+        instance.departure_city = validated_data.get('departure_city', instance.departure_city)
+        instance.arrival_city = validated_data.get('arrival_city', instance.arrival_city)
+        instance.departure_date = validated_data.get('departure_date', instance.departure_date)
+        instance.arrival_date = validated_data.get('arrival_date', instance.arrival_date)
+        instance.save()
+
+        # Clear existing related objects
+        instance.cuisines.all().delete()
+        instance.activities.all().delete()
+
+        # Create new related objects
+        for cuisine_item in cuisines_data:
+            cuisine = cuisine_item.get('cuisine')
+            if not cuisine:
+                continue
+            cuisine_id = cuisine.id if hasattr(cuisine, 'id') else cuisine
+            PreferenceCuisine.objects.create(preference=instance, cuisine_id=cuisine_id)
+
+        for activity_item in activities_data:
+            activity_category = activity_item.get('activity_category')
+            if not activity_category:
+                continue
+            activity_category_id = activity_category.id if hasattr(activity_category, 'id') else activity_category
+            PreferenceActivityCategory.objects.create(preference=instance, activity_category_id=activity_category_id)
+
+        return instance
 

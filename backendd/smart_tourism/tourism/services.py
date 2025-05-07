@@ -38,33 +38,35 @@ class RecommendationService:
                     temp_score += 10
                 if entity.arrival_city_id == pref.arrival_city_id:
                     temp_score += 10
-                if entity.price <= pref.budget:
-                    temp_score += 5
-                else:
-                    temp_score -= 5
+                if hasattr(entity, 'price') and entity.price is not None and hasattr(pref, 'budget') and pref.budget is not None:
+                    if entity.price <= pref.budget:
+                        temp_score += 5
+                    else:
+                        temp_score -= 5
                 if pref.departure_date and pref.arrival_date:
                     trip_days = (pref.arrival_date - pref.departure_date).days + 1
-                    if entity.duration <= trip_days:
+                    if hasattr(entity, 'duration') and entity.duration is not None and entity.duration <= trip_days:
                         temp_score += 5
                 if schedules and entity.id in schedules:
                     schedule = schedules[entity.id]
                     if pref.accommodation == 'hôtel' and any(s.hotel_id for s in schedule):
-                        if any(s.hotel.stars >= pref.stars for s in schedule if s.hotel):
+                        if any(s.hotel.stars is not None and pref.stars is not None and s.hotel.stars >= pref.stars for s in schedule if s.hotel):
                             temp_score += 5
                     elif pref.accommodation == "maison d'hôte" and any(s.guest_house_id for s in schedule):
                         temp_score += 5
             else:
                 if entity.destination_id in [pref.departure_city_id, pref.arrival_city_id]:
                     temp_score += 10
-                if entity_type == 'hotel' and pref.accommodation == 'hôtel' and entity.stars >= pref.stars:
-                    temp_score += 5
+                if entity_type == 'hotel' and pref.accommodation == 'hôtel':
+                    if entity.stars is not None and pref.stars is not None and entity.stars >= pref.stars:
+                        temp_score += 5
                 elif entity_type == 'guest_house' and pref.accommodation == "maison d'hôte":
                     temp_score += 5
                 elif entity_type == 'activity' and any(pac.activity_category_id == entity.category_id for pac in self.pref_activities.filter(preference=pref)):
                     temp_score += 5
                 elif entity_type == 'restaurant' and any(pc.cuisine_id == entity.cuisine_id for pc in self.pref_cuisines.filter(preference=pref)):
                     temp_score += 5
-                elif entity_type == 'festival' and entity.date and pref.departure_date <= entity.date <= pref.arrival_date:
+                elif entity_type == 'festival' and hasattr(entity, 'date') and entity.date is not None and pref.departure_date and pref.arrival_date and pref.departure_date <= entity.date <= pref.arrival_date:
                     temp_score += 5
             score = max(score, temp_score)
 
@@ -310,7 +312,7 @@ class RecommendationService:
                 'circuit_code': circuit.circuit_code,
                 'departure_city': circuit.departure_city.name if circuit.departure_city else 'Unknown',
                 'arrival_city': circuit.arrival_city.name if circuit.arrival_city else 'Unknown',
-                'price': float(circuit.price),
+                'price': float(circuit.price) if hasattr(circuit, 'price') and circuit.price is not None else None,
                 'duration': circuit.duration,
                 'score': total_score
             })
@@ -351,7 +353,7 @@ class RecommendationService:
                 elif entity_type == 'restaurant':
                     entity_data['forks'] = entity.forks
                 elif entity_type == 'festival':
-                    entity_data['date'] = entity.date.isoformat() if entity.date else None
+                    entity_data['date'] = entity.date.isoformat() if hasattr(entity, 'date') and entity.date is not None else None
 
                 scores.append(entity_data)
 

@@ -32,6 +32,10 @@ import FavoritesPage from "./components/pages/FavoritesPage";
 import CircuitComposer from "./components/CircuitComposer";
 import CircuitWizard from "./components/CircuitWizard";
 import CircuitSummary from "./components/CircuitSummary";
+import GuidesPage from "./components/pages/GuidesPage";
+import RecommendationsPage from "./components/RecommendationsPage";
+import CircuitList from "./components/CircuitList";
+import CircuitDetail from "./components/CircuitDetail";
 // import EntityDetailPage from "./components/pages/EntityDetailPage";
 
 const App = () => {
@@ -71,10 +75,12 @@ const App = () => {
         <Route path="/change-password" element={<ChangePassword />} />
         <Route path="/admin" element={<AdminDashboard />} />
         <Route path="/favorites" element={<FavoritesPage />} />
-        <Route path="/circuit-composer" element={<CircuitComposer />} />
         <Route path="/circuit-wizard" element={<CircuitWizard />} />
         <Route path="/circuit/summary/:id" element={<CircuitSummary />} />
-
+        <Route path="/guides" element={<GuidesPage />} />
+        <Route path="/recommandations" element={<RecommendationsPage />} />
+        <Route path="/" element={<CircuitList />} />
+        <Route path="/circuit/:id" element={<CircuitDetail />} />
       </Routes>
     </Router>
   );

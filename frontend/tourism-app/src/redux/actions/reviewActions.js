@@ -8,6 +8,12 @@ import {
   CREATE_REVIEW_SUCCESS,
   CREATE_REVIEW_FAIL,
   CLEAR_REVIEW_SUCCESS,
+  DELETE_REVIEW_REQUEST,
+  DELETE_REVIEW_SUCCESS,
+  DELETE_REVIEW_FAIL,
+  UPDATE_REVIEW_REQUEST,
+  UPDATE_REVIEW_SUCCESS,
+  UPDATE_REVIEW_FAIL,
 } from '../constants/reviewConstants';
 
 // Fetch reviews for an entity
@@ -76,6 +82,52 @@ export const createReview = (entityType, entityId, reviewData) => async (dispatc
     });
   }
 };
+
+
+// Delete a review
+export const deleteReview = (reviewId, entityType, entityId) => async (dispatch, getState) => {
+  dispatch({ type: DELETE_REVIEW_REQUEST });
+  try {
+    const { auth: { userInfo } } = getState();
+    const config = {
+      headers: {
+        Authorization: `Bearer ${userInfo.token}`,
+      },
+    };
+    await axios.delete(`/api/tourism/reviews/${reviewId}/`, config);
+    dispatch({ type: DELETE_REVIEW_SUCCESS, payload: reviewId });
+    dispatch(fetchReviews(entityType, entityId));
+  } catch (error) {
+    dispatch({
+      type: DELETE_REVIEW_FAIL,
+      payload: error.response?.data?.error || 'Failed to delete review',
+    });
+  }
+};
+
+// Update a review
+export const updateReview = (reviewId, entityType, entityId, reviewData) => async (dispatch, getState) => {
+  dispatch({ type: UPDATE_REVIEW_REQUEST });
+  try {
+    const { auth: { userInfo } } = getState();
+    const config = {
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${userInfo.token}`,
+      },
+    };
+    const response = await axios.put(`/api/tourism/reviews/${reviewId}/`, reviewData, config);
+    dispatch({ type: UPDATE_REVIEW_SUCCESS, payload: response.data });
+    dispatch(fetchReviews(entityType, entityId));
+  } catch (error) {
+    dispatch({
+      type: UPDATE_REVIEW_FAIL,
+      payload: error.response?.data?.error || 'Failed to update review',
+    });
+  }
+};
+
+
 
 
 export const clearReviewSuccess = () => ({

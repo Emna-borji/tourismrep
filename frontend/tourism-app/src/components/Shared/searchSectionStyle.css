@@ -1,14 +1,66 @@
+/* Main container for the search section */
 .search-section-container {
-    margin: 30px auto;
-    max-width: 700px;
-    display: flex;
+  display: flex;
+  justify-content: space-between;
+  gap: 20px;
+  flex-wrap: wrap;
+  padding: 20px;
+  background-color: #f8f9fa;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Responsive layout: adjust for smaller screens */
+@media (max-width: 768px) {
+  .search-section-container {
     flex-direction: column;
-    gap: 20px;
+    padding: 15px;
   }
-  
-  /* Responsive adjustments */
-  @media (max-width: 768px) {
-    .search-section-container {
-      max-width: 90%;
-    }
+
+  .search-section-container > * {
+    width: 100%;
+    margin-bottom: 20px;
   }
+}
+
+/* Styling for the Destination Dropdown */
+.destination-dropdown {
+  width: 100%;
+  max-width: 400px;
+  background-color: white;
+  border-radius: 8px;
+  padding: 10px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+}
+
+/* Styling for the Map Display */
+.map-display {
+  width: 100%;
+  max-width: 500px;
+  height: 300px;
+  background-color: #e9ecef;
+  border-radius: 8px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+}
+
+/* Styling for the Restaurant Class Filter */
+.restaurant-class-filter {
+  width: 100%;
+  max-width: 400px;
+  background-color: white;
+  border-radius: 8px;
+  padding: 10px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+}
+
+/* Optional: Add hover effect for the dropdown, map, and filter */
+.destination-dropdown:hover,
+.map-display:hover,
+.restaurant-class-filter:hover {
+  box-shadow: 0 4px 10px rgba(0, 123, 255, 0.2);
+}
+
+/* Optional: Adding some padding for better spacing */
+.search-section-container > * {
+  padding: 15px;
+}

@@ -3,6 +3,8 @@ import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Container } from 'react-bootstrap';
 import ItemListPage from './ItemListPage';
+import Navbar from './Navbar';
+
 import Search from './Search.jsx';
 import SortDropDown from './SortDropDown.jsx';
 import DestinationDropdown from './DestinationDropdown.jsx';
@@ -12,6 +14,7 @@ import MapDisplay from './MapDisplay.jsx';
 import HotelClassFilter from './HotelClassFilter.jsx';
 import { fetchEntities, fetchCuisines } from '../../redux/actions/entityActions.js';
 import { Form as BootstrapForm } from 'react-bootstrap';
+import HeroSection from './HeroSection.jsx';
 
 const useDebounce = (value, delay) => {
   const [debouncedValue, setDebouncedValue] = useState(value);
@@ -112,7 +115,11 @@ const EntityListPage = ({ entityType, itemType, itemDetailsRoute }) => {
   };
 
   return (
+    <>
+    <Navbar />
+    <HeroSection />
     <Container>
+      
       <div className="search-sort-destination-container">
         <Search onSearch={handleSearch} entityType={entityType} />
         <SortDropDown onSortChange={handleSortChange} />
@@ -144,7 +151,7 @@ const EntityListPage = ({ entityType, itemType, itemDetailsRoute }) => {
         {entityType === 'restaurant' && <RestaurantClassFilter onClassChange={handleClassChange} />}
         {entityType === 'hotel' && <HotelClassFilter onClassChange={handleClassChange} />}
       </div>
-
+      
       <ItemListPage
         items={entities}
         loading={loading}
@@ -154,6 +161,7 @@ const EntityListPage = ({ entityType, itemType, itemDetailsRoute }) => {
         entityType={entityType}
       />
     </Container>
+    </>
   );
 };
 
