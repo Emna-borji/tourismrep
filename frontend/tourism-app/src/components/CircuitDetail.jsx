@@ -7,6 +7,9 @@ import L from 'leaflet';
 import 'leaflet-routing-machine';
 import 'leaflet/dist/leaflet.css';
 import { motion } from 'framer-motion';
+import { fetchReviews, createReview } from '../redux/actions/reviewActions';
+import EntityReviews from './EntityReviews';
+import { Form, Button } from 'react-bootstrap';
 
 // Fix default marker icon issue with Leaflet in React
 delete L.Icon.Default.prototype._getIconUrl;
@@ -39,14 +42,23 @@ const MapInitializer = () => {
 const RoutingMachine = ({ waypoints }) => {
   const map = useMap();
   const routingControlRef = useRef(null);
+  const isMountedRef = useRef(true);
 
   useEffect(() => {
+    isMountedRef.current = true;
+
     if (!map || waypoints.length < 2) return;
 
     const initializeRouting = () => {
+      if (!isMountedRef.current) return;
+
       map.eachLayer((layer) => {
         if (layer instanceof L.Routing.Control || layer instanceof L.Polyline) {
-          map.removeLayer(layer);
+          try {
+            map.removeLayer(layer);
+          } catch (err) {
+            console.warn('Erreur lors de la suppression de la couche:', err);
+          }
         }
       });
 
@@ -67,6 +79,8 @@ const RoutingMachine = ({ waypoints }) => {
       }).addTo(map);
 
       routingControl.on('routesfound', (e) => {
+        if (!isMountedRef.current) return;
+
         const routes = e.routes;
         if (routes.length > 0) {
           const routeCoordinates = routes[0].coordinates.map((coord) => [
@@ -95,27 +109,42 @@ const RoutingMachine = ({ waypoints }) => {
       });
 
       routingControl.on('routingerror', (e) => {
-        console.error('Routing error:', e.error);
+        console.error('Erreur de routage:', e.error);
       });
 
       routingControlRef.current = routingControl;
     };
 
     const timer = setTimeout(() => {
-      initializeRouting();
+      if (isMountedRef.current) {
+        initializeRouting();
+      }
     }, 500);
 
     return () => {
+      isMountedRef.current = false;
       clearTimeout(timer);
-      if (routingControlRef.current) {
-        map.removeControl(routingControlRef.current);
-        routingControlRef.current = null;
-      }
-      map.eachLayer((layer) => {
-        if (layer instanceof L.Polyline) {
-          map.removeLayer(layer);
+
+      if (map) {
+        if (routingControlRef.current) {
+          try {
+            map.removeControl(routingControlRef.current);
+            routingControlRef.current = null;
+          } catch (err) {
+            console.warn('Erreur lors de la suppression du contrôle de routage:', err);
+          }
         }
-      });
+
+        map.eachLayer((layer) => {
+          if (layer instanceof L.Polyline) {
+            try {
+              map.removeLayer(layer);
+            } catch (err) {
+              console.warn('Erreur lors de la suppression de la couche:', err);
+            }
+          }
+        });
+      }
     };
   }, [map, waypoints]);
 
@@ -127,11 +156,17 @@ const CircuitDetail = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const { circuit, loading, error } = useSelector((state) => state.circuit);
+  const { reviews, loading: reviewsLoading, error: reviewsError } = useSelector((state) => state.reviews);
+  const { userInfo } = useSelector((state) => state.auth || {});
 
   const [isMapVisible, setIsMapVisible] = useState(false);
+  const [rating, setRating] = useState(0);
+  const [comment, setComment] = useState('');
+  const [image, setImage] = useState(null);
 
   useEffect(() => {
     dispatch(fetchCircuitDetails(id));
+    dispatch(fetchReviews('circuit', id));
   }, [dispatch, id]);
 
   useEffect(() => {
@@ -141,32 +176,46 @@ const CircuitDetail = () => {
     return () => clearTimeout(timer);
   }, []);
 
-  if (loading) return <div className="text-center text-gray-600 p-6">Loading...</div>;
-  if (error) return <div className="text-center text-red-500 p-6">Error: {error}</div>;
-  if (!circuit) return <div className="text-center text-gray-500 p-6">No circuit found.</div>;
+  const handleReviewSubmit = async (e) => {
+    e.preventDefault();
+    if (!userInfo) {
+      navigate('/login');
+      return;
+    }
 
-  // Calculate total days and nights
+    try {
+      await dispatch(createReview('circuit', id, { rating, comment, image }));
+      setRating(0);
+      setComment('');
+      setImage(null);
+      dispatch(fetchReviews('circuit', id));
+    } catch (error) {
+      console.error('Review submission failed:', error);
+    }
+  };
+
+  if (loading) return <div className="text-center text-gray-600 p-6">Chargement...</div>;
+  if (error) return <div className="text-center text-red-500 p-6">Erreur: {error}</div>;
+  if (!circuit) return <div className="text-center text-gray-500 p-6">Aucun circuit trouvé.</div>;
+
   const totalDays = circuit.duration || 1;
   const nights = totalDays - 1;
 
-  // Extract origin and destination names
   const originDestName = typeof circuit.departure_city === 'string' 
     ? circuit.departure_city 
-    : circuit.departure_city?.name || 'Unknown';
+    : circuit.departure_city?.name || 'Inconnu';
   const destinationDestName = typeof circuit.arrival_city === 'string' 
     ? circuit.arrival_city 
-    : circuit.arrival_city?.name || 'Unknown';
+    : circuit.arrival_city?.name || 'Inconnu';
 
-  // Prepare ordered destinations from schedules
   const orderedDestinations = (circuit.schedules || []).map((schedule) => ({
     id: schedule.destination_id,
-    name: schedule.destination_name || 'Unknown',
+    name: schedule.destination_name || 'Inconnu',
     days: schedule.day || 1,
     latitude: schedule.destination?.latitude || 36.8065,
     longitude: schedule.destination?.longitude || 10.1815,
   })).filter(dest => dest.latitude && dest.longitude && !isNaN(dest.latitude) && !isNaN(dest.longitude));
 
-  // Prepare waypoints for the map
   const waypoints = orderedDestinations
     .map((dest, index) => {
       if (!dest.latitude || !dest.longitude || isNaN(dest.latitude) || isNaN(dest.longitude)) return null;
@@ -175,22 +224,20 @@ const CircuitDetail = () => {
         lng: dest.longitude,
         name: `${dest.name}${
           index === 0
-            ? ' (Departure)'
+            ? ' (Départ)'
             : index === orderedDestinations.length - 1
-            ? ' (Arrival)'
+            ? ' (Arrivée)'
             : ''
         }`,
       };
     })
     .filter((point) => point !== null);
 
-  // Default map center if no waypoints are available
   const defaultCenter = [36.8065, 10.1815];
   const mapCenter = waypoints.length > 0
     ? [waypoints[0].lat, waypoints[0].lng]
     : defaultCenter;
 
-  // Prepare schedule data for display (similar to selectedEntities in CircuitWizard)
   const schedulesByDestination = {};
   (circuit.schedules || []).forEach((schedule) => {
     const destId = schedule.destination_id;
@@ -250,7 +297,6 @@ const CircuitDetail = () => {
         transition={{ duration: 0.3 }}
         className="flex flex-col md:flex-row space-y-6 md:space-y-0 md:space-x-6"
       >
-        {/* Map Section */}
         <div className="w-full md:w-1/2 h-96 md:h-[600px] circuit-wizard-map-container">
           {isMapVisible && waypoints.length >= 1 ? (
             <MapContainer
@@ -275,7 +321,7 @@ const CircuitDetail = () => {
                     <div className="text-center">
                       <strong>{point.name}</strong>
                       <p>
-                        Stop {index + 1} of {waypoints.length}
+                        Arrêt {index + 1} de {waypoints.length}
                       </p>
                     </div>
                   </Popup>
@@ -286,19 +332,18 @@ const CircuitDetail = () => {
           ) : (
             <p className="text-center text-gray-500 pt-40">
               {isMapVisible
-                ? `Unable to display map: Need at least one destination with valid coordinates. (Waypoints count: ${waypoints.length})`
-                : 'Loading map...'}
+                ? `Impossible d'afficher la carte : Besoin d'au moins une destination avec des coordonnées valides. (Nombre de waypoints : ${waypoints.length})`
+                : 'Chargement de la carte...'}
             </p>
           )}
         </div>
 
-        {/* Itinerary Section */}
         <div className="w-full md:w-1/2 space-y-6 overflow-y-auto md:max-h-[600px]">
           <h2 className="text-2xl font-bold text-gray-800">
-            Circuit {originDestName} to {destinationDestName}: {totalDays} Day(s) / {nights} Night(s)
+            Circuit {originDestName} to {destinationDestName}: {totalDays} Jour(s) / {nights} Nuit(s)
           </h2>
           {orderedDestinations.length === 0 ? (
-            <p className="text-gray-500">No destinations available to display.</p>
+            <p className="text-gray-500">Aucune destination disponible à afficher.</p>
           ) : (
             <>
               {orderedDestinations.map((dest) => (
@@ -322,7 +367,7 @@ const CircuitDetail = () => {
                       >
                         <div className="flex justify-between items-center">
                           <h3 className="text-lg font-semibold text-gray-700">
-                            Day {globalDay} - {dest.name}
+                            Jour {globalDay} - {dest.name}
                           </h3>
                           <button className="text-blue-500 hover:text-blue-700">
                             <svg
@@ -344,34 +389,34 @@ const CircuitDetail = () => {
                         <div className="mt-4 space-y-4">
                           <div>
                             <h4 className="text-md font-medium text-gray-600">
-                              Accommodation
+                              Hébergement
                             </h4>
                             {hotel ? (
                               <div className="mt-2 bg-gray-100 p-3 rounded-md">
                                 <p className="text-gray-800">{hotel.name}</p>
                                 <p className="text-sm text-gray-600">
-                                  Address: {hotel.address || 'N/A'}
+                                  Adresse: {hotel.address || 'N/A'}
                                 </p>
                                 <p className="text-sm text-gray-600">
-                                  Price: {hotel.price != null ? `${hotel.price} DT` : 'N/A'}
+                                  Prix: {hotel.price != null ? `${hotel.price} DT` : 'N/A'}
                                 </p>
                                 {hotel.stars && (
                                   <p className="text-sm text-gray-600">
-                                    Stars: {hotel.stars}
+                                    Étoiles: {hotel.stars}
                                   </p>
                                 )}
                                 {hotel.category && (
                                   <p className="text-sm text-gray-600">
-                                    Category: {hotel.category}
+                                    Catégorie: {hotel.category}
                                   </p>
                                 )}
                                 <p className="text-sm text-gray-600">
-                                  Rating: {hotel.rating != null ? hotel.rating : 'N/A'}
+                                  Note: {hotel.rating != null ? hotel.rating : 'N/A'}
                                 </p>
                               </div>
                             ) : (
                               <p className="text-sm text-gray-500 italic">
-                                No accommodation selected.
+                                Aucun hébergement sélectionné.
                               </p>
                             )}
                           </div>
@@ -383,47 +428,47 @@ const CircuitDetail = () => {
                               <div className="mt-2 bg-gray-100 p-3 rounded-md">
                                 <p className="text-gray-800">{restaurant.name}</p>
                                 <p className="text-sm text-gray-600">
-                                  Address: {restaurant.address || 'N/A'}
+                                  Adresse: {restaurant.address || 'N/A'}
                                 </p>
                                 <p className="text-sm text-gray-600">
-                                  Price: {restaurant.price != null ? `${restaurant.price} DT` : 'N/A'}
+                                  Prix: {restaurant.price != null ? `${restaurant.price} DT` : 'N/A'}
                                 </p>
                                 {restaurant.forks && (
                                   <p className="text-sm text-gray-600">
-                                    Forks: {restaurant.forks}
+                                    Fourchettes: {restaurant.forks}
                                   </p>
                                 )}
                                 <p className="text-sm text-gray-600">
-                                  Rating: {restaurant.rating != null ? restaurant.rating : 'N/A'}
+                                  Note: {restaurant.rating != null ? restaurant.rating : 'N/A'}
                                 </p>
                               </div>
                             ) : (
                               <p className="text-sm text-gray-500 italic">
-                                No restaurant selected.
+                                Aucun restaurant sélectionné.
                               </p>
                             )}
                           </div>
                           <div>
                             <h4 className="text-md font-medium text-gray-600">
-                              Activities
+                              Activités
                             </h4>
                             {activity ? (
                               <div className="mt-2 bg-gray-100 p-3 rounded-md">
                                 <p className="text-gray-800">{activity.name}</p>
                                 <p className="text-sm text-gray-600">
-                                  Address: {activity.address || 'N/A'}
+                                  Adresse: {activity.address || 'N/A'}
                                 </p>
                                 <p className="text-sm text-gray-600">
-                                  Price: {activity.price != null ? `${activity.price} DT` : 'N/A'}
+                                  Prix: {activity.price != null ? `${activity.price} DT` : 'N/A'}
                                 </p>
                                 {activity.category && (
                                   <p className="text-sm text-gray-600">
-                                    Category: {activity.category}
+                                    Catégorie: {activity.category}
                                   </p>
                                 )}
                                 {activity.exhibition && (
                                   <p className="text-sm text-gray-600">
-                                    Exhibition: {activity.exhibition}
+                                    Exposition: {activity.exhibition}
                                   </p>
                                 )}
                                 {activity.date && (
@@ -433,16 +478,16 @@ const CircuitDetail = () => {
                                 )}
                                 {activity.historical_period && (
                                   <p className="text-sm text-gray-600">
-                                    Historical Period: {activity.historical_period}
+                                    Période historique: {activity.historical_period}
                                   </p>
                                 )}
                                 <p className="text-sm text-gray-600">
-                                  Rating: {activity.rating != null ? activity.rating : 'N/A'}
+                                  Note: {activity.rating != null ? activity.rating : 'N/A'}
                                 </p>
                               </div>
                             ) : (
                               <p className="text-sm text-gray-500 italic">
-                                No activity selected.
+                                Aucune activité sélectionnée.
                               </p>
                             )}
                           </div>
@@ -460,7 +505,51 @@ const CircuitDetail = () => {
         </div>
       </motion.div>
 
-      {/* Summary Section (Sticky) */}
+      <div className="mt-6">
+        <h2 className="text-2xl font-bold text-gray-800">Avis sur ce circuit</h2>
+        <EntityReviews
+          reviews={reviews}
+          loading={reviewsLoading}
+          error={reviewsError}
+          entityType="circuit"
+          entityId={id}
+        />
+        <Form onSubmit={handleReviewSubmit} className="mt-4">
+          <Form.Group className="mb-3">
+            <Form.Label>Note (1-5)</Form.Label>
+            <Form.Control
+              type="number"
+              min="1"
+              max="5"
+              value={rating}
+              onChange={(e) => setRating(parseInt(e.target.value))}
+              required
+            />
+          </Form.Group>
+          <Form.Group className="mb-3">
+            <Form.Label>Commentaire</Form.Label>
+            <Form.Control
+              as="textarea"
+              rows={3}
+              value={comment}
+              onChange={(e) => setComment(e.target.value)}
+              required
+            />
+          </Form.Group>
+          <Form.Group className="mb-3">
+            <Form.Label>Image (Base64)</Form.Label>
+            <Form.Control
+              type="text"
+              value={image || ''}
+              onChange={(e) => setImage(e.target.value)}
+            />
+          </Form.Group>
+          <Button variant="primary" type="submit" disabled={!userInfo}>
+            Soumettre l'avis
+          </Button>
+        </Form>
+      </div>
+
       <div className="mt-6 bg-white p-4 rounded-lg shadow-md sticky bottom-4 max-w-sm mx-auto">
         <h3 className="text-lg font-semibold text-gray-800">Résumé</h3>
         <p className="text-gray-600">

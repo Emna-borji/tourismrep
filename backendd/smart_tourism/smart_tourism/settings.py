@@ -79,6 +79,7 @@ INSTALLED_APPS = [
     'users',
     'itinerary',
     'dashboard',
+    'django_filters',
 ]
 
 MIDDLEWARE = [

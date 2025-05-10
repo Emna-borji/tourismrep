@@ -1,4 +1,3 @@
-// src/pages/EntityDetailPage.jsx
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useParams, useNavigate } from 'react-router-dom';
@@ -32,8 +31,12 @@ const EntityDetailPage = () => {
   const [formData, setFormData] = useState({});
 
   useEffect(() => {
+    if (!entityType || !id) {
+      console.error('Invalid entityType or id:', { entityType, id });
+      return;
+    }
     dispatch(fetchEntityById(entityType, id));
-    dispatch(fetchReviews(entityType, id));
+    dispatch(fetchReviews(entityType, parseInt(id))); // Convert id to integer
     if (userInfo) {
       dispatch(fetchFavorites());
     }
@@ -41,7 +44,7 @@ const EntityDetailPage = () => {
 
   useEffect(() => {
     if (entity) {
-      console.log('Entity destination_id:', entity.destination_id); // Debug log
+      console.log('Entity destination_id:', entity.destination_id);
       setFormData({
         name: entity.name || '',
         description: entity.description || '',
@@ -60,7 +63,7 @@ const EntityDetailPage = () => {
         hours: entity.hours || '',
         period: entity.period || '',
         site_type: entity.site_type || '',
-        destination_id: entity.destination_id || '', // Ensure default to empty string
+        destination_id: entity.destination_id || '',
       });
     }
   }, [entity]);
@@ -94,7 +97,7 @@ const EntityDetailPage = () => {
       return;
     }
     try {
-      await dispatch(createReview(entityType, id, { rating, comment, image }));
+      await dispatch(createReview(entityType, parseInt(id), { rating, comment, image }));
       setRating(0);
       setComment('');
       setImage(null);
@@ -105,7 +108,7 @@ const EntityDetailPage = () => {
 
   const handleEditSubmit = (e) => {
     e.preventDefault();
-    console.log("Submitting form data:", formData); // Debug log
+    console.log("Submitting form data:", formData);
 
     const cleanedFormData = {
       name: formData.name,
@@ -155,11 +158,11 @@ const EntityDetailPage = () => {
   }
 
   if (error) {
-    return <Alert variant="danger" className="text-center mt-5">Error: {error}</Alert>;
+    return <Alert variant="danger" className="text-center mt-5">Erreur : {error}</Alert>;
   }
 
   if (!entity) {
-    return <Alert variant="warning" className="text-center mt-5">Entity not found.</Alert>;
+    return <Alert variant="warning" className="text-center mt-5">Entité non trouvée.</Alert>;
   }
 
   return (
@@ -182,6 +185,8 @@ const EntityDetailPage = () => {
             reviews={reviews}
             loading={reviewsLoading}
             error={reviewsError}
+            entityType={entityType} // Ajouté
+            entityId={parseInt(id)} // Ajouté et converti en entier
           />
         </Col>
       </Row>
@@ -190,7 +195,7 @@ const EntityDetailPage = () => {
         <Col>
           {createSuccess && (
             <Alert variant="success" dismissible onClose={() => dispatch(clearReviewSuccess())}>
-              Review submitted successfully!
+              Avis soumis avec succès !
             </Alert>
           )}
           <AddReviewForm

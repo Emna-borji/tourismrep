@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 import { Form } from 'react-bootstrap';
-import { FaUtensils } from 'react-icons/fa'; // Using utensils icon to represent forks
+import { FaUtensils } from 'react-icons/fa';
 import './restaurantClassFilterStyle.css';
 
-const RestaurantClassFilter = ({ onClassChange }) => {
+const RestaurantClassFilter = ({ onClassChange, className }) => {
   const [selectedClasses, setSelectedClasses] = useState({
     oneFork: false,
     twoForks: false,
@@ -17,7 +17,6 @@ const RestaurantClassFilter = ({ onClassChange }) => {
     };
     setSelectedClasses(updatedClasses);
 
-    // Pass the selected classes to the parent component
     const selected = Object.keys(updatedClasses).filter((key) => updatedClasses[key]);
     if (onClassChange) {
       onClassChange(selected);
@@ -25,41 +24,44 @@ const RestaurantClassFilter = ({ onClassChange }) => {
   };
 
   return (
-    <div className="class-filter-container">
-      <Form.Label className="class-filter-label">Classe de restaurant</Form.Label>
-      <div className="checkbox-group">
+    <div className={`tourism-restaurant-class-filter ${className}`}>
+      <Form.Label className="tourism-class-filter-label">Classe de restaurant</Form.Label>
+      <div className="tourism-checkbox-group">
         <Form.Check
           type="checkbox"
           label={
-            <span>
-              <FaUtensils /> {/* 1 fork */}
+            <span className="tourism-fork-label">
+              <FaUtensils className="tourism-fork-icon" />
             </span>
           }
           checked={selectedClasses.oneFork}
           onChange={() => handleCheckboxChange('oneFork')}
-          className="class-checkbox"
+          className="tourism-class-checkbox"
         />
         <Form.Check
           type="checkbox"
           label={
-            <span>
-              <FaUtensils /> <FaUtensils /> {/* 2 forks */}
+            <span className="tourism-fork-label">
+              <FaUtensils className="tourism-fork-icon" />
+              <FaUtensils className="tourism-fork-icon" />
             </span>
           }
           checked={selectedClasses.twoForks}
           onChange={() => handleCheckboxChange('twoForks')}
-          className="class-checkbox"
+          className="tourism-class-checkbox"
         />
         <Form.Check
           type="checkbox"
           label={
-            <span>
-              <FaUtensils /> <FaUtensils /> <FaUtensils /> {/* 3 forks */}
+            <span className="tourism-fork-label">
+              <FaUtensils className="tourism-fork-icon" />
+              <FaUtensils className="tourism-fork-icon" />
+              <FaUtensils className="tourism-fork-icon" />
             </span>
           }
           checked={selectedClasses.threeForks}
           onChange={() => handleCheckboxChange('threeForks')}
-          className="class-checkbox"
+          className="tourism-class-checkbox"
         />
       </div>
     </div>

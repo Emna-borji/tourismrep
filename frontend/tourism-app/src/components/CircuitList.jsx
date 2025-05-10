@@ -4,6 +4,7 @@ import { Container, Row, Col, Pagination, Button, Alert } from 'react-bootstrap'
 import { Link } from 'react-router-dom';
 import CircuitCard from './CircuitCard';
 import CreateCircuitForm from './CreateCircuitForm';
+import Search from './Shared/Search'; // Import the Search component
 import { fetchCircuits } from '../redux/actions/circuitActions';
 
 const CircuitList = () => {
@@ -14,14 +15,20 @@ const CircuitList = () => {
   const { userInfo } = useSelector(state => state.auth || {});
   const [currentPage, setCurrentPage] = useState(1);
   const [showCreateModal, setShowCreateModal] = useState(false);
+  const [searchQuery, setSearchQuery] = useState(''); // State for search query
 
   useEffect(() => {
     console.log('showCreateModal state:', showCreateModal);
   }, [showCreateModal]);
 
   useEffect(() => {
-    dispatch(fetchCircuits());
-  }, [dispatch]);
+    dispatch(fetchCircuits(searchQuery)); // Fetch circuits with the search query
+  }, [dispatch, searchQuery]);
+
+  const handleSearch = (query) => {
+    setSearchQuery(query); // Update the search query
+    setCurrentPage(1); // Reset to the first page on new search
+  };
 
   if (loading) return <div>Loading...</div>;
   if (error) return <div>Error: {error}</div>;
@@ -60,6 +67,9 @@ const CircuitList = () => {
           </Alert>
         )}
       </div>
+
+      {/* Add the Search component */}
+      <Search onSearch={handleSearch} entityType="circuit" />
 
       {circuitList.length === 0 ? (
         <div className="text-center">Aucun circuit disponible.</div>

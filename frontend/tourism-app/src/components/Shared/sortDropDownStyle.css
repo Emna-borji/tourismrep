@@ -1,89 +1,91 @@
-/* Main container for the sort dropdown */
-.sort-container {
-  margin-bottom: 20px;
-  padding: 10px;
-  background-color: #f8f9fa;
-  border-radius: 8px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+/* Importing Tailwind CSS via CDN */
+@import url('https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css');
+
+/* Root variables for tourism-themed color scheme */
+:root {
+  --primary-color: #1e88e5 !important; /* Ocean blue for travel vibe */
+  --secondary-color: #2c5ba1 !important; /* Darker blue for hover and labels */
+  --text-color: #2d3748 !important; /* Dark gray for readability */
+  --border-radius: 8px !important;
+  --transition: all 0.3s ease !important;
 }
 
-/* Label styling */
-.sort-label {
-  font-size: 16px;
-  font-weight: 500;
-  color: #007bff; /* Primary brand color */
-  margin-bottom: 8px;
+/* Sort container */
+.tourism-sort-container {
+  width: 100% !important;
 }
 
-/* Dropdown customization */
-.custom-sort-dropdown {
-  width: 100%;
-  max-width: 300px;
-  background-color: #ffffff;
-  border-radius: 8px;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+/* Sort label */
+.tourism-sort-label {
+  font-size: 1.1rem !important;
+  font-weight: 500 !important;
+  color: var(--secondary-color) !important; /* Darker blue for "Trier par prix" */
+  margin-bottom: 0.5rem !important;
 }
 
-.custom-sort-dropdown.focused {
-  border-color: #007bff; /* Highlighted when focused */
+/* Sort dropdown */
+.tourism-sort-dropdown {
+  width: 100% !important;
 }
 
-.custom-sort-toggle {
-  width: 100%;
-  padding: 10px;
-  font-size: 16px;
-  background-color: #ffffff;
-  color: #333;
-  border: 1px solid #ddd;
-  border-radius: 8px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  text-align: left;
-  transition: all 0.3s ease;
+/* Sort toggle */
+.tourism-sort-toggle {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  padding: 0.75rem !important;
+  border: 1px solid #d1d5db !important;
+  border-radius: var(--border-radius) !important;
+  background-color: #ffffff !important;
+  color: var(--secondary-color) !important; /* Darker blue for chosen item */
+  width: 100% !important;
+  transition: var(--transition) !important;
 }
 
-.custom-sort-toggle:hover {
-  border-color: #007bff; /* Highlight on hover */
+.tourism-sort-toggle:hover {
+  border-color: var(--secondary-color) !important;
 }
 
-.chevron-icon {
-  color: #007bff;
-  font-size: 18px;
-  transition: transform 0.3s ease;
+.tourism-sort-dropdown.tourism-focused .tourism-sort-toggle {
+  border-color: var(--primary-color) !important;
+  box-shadow: 0 0 0 2px var(--primary-color) !important;
 }
 
-/* Menu and items styling */
-.custom-sort-menu {
-  padding: 0;
-  border-radius: 8px;
-  margin-top: 5px;
-  background-color: #ffffff;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+/* Chevron icon */
+.tourism-chevron-icon {
+  margin-left: 0.5rem !important;
+  color: var(--text-color) !important;
 }
 
-.custom-sort-menu .selected {
-  font-weight: bold;
-  color: #007bff;
+/* Sort menu */
+.tourism-sort-menu {
+  width: 100% !important;
+  border-radius: var(--border-radius) !important;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1) !important;
 }
 
-.custom-sort-menu .dropdown-item {
-  padding: 10px;
-  font-size: 16px;
-  cursor: pointer;
-  transition: background-color 0.3s ease;
+/* Menu items */
+.tourism-sort-menu .dropdown-item {
+  padding: 0.5rem 1rem !important;
+  color: var(--secondary-color) !important; /* Darker blue for sort items */
+  transition: var(--transition) !important;
 }
 
-.custom-sort-menu .dropdown-item:hover {
-  background-color: #f1f1f1;
+.tourism-sort-menu .dropdown-item:hover {
+  background-color: #e3f2fd !important; /* Light blue background on hover */
+  color: var(--primary-color) !important; /* Ocean blue on hover */
 }
 
-.custom-sort-menu .dropdown-item:focus {
-  background-color: #007bff;
-  color: white;
+/* Selected item */
+.tourism-sort-menu .tourism-selected {
+  background-color: #e3f2fd !important;
+  color: var(--secondary-color) !important; /* Darker blue for selected item */
+  font-weight: 500 !important;
 }
 
-/* Optional: Add transition for the dropdown toggle's chevron icon */
-.custom-sort-dropdown .focused .chevron-icon {
-  transform: rotate(180deg); /* Rotate chevron when dropdown is open */
+/* Accessibility improvements */
+.tourism-sort-toggle:focus-visible,
+.tourism-sort-menu .dropdown-item:focus-visible {
+  outline: 2px solid var(--primary-color) !important;
+  outline-offset: 2px !important;
 }

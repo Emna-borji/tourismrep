@@ -180,12 +180,37 @@ class CircuitCreateSerializer(serializers.ModelSerializer):
 
 
 class CircuitHistorySerializer(serializers.ModelSerializer):
-    circuit = CircuitSerializer(read_only=True)
+    circuit = serializers.PrimaryKeyRelatedField(queryset=Circuit.objects.all(), required=True)
+    circuit_details = CircuitSerializer(source='circuit', read_only=True)  # Nested serializer for reading
 
     class Meta:
         model = CircuitHistory
-        fields = ['id', 'circuit', 'departure_date', 'arrival_date', 'created_at', 'updated_at']
+        fields = ['id', 'circuit', 'circuit_details', 'departure_date', 'arrival_date', 'created_at', 'updated_at']
         read_only_fields = ['created_at', 'updated_at']
+
+    def validate(self, data):
+        circuit = data.get('circuit')
+        departure_date = data.get('departure_date')
+        arrival_date = data.get('arrival_date')
+        user = self.context['request'].user
+
+        if circuit and departure_date and arrival_date:
+            # Check for existing entry for this user
+            exists = CircuitHistory.objects.filter(
+                circuit=circuit,
+                departure_date=departure_date,
+                arrival_date=arrival_date,
+                user=user  # Ensure uniqueness per user
+            ).exists()
+            if exists:
+                raise serializers.ValidationError(
+                    "Un historique avec ce circuit et ces dates existe déjà pour cet utilisateur."
+                )
+        return data
+
+    def create(self, validated_data):
+        validated_data['user'] = self.context['request'].user
+        return super().create(validated_data)
 
 
 

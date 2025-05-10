@@ -80,7 +80,43 @@ export const ADMIN_CREATE_CIRCUIT_FAIL = 'ADMIN_CREATE_CIRCUIT_FAIL';
 
 
 // Thunk Action to Fetch List of Circuits
-export const fetchCircuits = () => async (dispatch, getState) => {
+// export const fetchCircuits = () => async (dispatch, getState) => {
+//   try {
+//     dispatch({ type: FETCH_CIRCUITS_REQUEST });
+
+//     const { auth } = getState();
+//     let token = auth.userInfo?.token || auth.userInfo?.accessToken || auth.userInfo?.access_token || auth.userInfo?.jwt || auth.token;
+//     if (!token) {
+//       const localToken = localStorage.getItem('token') || localStorage.getItem('authToken');
+//       if (!localToken) {
+//         throw new Error('Authentication token is missing. Please log in again.');
+//       }
+//       token = localToken;
+//     }
+
+//     const config = {
+//       headers: {
+//         'Content-Type': 'application/json',
+//         Authorization: `Bearer ${token}`,
+//       },
+//     };
+
+//     const response = await api.get('/api/itinerary/circuits/', config);
+//     dispatch({
+//       type: FETCH_CIRCUITS_SUCCESS,
+//       payload: response.data,
+//     });
+//   } catch (error) {
+//     const errorMsg = error.response?.data?.message || error.response?.data?.detail || error.message || 'Failed to fetch circuits';
+//     dispatch({
+//       type: FETCH_CIRCUITS_FAIL,
+//       payload: errorMsg,
+//     });
+//     throw new Error(errorMsg);
+//   }
+// };
+
+export const fetchCircuits = (searchQuery = '') => async (dispatch, getState) => {
   try {
     dispatch({ type: FETCH_CIRCUITS_REQUEST });
 
@@ -101,7 +137,10 @@ export const fetchCircuits = () => async (dispatch, getState) => {
       },
     };
 
-    const response = await api.get('/api/itinerary/circuits/', config);
+    // Construct the URL with the search query if provided
+    const url = searchQuery ? `/api/itinerary/circuits/?search=${encodeURIComponent(searchQuery)}` : '/api/itinerary/circuits/';
+    const response = await api.get(url, config);
+
     dispatch({
       type: FETCH_CIRCUITS_SUCCESS,
       payload: response.data,
@@ -115,6 +154,9 @@ export const fetchCircuits = () => async (dispatch, getState) => {
     throw new Error(errorMsg);
   }
 };
+
+
+
 
 // Thunk Action to Fetch Circuit Details
 export const fetchCircuitDetails = (circuitId) => async (dispatch, getState) => {

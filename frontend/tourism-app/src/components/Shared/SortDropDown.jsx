@@ -1,11 +1,10 @@
-// src/pages/Shared/SortDropDown.jsx
 import React, { useState } from 'react';
 import { Dropdown, Form } from 'react-bootstrap';
 import { FaChevronDown } from 'react-icons/fa';
 import './sortDropDownStyle.css';
 
-const SortDropDown = ({ onSortChange }) => {
-  const [selectedOption, setSelectedOption] = useState('Choisissez le tri'); // Default to neutral option
+const SortDropDown = ({ onSortChange, className }) => {
+  const [selectedOption, setSelectedOption] = useState('Choisissez le tri');
   const [isFocused, setIsFocused] = useState(false);
 
   const handleSelect = (option) => {
@@ -16,32 +15,31 @@ const SortDropDown = ({ onSortChange }) => {
   };
 
   return (
-    <div className="sort-container">
-      <Form.Label className="sort-label">Trier par prix</Form.Label>
+    <div className={`tourism-sort-container ${className}`}>
+      <Form.Label className="tourism-sort-label">Trier par prix</Form.Label>
       <Dropdown
         onToggle={(isOpen) => setIsFocused(isOpen)}
-        className={`custom-sort-dropdown ${isFocused ? 'focused' : ''}`}
+        className={`tourism-sort-dropdown ${isFocused ? 'tourism-focused' : ''}`}
       >
-        <Dropdown.Toggle className="custom-sort-toggle">
+        <Dropdown.Toggle className="tourism-sort-toggle">
           {selectedOption}
-          <FaChevronDown className="chevron-icon" />
+          <FaChevronDown className="tourism-chevron-icon" />
         </Dropdown.Toggle>
-
-        <Dropdown.Menu className="custom-sort-menu">
+        <Dropdown.Menu className="tourism-sort-menu">
           <Dropdown.Item
-            className={selectedOption === 'Choisissez le tri' ? 'selected' : ''}
+            className={selectedOption === 'Choisissez le tri' ? 'tourism-selected' : ''}
             onClick={() => handleSelect('Choisissez le tri')}
           >
             Choisissez le tri
           </Dropdown.Item>
           <Dropdown.Item
-            className={selectedOption === 'Prix croissant' ? 'selected' : ''}
+            className={selectedOption === 'Prix croissant' ? 'tourism-selected' : ''}
             onClick={() => handleSelect('Prix croissant')}
           >
             Prix croissant
           </Dropdown.Item>
           <Dropdown.Item
-            className={selectedOption === 'Prix décroissant' ? 'selected' : ''}
+            className={selectedOption === 'Prix décroissant' ? 'tourism-selected' : ''}
             onClick={() => handleSelect('Prix décroissant')}
           >
             Prix décroissant

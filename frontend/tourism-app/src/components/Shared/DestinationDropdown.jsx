@@ -1,15 +1,13 @@
-// src/components/DestinationDropdown.jsx
 import React, { useState, useEffect } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
 import { Dropdown, Form } from 'react-bootstrap';
 import { FaChevronDown } from 'react-icons/fa';
-import { fetchDestinations } from '../../redux/actions/destinationActions'; // Update import
+import { useDispatch, useSelector } from 'react-redux';
+import { fetchDestinations } from '../../redux/actions/destinationActions';
 import './destinationDropdownStyle.css';
 
-const DestinationDropdown = ({ onDestinationChange }) => {
+const DestinationDropdown = ({ onDestinationChange, className }) => {
   const dispatch = useDispatch();
-  const { destinations, loading, error } = useSelector((state) => state.destinations); // Read from state.destinations
-
+  const { destinations, loading, error } = useSelector((state) => state.destinations);
   const [selectedDestinationId, setSelectedDestinationId] = useState('');
   const [isFocused, setIsFocused] = useState(false);
 
@@ -30,23 +28,22 @@ const DestinationDropdown = ({ onDestinationChange }) => {
   };
 
   return (
-    <div className="destination-container">
-      <Form.Label className="destination-label">Recherche</Form.Label>
+    <div className={`tourism-destination-container ${className}`}>
+      <Form.Label className="tourism-destination-label">Recherche</Form.Label>
       {loading && <p>Loading destinations...</p>}
       {error && <p>Error: {error}</p>}
       <Dropdown
         onToggle={(isOpen) => setIsFocused(isOpen)}
-        className={`custom-destination-dropdown ${isFocused ? 'focused' : ''}`}
+        className={`tourism-destination-dropdown ${isFocused ? 'tourism-focused' : ''}`}
       >
-        <Dropdown.Toggle className="custom-destination-toggle">
+        <Dropdown.Toggle className="tourism-destination-toggle">
           {selectedDestinationName}
-          <FaChevronDown className="chevron-icon" />
+          <FaChevronDown className="tourism-chevron-icon" />
         </Dropdown.Toggle>
-
-        <Dropdown.Menu className="custom-destination-menu">
+        <Dropdown.Menu className="tourism-destination-menu">
           <Dropdown.Item
             key="placeholder"
-            className={selectedDestinationId === '' ? 'selected' : ''}
+            className={selectedDestinationId === '' ? 'tourism-selected' : ''}
             onClick={() => handleSelect('')}
           >
             Choisissez votre destination
@@ -54,7 +51,7 @@ const DestinationDropdown = ({ onDestinationChange }) => {
           {destinations.map((destination) => (
             <Dropdown.Item
               key={destination.id}
-              className={selectedDestinationId === String(destination.id) ? 'selected' : ''}
+              className={selectedDestinationId === String(destination.id) ? 'tourism-selected' : ''}
               onClick={() => handleSelect(String(destination.id))}
             >
               {destination.name}

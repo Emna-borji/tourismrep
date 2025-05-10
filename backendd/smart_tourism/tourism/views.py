@@ -16,6 +16,7 @@ from .services import RecommendationService
 from itinerary.models import Circuit
 from itinerary.serializers import CircuitCreateSerializer
 import logging
+from rest_framework import serializers
 
 logger = logging.getLogger(__name__)
 

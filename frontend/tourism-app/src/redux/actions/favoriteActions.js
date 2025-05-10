@@ -14,7 +14,8 @@ import {
 // Fetch a single entity by ID
 export const fetchEntityById = (entityType, id) => async (dispatch) => {
   try {
-    const url = `/api/tourism/${entityType}s/${id}/`;
+    const pluralEntityType = entityType === 'activity' ? 'activities' : `${entityType}s`;
+    const url = `/api/tourism/${pluralEntityType}/${id}/`;
     console.log('Fetching entity from:', url);
     const response = await axios.get(url);
     console.log(`Entity details for ${entityType}/${id}:`, response.data);

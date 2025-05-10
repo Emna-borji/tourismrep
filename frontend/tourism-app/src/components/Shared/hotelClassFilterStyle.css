@@ -4,14 +4,14 @@
 /* Root variables for tourism-themed color scheme */
 :root {
   --primary-color: #1e88e5 !important; /* Ocean blue for travel vibe */
-  --secondary-color: #2c5ba1 !important; /* Darker blue for labels */
+  --secondary-color: #2c5ba1 !important; /* Darker blue for labels and stars */
   --text-color: #2d3748 !important; /* Dark gray for readability */
   --border-radius: 8px !important;
   --transition: all 0.3s ease !important;
 }
 
-/* Restaurant class filter container */
-.tourism-restaurant-class-filter {
+/* Hotel class filter container */
+.tourism-hotel-class-filter {
   display: flex !important;
   flex-direction: column !important;
   gap: 0.5rem !important;
@@ -26,11 +26,11 @@
 .tourism-class-filter-label {
   font-size: 1.1rem !important;
   font-weight: 500 !important;
-  color: var(--secondary-color) !important; /* Darker blue for "Classe de restaurant" */
+  color: var(--secondary-color) !important; /* Darker blue for "Classe d'hôtel" */
 }
 
 /* Checkbox group */
-.tourism TESTING-checkbox-group {
+.tourism-checkbox-group {
   display: flex !important;
   flex-direction: column !important;
   gap: 0.75rem !important;
@@ -53,21 +53,21 @@
   box-shadow: 0 0 0 2px var(--primary-color) !important;
 }
 
-/* Fork label and icons */
-.tourism-fork-label {
+/* Star label and icons */
+.tourism-star-label {
   display: flex !important;
   align-items: center !important;
   gap: 0.25rem !important;
 }
 
-.tourism-fork-icon {
-  color: var(--secondary-color) !important;
+.tourism-star-icon {
+  color: var(--secondary-color) !important; /* Darker blue for star icons */
   font-size: 1.2rem !important;
   transition: var(--transition) !important;
 }
 
-.tourism-class-checkbox:hover .tourism-fork-icon {
-  color: var(--primary-color) !important;
+.tourism-class-checkbox:hover .tourism-star-icon {
+  color: var(--primary-color) !important; /* Ocean blue on hover */
 }
 
 /* Accessibility improvements */

@@ -4,6 +4,7 @@ import { fetchDestinations } from '../redux/actions/destinationActions';
 import { fetchCuisines, fetchActivityCategories, savePreference } from '../redux/actions/preferenceActions';
 import { fetchEntities, clearEntities } from '../redux/actions/entityActions';
 import { composeCircuit, checkExistingCircuit, fetchCircuitDetails } from '../redux/actions/circuitActions';
+import { saveCircuitToHistory, checkCircuitHistoryDuplicate } from '../redux/actions/circuitHistoryActions';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
@@ -174,15 +175,27 @@ const Step3 = ({ formData, setFormData, destinations }) => {
 const MapInitializer = () => {
   const map = useMap();
   const mapInitialized = useRef(false);
+  const timeoutRef = useRef(null);
 
   useEffect(() => {
     if (map && !mapInitialized.current) {
-      const timeout = setTimeout(() => {
-        map.invalidateSize();
-        mapInitialized.current = true;
+      timeoutRef.current = setTimeout(() => {
+        if (map && map._container) {
+          try {
+            map.invalidateSize();
+            mapInitialized.current = true;
+          } catch (error) {
+            console.error('Error invalidating map size:', error);
+          }
+        }
       }, 500);
 
-      return () => clearTimeout(timeout);
+      return () => {
+        if (timeoutRef.current) {
+          clearTimeout(timeoutRef.current);
+          timeoutRef.current = null;
+        }
+      };
     }
   }, [map]);
 
@@ -291,6 +304,9 @@ const CircuitWizard = () => {
   const { loading: circuitLoading } = useSelector(
     (state) => state.circuit || {}
   );
+  const { saving: historySaving, saveError: historySaveError } = useSelector(
+    (state) => state.circuitHistory || {}
+  );
 
   const [step, setStep] = useState(1);
   const [formData, setFormData] = useState({
@@ -313,21 +329,33 @@ const CircuitWizard = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isMapVisible, setIsMapVisible] = useState(false);
   const [showDuplicateDialog, setShowDuplicateDialog] = useState(false);
+  const [showHistoryDuplicateDialog, setShowHistoryDuplicateDialog] = useState(false);
   const [existingCircuitId, setExistingCircuitId] = useState(null);
+  const isMounted = useRef(true);
 
   useEffect(() => {
+    isMounted.current = true;
     dispatch(fetchDestinations());
     dispatch(fetchCuisines());
     dispatch(fetchActivityCategories());
     dispatch(clearEntities());
+
+    return () => {
+      isMounted.current = false;
+    };
   }, [dispatch]);
 
   useEffect(() => {
-    if (step === 4) {
+    if (step === 4 && isMounted.current) {
       const timer = setTimeout(() => {
-        setIsMapVisible(true);
+        if (isMounted.current) {
+          setIsMapVisible(true);
+        }
       }, 600);
-      return () => clearTimeout(timer);
+      return () => {
+        clearTimeout(timer);
+        setIsMapVisible(false);
+      };
     } else {
       setIsMapVisible(false);
     }
@@ -337,7 +365,8 @@ const CircuitWizard = () => {
     if (!formData.departure_date || !formData.arrival_date) return 0;
     const depDate = new Date(formData.departure_date);
     const arrDate = new Date(formData.arrival_date);
-    return Math.ceil((arrDate - depDate) / (1000 * 60 * 60 * 24)) + 1;
+    const diffDays = Math.ceil((arrDate - depDate) / (1000 * 60 * 60 * 24)) + 1;
+    return diffDays > 0 ? diffDays : 0;
   }, [formData.departure_date, formData.arrival_date]);
 
   const calculateEntityPrice = useCallback(() => {
@@ -402,6 +431,10 @@ const CircuitWizard = () => {
       const arrDate = new Date(formData.arrival_date);
       if (depDate >= arrDate)
         newErrors.dates = 'Arrival date must be after departure date';
+      const days = Math.ceil((arrDate - depDate) / (1000 * 60 * 60 * 24)) + 1;
+      if (days < 2) {
+        newErrors.dates = 'Circuit duration must be at least 2 days';
+      }
     }
     return newErrors;
   }, [formData, destinations]);
@@ -693,6 +726,40 @@ const CircuitWizard = () => {
         setExistingCircuitId(null);
       }
     }
+  };
+
+  const handleConfirmSaveToHistory = async () => {
+    setShowHistoryDuplicateDialog(false);
+    try {
+      const circuitHistoryData = {
+        circuit: formData.circuit.id,
+        departure_date: formData.departure_date,
+        arrival_date: formData.arrival_date,
+      };
+      console.log('Saving circuit history with data:', circuitHistoryData);
+      await dispatch(saveCircuitToHistory(circuitHistoryData));
+
+      setTimeout(() => {
+        if (isMounted.current) {
+          navigate(`/circuit/summary/${formData.circuit.id}`);
+        }
+      }, 100);
+    } catch (error) {
+      setErrors({
+        api: error.message || 'Failed to save circuit to history. Please try again.',
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleCancelSaveToHistory = () => {
+    setShowHistoryDuplicateDialog(false);
+    setTimeout(() => {
+      if (isMounted.current) {
+        navigate(`/circuit/summary/${formData.circuit.id}`);
+      }
+    }, 100);
   };
 
   const handleNext = async () => {
@@ -990,7 +1057,29 @@ const CircuitWizard = () => {
         setIsSubmitting(false);
         return;
       }
-      navigate(`/circuit/summary/${formData.circuit.id}`);
+
+      try {
+        const circuitHistoryData = {
+          circuit: formData.circuit.id,
+          departure_date: formData.departure_date,
+          arrival_date: formData.arrival_date,
+        };
+
+        const historyCheck = await dispatch(checkCircuitHistoryDuplicate(circuitHistoryData));
+
+        if (historyCheck.exists) {
+          setShowHistoryDuplicateDialog(true);
+          setIsSubmitting(false);
+          return;
+        }
+
+        await handleConfirmSaveToHistory();
+      } catch (error) {
+        setErrors({
+          api: error.message || 'Failed to check circuit history. Please try again.',
+        });
+        setIsSubmitting(false);
+      }
     }
     setIsSubmitting(false);
   };
@@ -1203,9 +1292,9 @@ const CircuitWizard = () => {
                 />
                 {errors.forks && (
                   <p className="text-red-500 text-sm mt-1">{errors.forks}</p>
-                )}
-              </div>
-            )}
+              )}
+            </div>
+          )}
         </div>
 
         <div className="input-row">
@@ -1467,11 +1556,6 @@ const CircuitWizard = () => {
               zoom={6}
               className="circuit-wizard-map"
               key={waypoints.map((p) => `${p.lat}-${p.lng}`).join('-')}
-              whenReady={(map) => {
-                setTimeout(() => {
-                  map.target.invalidateSize();
-                }, 500);
-              }}
             >
               <TileLayer
                 url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
@@ -1687,7 +1771,10 @@ const CircuitWizard = () => {
       {entitiesError && (
         <p className="text-red-500 mb-4">Error loading entities: {entitiesError}</p>
       )}
-      {circuitLoading ? (
+      {historySaveError && (
+        <p className="text-red-500 mb-4">Error saving circuit to history: {historySaveError}</p>
+      )}
+      {circuitLoading || historySaving ? (
         <p className="text-gray-600">Loading...</p>
       ) : (
         <div>
@@ -1719,13 +1806,13 @@ const CircuitWizard = () => {
             <div className="flex justify-end space-x-4">
               <button
                 onClick={handleViewExistingCircuit}
-                className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition"
+                className="px-4 py-2 bg-gray-500 text-white rounded-md hover:bg-gray-600"
               >
                 View Existing
               </button>
               <button
                 onClick={handleProceedWithNewCircuit}
-                className="px-4 py-2 bg-green-500 text-white rounded-md hover:bg-green-600 transition"
+                className="px-4 py-2 bg-indigo-500 text-white rounded-md hover:bg-indigo-600"
               >
                 Create New
               </button>
@@ -1733,25 +1820,56 @@ const CircuitWizard = () => {
           </div>
         </div>
       )}
+      {showHistoryDuplicateDialog && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white p-6 rounded-lg shadow-lg max-w-sm w-full">
+            <h3 className="text-lg font-semibold text-gray-800 mb-4">
+              Circuit History Duplicate Found
+            </h3>
+            <p className="text-gray-600 mb-6">
+              This circuit has already been saved to your history with the same dates. Do you want to save it again?
+            </p>
+            <div className="flex justify-end space-x-4">
+              <button
+                onClick={handleCancelSaveToHistory}
+                className="px-4 py-2 bg-gray-500 text-white rounded-md hover:bg-gray-600"
+              >
+                No
+              </button>
+              <button
+                onClick={handleConfirmSaveToHistory}
+                className="px-4 py-2 bg-indigo-500 text-white rounded-md hover:bg-indigo-600"
+              >
+                Yes
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+      {errors.api && (
+        <p className="text-red-500 mt-4">{errors.api}</p>
+      )}
       <div className="mt-8 flex justify-between">
         {step > 1 && (
           <button
             onClick={handleBack}
-            className="px-6 py-3 bg-gray-500 text-white rounded-md hover:bg-gray-600 transition"
+            className="px-6 py-2 bg-gray-500 text-white rounded-md hover:bg-gray-600"
           >
             Back
           </button>
         )}
         <button
           onClick={handleNext}
-          disabled={isSubmitting || (step === 2 && !validateStep2().isValid)}
-          className={`px-6 py-3 ${
-            isSubmitting || (step === 2 && !validateStep2().isValid) ? 'bg-indigo-300' : 'bg-indigo-500'
-          } text-white rounded-md hover:bg-indigo-600 transition ${
-            step === 1 ? 'ml-auto' : ''
-          }`}
+          disabled={isSubmitting}
+          className={`px-6 py-2 ${
+            isSubmitting ? 'bg-indigo-300' : 'bg-indigo-500 hover:bg-indigo-600'
+          } text-white rounded-md transition-colors`}
         >
-          {isSubmitting ? 'Processing...' : step === 4 ? 'Finish' : 'Next'}
+          {isSubmitting
+            ? 'Processing...'
+            : step === 4
+            ? 'Save & View Summary'
+            : 'Next'}
         </button>
       </div>
     </div>

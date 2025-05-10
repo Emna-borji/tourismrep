@@ -87,7 +87,8 @@ export const clearEntities = () => (dispatch) => {
 export const fetchEntityById = (entityType, id) => async (dispatch) => {
   dispatch({ type: FETCH_ENTITY_REQUEST });
   try {
-    const response = await axios.get(`/api/tourism/${entityType}s/${id}/`);
+    const pluralEntityType = entityType === 'activity' ? 'activities' : `${entityType}s`;
+    const response = await axios.get(`/api/tourism/${pluralEntityType}/${id}/`);
     dispatch({ type: FETCH_ENTITY_SUCCESS, payload: { entityType, data: response.data } });
   } catch (error) {
     dispatch({

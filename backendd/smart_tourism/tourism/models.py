@@ -671,6 +671,7 @@ class Review(models.Model):
         ('festival', 'Festival'),
         ('activity', 'Activity'),
         ('archaeological_sites', 'Archaeological Sites'),
+        ('circuit', 'Circuit'),
     ]
     entity_type = models.CharField(max_length=50, choices=ENTITY_TYPES)
     entity_id = models.IntegerField()

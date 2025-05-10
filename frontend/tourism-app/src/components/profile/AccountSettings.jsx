@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Container, Row, Col, Form, Button, Tabs, Tab, Card, Accordion, Spinner, Alert } from 'react-bootstrap';
-import { Link } from 'react-router-dom'; // Import Link for navigation
+import { Link } from 'react-router-dom';
 import Sidebar from './Sidebar';
 import { fetchUserProfile, updateUserProfile } from '../../redux/actions/authActions';
 import { fetchDestinations } from '../../redux/actions/destinationActions';
@@ -153,9 +153,10 @@ const AccountSettings = () => {
       <div className="circuit-history-list">
         <Accordion>
           {circuitHistory.map((history, index) => {
-            const circuit = history.circuit || {};
-            const departureCity = circuit.departure_city || 'Inconnue';
-            const arrivalCity = circuit.arrival_city || 'Inconnue';
+            const circuit = history.circuit_details || {};
+            console.log('Circuit Details:', circuit); // Debug log
+            const departureCity = circuit.departure_city || 'Inconnue'; // Use value directly as it's already a name
+            const arrivalCity = circuit.arrival_city || 'Inconnue'; // Use value directly as it's already a name
             const schedules = circuit.schedules || [];
 
             return (
@@ -187,7 +188,7 @@ const AccountSettings = () => {
                                 Jour {schedule.day || 'N/A'} -{' '}
                                 {schedule.destination_id ? (
                                   <Link to={`/destination/${schedule.destination_id}`} className="entity-link">
-                                    {schedule.destination_name || 'Inconnue'}
+                                    {destinations.find(d => d.id === schedule.destination_id)?.name || schedule.destination_name || 'Inconnue'}
                                   </Link>
                                 ) : (
                                   schedule.destination_name || 'Inconnue'
@@ -196,59 +197,59 @@ const AccountSettings = () => {
                               <ul>
                                 <li><strong>Ordre :</strong> {schedule.order || 'N/A'}</li>
                                 {schedule.distance_km && <li><strong>Distance :</strong> {schedule.distance_km} km</li>}
-                                {schedule.hotel_name && (
+                                {schedule.hotel?.name && (
                                   <li>
                                     <strong>Hôtel :</strong>{' '}
-                                    <Link to={`/hotel/${schedule.hotel_id}`} className="entity-link">
-                                      {schedule.hotel_name}
+                                    <Link to={`/hotel/${schedule.hotel?.id}`} className="entity-link">
+                                      {schedule.hotel.name}
                                     </Link>
                                   </li>
                                 )}
-                                {schedule.guest_house_name && (
+                                {schedule.guest_house?.name && (
                                   <li>
                                     <strong>Maison d'hôte :</strong>{' '}
-                                    <Link to={`/guest-house/${schedule.guest_house_id}`} className="entity-link">
-                                      {schedule.guest_house_name}
+                                    <Link to={`/guest-house/${schedule.guest_house?.id}`} className="entity-link">
+                                      {schedule.guest_house.name}
                                     </Link>
                                   </li>
                                 )}
-                                {schedule.restaurant_name && (
+                                {schedule.restaurant?.name && (
                                   <li>
                                     <strong>Restaurant :</strong>{' '}
-                                    <Link to={`/restaurant/${schedule.restaurant_id}`} className="entity-link">
-                                      {schedule.restaurant_name}
+                                    <Link to={`/restaurant/${schedule.restaurant?.id}`} className="entity-link">
+                                      {schedule.restaurant.name}
                                     </Link>
                                   </li>
                                 )}
-                                {schedule.activity_name && (
+                                {schedule.activity?.name && (
                                   <li>
                                     <strong>Activité :</strong>{' '}
-                                    <Link to={`/activity/${schedule.activity_id}`} className="entity-link">
-                                      {schedule.activity_name}
+                                    <Link to={`/activities/${schedule.activity?.id}`} className="entity-link">
+                                      {schedule.activity.name}
                                     </Link>
                                   </li>
                                 )}
-                                {schedule.museum_name && (
+                                {schedule.museum?.name && (
                                   <li>
                                     <strong>Musée :</strong>{' '}
-                                    <Link to={`/museum/${schedule.museum_id}`} className="entity-link">
-                                      {schedule.museum_name}
+                                    <Link to={`/museum/${schedule.museum?.id}`} className="entity-link">
+                                      {schedule.museum.name}
                                     </Link>
                                   </li>
                                 )}
-                                {schedule.festival_name && (
+                                {schedule.festival?.name && (
                                   <li>
                                     <strong>Festival :</strong>{' '}
-                                    <Link to={`/festival/${schedule.festival_id}`} className="entity-link">
-                                      {schedule.festival_name}
+                                    <Link to={`/festival/${schedule.festival?.id}`} className="entity-link">
+                                      {schedule.festival.name}
                                     </Link>
                                   </li>
                                 )}
-                                {schedule.archaeological_site_name && (
+                                {schedule.archaeological_site?.name && (
                                   <li>
                                     <strong>Site archéologique :</strong>{' '}
-                                    <Link to={`/archaeological-site/${schedule.archaeological_site_id}`} className="entity-link">
-                                      {schedule.archaeological_site_name}
+                                    <Link to={`/archaeological-site/${schedule.archaeological_site?.id}`} className="entity-link">
+                                      {schedule.archaeological_site.name}
                                     </Link>
                                   </li>
                                 )}

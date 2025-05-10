@@ -1,8 +1,9 @@
-// src/pages/Shared/HotelClassFilter.jsx
 import React, { useState } from 'react';
 import { Form } from 'react-bootstrap';
+import { FaStar } from 'react-icons/fa';
+import './hotelClassFilterStyle.css';
 
-const HotelClassFilter = ({ onClassChange }) => {
+const HotelClassFilter = ({ onClassChange, className }) => {
   const [selectedClasses, setSelectedClasses] = useState([]);
 
   const handleChange = (e) => {
@@ -20,43 +21,80 @@ const HotelClassFilter = ({ onClassChange }) => {
   };
 
   return (
-    <div className="class-filter">
-      <h5>Filter by Stars</h5>
-      <Form.Check
-        type="checkbox"
-        label="1 Star"
-        value="oneStar"
-        onChange={handleChange}
-        checked={selectedClasses.includes('oneStar')}
-      />
-      <Form.Check
-        type="checkbox"
-        label="2 Stars"
-        value="twoStars"
-        onChange={handleChange}
-        checked={selectedClasses.includes('twoStars')}
-      />
-      <Form.Check
-        type="checkbox"
-        label="3 Stars"
-        value="threeStars"
-        onChange={handleChange}
-        checked={selectedClasses.includes('threeStars')}
-      />
-      <Form.Check
-        type="checkbox"
-        label="4 Stars"
-        value="fourStars"
-        onChange={handleChange}
-        checked={selectedClasses.includes('fourStars')}
-      />
-      <Form.Check
-        type="checkbox"
-        label="5 Stars"
-        value="fiveStars"
-        onChange={handleChange}
-        checked={selectedClasses.includes('fiveStars')}
-      />
+    <div className={`tourism-hotel-class-filter ${className}`}>
+      <Form.Label className="tourism-class-filter-label">Classe d'hôtel</Form.Label>
+      <div className="tourism-checkbox-group">
+        <Form.Check
+          type="checkbox"
+          label={
+            <span className="tourism-star-label">
+              <FaStar className="tourism-star-icon" />
+            </span>
+          }
+          value="oneStar"
+          onChange={handleChange}
+          checked={selectedClasses.includes('oneStar')}
+          className="tourism-class-checkbox"
+        />
+        <Form.Check
+          type="checkbox"
+          label={
+            <span className="tourism-star-label">
+              <FaStar className="tourism-star-icon" />
+              <FaStar className="tourism-star-icon" />
+            </span>
+          }
+          value="twoStars"
+          onChange={handleChange}
+          checked={selectedClasses.includes('twoStars')}
+          className="tourism-class-checkbox"
+        />
+        <Form.Check
+          type="checkbox"
+          label={
+            <span className="tourism-star-label">
+              <FaStar className="tourism-star-icon" />
+              <FaStar className="tourism-star-icon" />
+              <FaStar className="tourism-star-icon" />
+            </span>
+          }
+          value="threeStars"
+          onChange={handleChange}
+          checked={selectedClasses.includes('threeStars')}
+          className="tourism-class-checkbox"
+        />
+        <Form.Check
+          type="checkbox"
+          label={
+            <span className="tourism-star-label">
+              <FaStar className="tourism-star-icon" />
+              <FaStar className="tourism-star-icon" />
+              <FaStar className="tourism-star-icon" />
+              <FaStar className="tourism-star-icon" />
+            </span>
+          }
+          value="fourStars"
+          onChange={handleChange}
+          checked={selectedClasses.includes('fourStars')}
+          className="tourism-class-checkbox"
+        />
+        <Form.Check
+          type="checkbox"
+          label={
+            <span className="tourism-star-label">
+              <FaStar className="tourism-star-icon" />
+              <FaStar className="tourism-star-icon" />
+              <FaStar className="tourism-star-icon" />
+              <FaStar className="tourism-star-icon" />
+              <FaStar className="tourism-star-icon" />
+            </span>
+          }
+          value="fiveStars"
+          onChange={handleChange}
+          checked={selectedClasses.includes('fiveStars')}
+          className="tourism-class-checkbox"
+        />
+      </div>
     </div>
   );
 };

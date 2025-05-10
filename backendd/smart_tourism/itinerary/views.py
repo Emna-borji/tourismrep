@@ -5,6 +5,12 @@ from rest_framework import status
 from django.db import transaction
 import time
 import random
+from rest_framework import viewsets
+
+from rest_framework.filters import SearchFilter
+from django_filters.rest_framework import DjangoFilterBackend
+from rest_framework.decorators import action
+
 
 from django.utils import timezone
 from django.db.models import Avg
@@ -859,6 +865,8 @@ class CircuitViewSet(viewsets.ModelViewSet):
     queryset = Circuit.objects.all()
     serializer_class = CircuitCreateSerializer
     permission_classes = [CircuitPermission]
+    filter_backends = [DjangoFilterBackend, SearchFilter]
+    search_fields = ['name', 'description', 'departure_city__name', 'arrival_city__name', 'schedules__destination__name']  # Search related fields' names
 
 class CircuitHistoryViewSet(viewsets.ModelViewSet):
     serializer_class = CircuitHistorySerializer
@@ -895,7 +903,7 @@ class CircuitHistoryViewSet(viewsets.ModelViewSet):
             return Response({"error": "Format de date invalide. Utilisez YYYY-MM-DD."}, status=status.HTTP_400_BAD_REQUEST)
 
         delta = arrival_date - departure_date
-        duration_in_days = delta.days
+        duration_in_days = delta.days + 1  # Add 1 to include the arrival date, matching frontend logic
 
         try:
             circuit = Circuit.objects.get(id=circuit_id)
@@ -909,6 +917,51 @@ class CircuitHistoryViewSet(viewsets.ModelViewSet):
             )
 
         return super().create(request, *args, **kwargs)
+
+    @action(detail=False, methods=['post'])
+    def check_history_duplicate(self, request):
+        circuit_id = request.data.get('circuit')
+        departure_date = request.data.get('departure_date')
+        arrival_date = request.data.get('arrival_date')
+        user = request.user
+
+        if not circuit_id or not departure_date or not arrival_date:
+            return Response(
+                {"error": "Circuit ID, departure date, and arrival date are required."},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        try:
+            departure_date = datetime.strptime(departure_date, "%Y-%m-%d").date()
+            arrival_date = datetime.strptime(arrival_date, "%Y-%m-%d").date()
+        except ValueError:
+            return Response(
+                {"error": "Format de date invalide. Utilisez YYYY-MM-DD."},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        try:
+            circuit = Circuit.objects.get(id=circuit_id)
+        except Circuit.DoesNotExist:
+            return Response(
+                {"error": "Circuit introuvable."},
+                status=status.HTTP_404_NOT_FOUND
+            )
+
+        exists = CircuitHistory.objects.filter(
+            circuit=circuit,
+            departure_date=departure_date,
+            arrival_date=arrival_date,
+            user=user
+        ).exists()
+
+        if exists:
+            return Response(
+                {"exists": True, "message": "A circuit history entry already exists for this circuit and dates."},
+                status=status.HTTP_200_OK
+            )
+
+        return Response({"exists": False}, status=status.HTTP_200_OK)
     
 
 

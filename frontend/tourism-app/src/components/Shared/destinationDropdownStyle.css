@@ -1,101 +1,92 @@
-/* Main container for the destination dropdown */
-.destination-container {
-  margin-bottom: 20px;
-  padding: 15px !important;
-  background-color: #f8f9fa;
-  border-radius: 8px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  border-color: #f8f9fa !important;
+/* Importing Tailwind CSS via CDN */
+@import url('https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css');
+
+/* Root variables for tourism-themed color scheme */
+:root {
+  --primary-color: #1e88e5 !important; /* Ocean blue for travel vibe */
+  --secondary-color: #2c5ba1 !important; /* Darker blue for hover and labels */
+  --text-color: #2d3748 !important; /* Dark gray for readability */
+  --border-radius: 8px !important;
+  --transition: all 0.3s ease !important;
 }
 
-/* Label styling for destination dropdown */
-.destination-label {
-  font-size: 16px;
-  font-weight: 500;
-  color: #007bff; /* Primary brand color */
-  margin-bottom: 8px;
+/* Destination container */
+.tourism-destination-container {
+  width: 100% !important;
 }
 
-/* Dropdown container */
-.custom-destination-dropdown {
-  width: 100%;
-  max-width: 300px;
-  background-color: #ffffff;
-  border-radius: 8px;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
-  border: 1px solid #ccc; /* Default grey border */
-  transition: border 0.3s ease;
-  
+/* Destination label */
+.tourism-destination-label {
+  font-size: 1.1rem !important;
+  font-weight: 500 !important;
+  color: var(--secondary-color) !important; /* Darker blue for "Recherche" */
+  margin-bottom: 0.5rem !important;
 }
 
-/* When the dropdown is focused (clicked) */
-.custom-destination-dropdown.focused {
-  border-color: #007bff; /* Bluish border on focus */
+/* Destination dropdown */
+.tourism-destination-dropdown {
+  width: 100% !important;
 }
 
-/* Dropdown toggle button */
-.custom-destination-toggle {
-  width: 100%;
-  padding: 12px;
-  font-size: 16px;
+/* Destination toggle */
+.tourism-destination-toggle {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  padding: 0.75rem !important;
+  border: 1px solid #d1d5db !important;
+  border-radius: var(--border-radius) !important;
   background-color: #ffffff !important;
-  color: #333 !important;
-  border: none;
-  border-radius: 8px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  text-align: left;
-  transition: all 0.3s ease;
+  color: var(--secondary-color) !important; /* Blue text for chosen item */
+  width: 100% !important;
+  transition: var(--transition) !important;
 }
 
-/* Hover effect for dropdown toggle */
-.custom-destination-toggle:hover {
-  background-color: #007bff !important;
-  color: rgb(254, 254, 254) !important;
+.tourism-destination-toggle:hover {
+  border-color: var(--secondary-color) !important;
 }
 
-/* Chevron icon for dropdown */
-.chevron-icon {
-  color: #007bff;
-  font-size: 18px;
-  transition: transform 0.3s ease;
+.tourism-destination-dropdown.tourism-focused .tourism-destination-toggle {
+  border-color: var(--primary-color) !important;
+  box-shadow: 0 0 0 2px var(--primary-color) !important;
 }
 
-/* Dropdown menu */
-.custom-destination-menu {
-  padding: 0;
-  border-radius: 8px;
-  margin-top: 5px;
-  background-color: #ffffff !important;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1) !important;
+/* Chevron icon */
+.tourism-chevron-icon {
+  margin-left: 0.5rem !important;
+  color: var(--text-color) !important;
 }
 
-/* Selected item in dropdown */
-.custom-destination-menu .selected {
-  font-weight: bold;
-  color: #007bff;
+/* Destination menu */
+.tourism-destination-menu {
+  width: 100% !important;
+  border-radius: var(--border-radius) !important;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1) !important;
+  max-height: 200px !important;
+  overflow-y: auto !important;
 }
 
-/* Individual dropdown item */
-.custom-destination-menu .dropdown-item {
-  padding: 12px;
-  font-size: 16px;
-  cursor: pointer;
-  transition: background-color 0.3s ease;
+/* Menu items */
+.tourism-destination-menu .dropdown-item {
+  padding: 0.5rem 1rem !important;
+  color: var(--secondary-color) !important; /* Blue text for destination items */
+  transition: var(--transition) !important;
 }
 
-/* Hover effect for each item */
-.custom-destination-menu .dropdown-item:hover {
-  background-color: #f1f1f1;
+.tourism-destination-menu .dropdown-item:hover {
+  background-color: #e3f2fd !important; /* Light blue background on hover */
+  color: var(--primary-color) !important;
 }
 
-.custom-destination-menu .dropdown-item:focus {
-  background-color: #007bff;
-  color: white;
+.tourism-destination-menu .tourism-selected {
+  background-color: #e3f2fd !important;
+  color: var(--secondary-color) !important; /* Blue text for selected item */
+  font-weight: 500 !important;
 }
 
-/* Optional: Rotate the chevron when dropdown is open */
-.custom-destination-dropdown .focused .chevron-icon {
-  transform: rotate(180deg);
+/* Accessibility improvements */
+.tourism-destination-toggle:focus-visible,
+.tourism-destination-menu .dropdown-item:focus-visible {
+  outline: 2px solid var(--primary-color) !important;
+  outline-offset: 2px !important;
 }

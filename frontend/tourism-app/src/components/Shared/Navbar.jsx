@@ -3,9 +3,11 @@ import { Navbar as BootstrapNavbar, Nav, Dropdown } from 'react-bootstrap';
 import { FaHome, FaUtensils, FaMapSigns, FaLandmark, FaFeatherAlt, FaBriefcaseMedical, FaBus, FaHammer, FaBars, FaUser } from 'react-icons/fa';
 import './navbar.css';
 import { Link } from 'react-router-dom';
-
+import { useSelector } from 'react-redux';
 
 const Navbar = () => {
+  const { userInfo } = useSelector((state) => state.auth || {});
+
   return (
     <BootstrapNavbar expand="lg" className="custom-navbar">
       <Nav className="mx-auto">
@@ -83,20 +85,28 @@ const Navbar = () => {
           <FaBars className="nav-icon" /> Annuaire
         </Nav.Link> */}
 
-        {/* Profile Dropdown */}
-        <Dropdown
-          onMouseEnter={(e) => e.currentTarget.querySelector('.dropdown-toggle').click()}
-          onMouseLeave={(e) => e.currentTarget.querySelector('.dropdown-toggle').click()}
-        >
-          <Dropdown.Toggle as={Nav.Link} className="nav-link-custom profile-toggle">
-            <FaUser className="profile-icon" />
-          </Dropdown.Toggle>
-          <Dropdown.Menu className="dropdown-menu-custom profile-dropdown">
-            <Dropdown.Item className="dropdown-item-custom profile-name">boriji</Dropdown.Item>
-            <Dropdown.Item as={Link} to="/account-settings" className="dropdown-item-custom">Profil</Dropdown.Item>
-            <Dropdown.Item className="dropdown-item-custom">Se déconnecter</Dropdown.Item>
-          </Dropdown.Menu>
-        </Dropdown>
+        {/* Profil ou Bouton Se connecter */}
+        {userInfo ? (
+          <Dropdown
+            onMouseEnter={(e) => e.currentTarget.querySelector('.dropdown-toggle').click()}
+            onMouseLeave={(e) => e.currentTarget.querySelector('.dropdown-toggle').click()}
+          >
+            <Dropdown.Toggle as={Nav.Link} className="nav-link-custom profile-toggle">
+              <FaUser className="profile-icon" />
+            </Dropdown.Toggle>
+            <Dropdown.Menu className="dropdown-menu-custom profile-dropdown">
+              <Dropdown.Item className="dropdown-item-custom profile-name">
+                {userInfo.firstname || 'Utilisateur'}
+              </Dropdown.Item>
+              <Dropdown.Item as={Link} to="/account-settings" className="dropdown-item-custom">Profil</Dropdown.Item>
+              <Dropdown.Item className="dropdown-item-custom">Se déconnecter</Dropdown.Item>
+            </Dropdown.Menu>
+          </Dropdown>
+        ) : (
+          <Nav.Link as={Link} to="/login" className="nav-link-custom login-link">
+            Se connecter
+          </Nav.Link>
+        )}
       </Nav>
     </BootstrapNavbar>
   );

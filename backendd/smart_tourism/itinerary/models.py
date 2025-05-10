@@ -123,6 +123,12 @@ class CircuitHistory(models.Model):
     class Meta:
         db_table = 'circuit_history'
         managed = False
+        constraints = [
+            models.UniqueConstraint(
+                fields=['circuit', 'departure_date', 'arrival_date', 'user'],
+                name='unique_circuit_dates_per_user'
+            )
+        ]
     
 
 

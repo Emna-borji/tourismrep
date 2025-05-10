@@ -2,6 +2,7 @@ from rest_framework import serializers
 from django.db.models import Avg
 from django.core.validators import MinValueValidator, MaxValueValidator, URLValidator, RegexValidator
 from .models import Hotel, Restaurant, Activity, Museum, ArchaeologicalSite, Festival, GuestHouse, Destination, Review, Favorite, Cuisine, ActivityCategory, Equipment, EntityImage
+from users.models import CustomUser  # Import the model directly
 
 
 class EquipmentSerializer(serializers.ModelSerializer):
@@ -23,6 +24,8 @@ class ActivityCategorySerializer(serializers.ModelSerializer):
     class Meta:
         model = ActivityCategory
         fields = ['id', 'name']
+    def __str__(self):
+        return self.name
 
 class CuisineSerializer(serializers.ModelSerializer):
     class Meta:
@@ -214,15 +217,16 @@ class RestaurantSerializer(serializers.ModelSerializer):
 
 class ActivitySerializer(serializers.ModelSerializer):
     rating = serializers.SerializerMethodField()
-    destination = serializers.StringRelatedField(read_only=True)  # Add this to resolve destination name
-    destination_id = serializers.IntegerField(write_only=True)    # Add this for creating/updating
+    destination = serializers.StringRelatedField(read_only=True)  # Resolves destination name
+    destination_id = serializers.IntegerField(write_only=True)    # For creating/updating
+    category = serializers.StringRelatedField()  # Resolve category to its name
 
     class Meta:
         model = Activity
         fields = '__all__'
 
     def get_rating(self, obj):
-    # Map model classes to entity types
+        # Map model classes to entity types
         entity_type_map = {
             'Hotel': 'hotel',
             'GuestHouse': 'guest_house',
@@ -544,8 +548,13 @@ class GuestHouseSerializer(serializers.ModelSerializer):
 #         model = Review
 #         fields = ['id', 'entity_type', 'entity_id', 'user', 'rating', 'comment', 'image', 'created_at', 'updated_at']
 
+class NestedUserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = CustomUser
+        fields = ['id', 'email', 'firstname', 'lastname', 'username', 'role']
+
 class ReviewSerializer(serializers.ModelSerializer):
-    user = serializers.SerializerMethodField()
+    user = NestedUserSerializer(read_only=True)  # Use the lightweight serializer
 
     def get_user(self, obj):
         from users.serializers import AdminUserSerializer

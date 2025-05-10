@@ -125,7 +125,7 @@ const EntityReviews = ({ reviews, loading, error, entityType, entityId }) => {
                       {Array(review.rating).fill().map((_, i) => (
                         <FaStar key={i} color="gold" />
                       ))}
-                      <span className="ms-2">by {review.user.name}</span>
+                      <span className="ms-2">by {review.user.firstname}</span>
                     </Card.Title>
                     <Card.Text>{review.comment}</Card.Text>
                     {review.image && (
