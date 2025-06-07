@@ -1,0 +1,112 @@
+/* Existing styles remain unchanged */
+
+.login-container {
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.login-form {
+  background-color: #ffffff;
+  padding: 2rem;
+  border-radius: 0.75rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  max-width: 800px !important;
+  width: 100%;
+}
+
+.login-form h2 {
+  color: #2550ad;
+  font-family: 'Arial', sans-serif;
+  font-size: 1.5rem;
+  font-weight: 600;
+  text-align: center;
+  margin-bottom: 1.5rem;
+}
+
+.login-form .form-label {
+  color: #6b7280;
+  font-weight: 500;
+}
+
+.login-form .form-control,
+.login-form .form-select {
+  border: 1px solid #d2cba2;
+  border-radius: 0.6px;
+  padding: 0.75rem;
+  font-size: 1rem;
+  transition: border-color 0.3s ease;
+}
+
+.login-form .form-control:focus,
+.login-form .form-select:focus {
+  border-color: #2550ad;
+  box-shadow: none;
+}
+
+.login-form .btn-primary {
+  background-color: #2550ad;
+  border-color: #2550ad;
+  font-weight: 500;
+  padding: 0.75rem;
+  text-transform: uppercase;
+  transition: background-color 0.3s ease;
+  width: 100%;
+}
+
+.login-form .btn-primary:hover {
+  background-color: #1e4291;
+  border-color: #1e4291;
+}
+
+.login-form .btn-primary:disabled {
+  background-color: #3b66c4;
+  border-color: #3b66c4;
+  opacity: 0.65;
+}
+
+.login-form .text-center a {
+  color: #2550ad;
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.login-form .text-center a:hover {
+  color: #1e4291;
+  text-decoration: underline;
+}
+
+.text-danger {
+  color: #dc3545;
+}
+
+.text-sm {
+  font-size: 0.875rem;
+}
+
+/* New styles for success notification */
+.success-notification {
+  position: fixed;
+  top: 1rem;
+  right: 1rem;
+  z-index: 1000;
+  width: 250px; /* Fixed width for consistency */
+}
+
+/* Fade-out animation */
+@keyframes fade-out {
+  0% {
+    opacity: 1;
+  }
+  80% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+.animate-fade-out {
+  animation: fade-out 3s ease-in-out forwards;
+}

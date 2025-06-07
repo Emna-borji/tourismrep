@@ -2,6 +2,7 @@ import React, { useEffect, useState, useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useParams, useNavigate } from 'react-router-dom';
 import { fetchCircuitDetails } from '../redux/actions/circuitActions';
+import { fetchDestinations } from '../redux/actions/destinationActions';
 import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet-routing-machine';
@@ -9,7 +10,12 @@ import 'leaflet/dist/leaflet.css';
 import { motion } from 'framer-motion';
 import { fetchReviews, createReview } from '../redux/actions/reviewActions';
 import EntityReviews from './EntityReviews';
-import { Form, Button } from 'react-bootstrap';
+import { Button, Form, Modal } from 'react-bootstrap';
+import './circuitDetail.css';
+import HeroSection from './Shared/HeroSection';
+
+// Import Font Awesome for icons
+import '@fortawesome/fontawesome-free/css/all.min.css';
 
 // Fix default marker icon issue with Leaflet in React
 delete L.Icon.Default.prototype._getIconUrl;
@@ -19,18 +25,63 @@ L.Icon.Default.mergeOptions({
   shadowUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png',
 });
 
-// Component to handle map initialization and size invalidation
+// Define entity icons for the map markers
+const entityIcons = {
+  activity: new L.Icon({
+    iconUrl: 'https://cdn-icons-png.flaticon.com/512/3082/3082383.png',
+    iconSize: [30, 30],
+    iconAnchor: [15, 30],
+    popupAnchor: [0, -30],
+  }),
+  restaurant: new L.Icon({
+    iconUrl: 'https://cdn-icons-png.flaticon.com/512/4727/4727371.png',
+    iconSize: [30, 30],
+    iconAnchor: [15, 30],
+    popupAnchor: [0, -30],
+  }),
+  guest_house: new L.Icon({
+    iconUrl: 'https://cdn-icons-png.flaticon.com/512/2976/2976243.png',
+    iconSize: [30, 30],
+    iconAnchor: [15, 30],
+    popupAnchor: [0, -30],
+  }),
+  hotel: new L.Icon({
+    iconUrl: 'https://cdn-icons-png.flaticon.com/512/2921/2921845.png',
+    iconSize: [30, 30],
+    iconAnchor: [15, 30],
+    popupAnchor: [0, -30],
+  }),
+  museum: new L.Icon({
+    iconUrl: 'https://cdn-icons-png.flaticon.com/512/2206/2206238.png',
+    iconSize: [30, 30],
+    iconAnchor: [15, 30],
+    popupAnchor: [0, -30],
+  }),
+  festival: new L.Icon({
+    iconUrl: 'https://cdn-icons-png.flaticon.com/512/3652/3652195.png',
+    iconSize: [30, 30],
+    iconAnchor: [15, 30],
+    popupAnchor: [0, -30],
+  }),
+  archaeological_site: new L.Icon({
+    iconUrl: 'https://cdn-icons-png.flaticon.com/512/2282/2282197.png',
+    iconSize: [30, 30],
+    iconAnchor: [15, 30],
+    popupAnchor: [0, -30],
+  }),
+};
+
 const MapInitializer = () => {
   const map = useMap();
   const mapInitialized = useRef(false);
 
   useEffect(() => {
     if (map && !mapInitialized.current) {
+      map.invalidateSize();
+      mapInitialized.current = true;
       const timeout = setTimeout(() => {
         map.invalidateSize();
-        mapInitialized.current = true;
-      }, 500);
-
+      }, 100);
       return () => clearTimeout(timeout);
     }
   }, [map]);
@@ -38,7 +89,6 @@ const MapInitializer = () => {
   return null;
 };
 
-// Component to handle routing with Leaflet Routing Machine
 const RoutingMachine = ({ waypoints }) => {
   const map = useMap();
   const routingControlRef = useRef(null);
@@ -47,7 +97,12 @@ const RoutingMachine = ({ waypoints }) => {
   useEffect(() => {
     isMountedRef.current = true;
 
-    if (!map || waypoints.length < 2) return;
+    console.log('Waypoints:', waypoints);
+
+    if (!map || waypoints.length < 2) {
+      console.log('Not enough waypoints to draw a route:', waypoints.length);
+      return;
+    }
 
     const initializeRouting = () => {
       if (!isMountedRef.current) return;
@@ -57,7 +112,7 @@ const RoutingMachine = ({ waypoints }) => {
           try {
             map.removeLayer(layer);
           } catch (err) {
-            console.warn('Erreur lors de la suppression de la couche:', err);
+            console.warn('Error removing layer:', err);
           }
         }
       });
@@ -74,7 +129,7 @@ const RoutingMachine = ({ waypoints }) => {
         show: false,
         addWaypoints: false,
         draggableWaypoints: false,
-        fitSelectedRoutes: false,
+        fitSelectedRoutes: true,
         showAlternatives: false,
       }).addTo(map);
 
@@ -82,6 +137,8 @@ const RoutingMachine = ({ waypoints }) => {
         if (!isMountedRef.current) return;
 
         const routes = e.routes;
+        console.log('Routes found:', routes);
+
         if (routes.length > 0) {
           const routeCoordinates = routes[0].coordinates.map((coord) => [
             coord.lat,
@@ -109,7 +166,16 @@ const RoutingMachine = ({ waypoints }) => {
       });
 
       routingControl.on('routingerror', (e) => {
-        console.error('Erreur de routage:', e.error);
+        console.error('Routing error:', e.error);
+        const fallbackLine = L.polyline(
+          waypoints.map((point) => [point.lat, point.lng]),
+          {
+            color: 'red',
+            weight: 3,
+            opacity: 0.5,
+            dashArray: '5, 10',
+          }
+        ).addTo(map);
       });
 
       routingControlRef.current = routingControl;
@@ -131,7 +197,7 @@ const RoutingMachine = ({ waypoints }) => {
             map.removeControl(routingControlRef.current);
             routingControlRef.current = null;
           } catch (err) {
-            console.warn('Erreur lors de la suppression du contrôle de routage:', err);
+            console.warn('Error removing routing control:', err);
           }
         }
 
@@ -140,7 +206,7 @@ const RoutingMachine = ({ waypoints }) => {
             try {
               map.removeLayer(layer);
             } catch (err) {
-              console.warn('Erreur lors de la suppression de la couche:', err);
+              console.warn('Error removing polyline layer:', err);
             }
           }
         });
@@ -156,6 +222,7 @@ const CircuitDetail = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const { circuit, loading, error } = useSelector((state) => state.circuit);
+  const { destinations } = useSelector((state) => state.destinations || { destinations: [] });
   const { reviews, loading: reviewsLoading, error: reviewsError } = useSelector((state) => state.reviews);
   const { userInfo } = useSelector((state) => state.auth || {});
 
@@ -163,10 +230,13 @@ const CircuitDetail = () => {
   const [rating, setRating] = useState(0);
   const [comment, setComment] = useState('');
   const [image, setImage] = useState(null);
+  const [expandedDays, setExpandedDays] = useState({});
+  const [showReviewModal, setShowReviewModal] = useState(false);
 
   useEffect(() => {
     dispatch(fetchCircuitDetails(id));
     dispatch(fetchReviews('circuit', id));
+    dispatch(fetchDestinations());
   }, [dispatch, id]);
 
   useEffect(() => {
@@ -188,10 +258,18 @@ const CircuitDetail = () => {
       setRating(0);
       setComment('');
       setImage(null);
+      setShowReviewModal(false);
       dispatch(fetchReviews('circuit', id));
     } catch (error) {
       console.error('Review submission failed:', error);
     }
+  };
+
+  const toggleDay = (dayKey) => {
+    setExpandedDays((prev) => ({
+      ...prev,
+      [dayKey]: !prev[dayKey],
+    }));
   };
 
   if (loading) return <div className="text-center text-gray-600 p-6">Chargement...</div>;
@@ -201,370 +279,452 @@ const CircuitDetail = () => {
   const totalDays = circuit.duration || 1;
   const nights = totalDays - 1;
 
-  const originDestName = typeof circuit.departure_city === 'string' 
-    ? circuit.departure_city 
-    : circuit.departure_city?.name || 'Inconnu';
-  const destinationDestName = typeof circuit.arrival_city === 'string' 
-    ? circuit.arrival_city 
-    : circuit.arrival_city?.name || 'Inconnu';
+  const departureDest = destinations.find((d) => d.id === parseInt(circuit.departure_city));
+  const arrivalDest = destinations.find((d) => d.id === parseInt(circuit.arrival_city));
+  const originDestName = departureDest?.name || 'Inconnu';
+  const destinationDestName = arrivalDest?.name || 'Inconnu';
 
-  const orderedDestinations = (circuit.schedules || []).map((schedule) => ({
-    id: schedule.destination_id,
-    name: schedule.destination_name || 'Inconnu',
-    days: schedule.day || 1,
-    latitude: schedule.destination?.latitude || 36.8065,
-    longitude: schedule.destination?.longitude || 10.1815,
-  })).filter(dest => dest.latitude && dest.longitude && !isNaN(dest.latitude) && !isNaN(dest.longitude));
-
-  const waypoints = orderedDestinations
-    .map((dest, index) => {
-      if (!dest.latitude || !dest.longitude || isNaN(dest.latitude) || isNaN(dest.longitude)) return null;
-      return {
-        lat: dest.latitude,
-        lng: dest.longitude,
-        name: `${dest.name}${
-          index === 0
-            ? ' (Départ)'
-            : index === orderedDestinations.length - 1
-            ? ' (Arrivée)'
-            : ''
-        }`,
-      };
-    })
-    .filter((point) => point !== null);
-
-  const defaultCenter = [36.8065, 10.1815];
-  const mapCenter = waypoints.length > 0
-    ? [waypoints[0].lat, waypoints[0].lng]
-    : defaultCenter;
+  const departureCoords = departureDest
+    ? { lat: departureDest.latitude || 36.8065, lng: departureDest.longitude || 10.1815, name: `${originDestName} (Départ)` }
+    : { lat: 36.8065, lng: 10.1815, name: 'Départ Inconnu' };
+  const arrivalCoords = arrivalDest
+    ? { lat: arrivalDest.latitude || 36.8065, lng: arrivalDest.longitude || 10.1815, name: `${destinationDestName} (Arrivée)` }
+    : { lat: 36.8065, lng: 10.1815, name: 'Arrivée Inconnu' };
 
   const schedulesByDestination = {};
   (circuit.schedules || []).forEach((schedule) => {
     const destId = schedule.destination_id;
-    const day = schedule.day;
-
     if (!schedulesByDestination[destId]) {
-      schedulesByDestination[destId] = {};
+      schedulesByDestination[destId] = [];
     }
-    if (!schedulesByDestination[destId][day]) {
-      schedulesByDestination[destId][day] = {};
-    }
+    schedulesByDestination[destId].push(schedule);
+  });
 
-    const entityTypes = [
-      { type: 'hotel', data: schedule.hotel },
-      { type: 'guest_house', data: schedule.guest_house },
-      { type: 'restaurant', data: schedule.restaurant },
-      { type: 'activity', data: schedule.activity },
-      { type: 'museum', data: schedule.museum },
-      { type: 'festival', data: schedule.festival },
-      { type: 'archaeological_site', data: schedule.archaeological_site },
-    ];
+  Object.values(schedulesByDestination).forEach((schedules) => {
+    schedules.sort((a, b) => a.order - b.order);
+  });
 
-    entityTypes.forEach(({ type, data }) => {
-      if (data && Object.keys(data).length > 0) {
-        schedulesByDestination[destId][day][type] = {
-          id: data.id,
-          name: data.name,
-          address: data.address || 'N/A',
-          price: data.price != null ? data.price : 'N/A',
-          stars: data.stars || null,
-          category: data.category || null,
-          forks: data.forks || null,
-          exhibition: data.exhibition || null,
-          date: data.date || null,
-          historical_period: data.historical_period || null,
-          rating: data.rating != null ? data.rating : 'N/A',
-        };
+  const orderedDestinations = Object.entries(schedulesByDestination).map(([destId, schedules]) => {
+    const dest = destinations.find((d) => d.id === parseInt(destId)) || {};
+    return {
+      id: parseInt(destId),
+      name: schedules[0].destination_name || dest.name || 'Inconnu',
+      latitude: schedules[0].destination?.latitude || dest.latitude || 36.8065,
+      longitude: schedules[0].destination?.longitude || dest.longitude || 10.1815,
+      schedules: schedules,
+    };
+  });
+
+  let waypoints = orderedDestinations
+    .map((dest) => {
+      if (isNaN(dest.latitude) || isNaN(dest.longitude)) {
+        console.warn(`Invalid coordinates for destination ${dest.name}:`, dest);
+        return null;
       }
+      return {
+        lat: dest.latitude,
+        lng: dest.longitude,
+        name: `${dest.name}`,
+      };
+    })
+    .filter((point) => point !== null);
+
+  if (!waypoints.some((wp) => wp.name.includes('Départ'))) {
+    waypoints.unshift(departureCoords);
+  }
+  if (!waypoints.some((wp) => wp.name.includes('Arrivée'))) {
+    waypoints.push(arrivalCoords);
+  }
+
+  console.log('Final Waypoints:', waypoints);
+
+  const defaultCenter = [36.8065, 10.1815];
+  const mapCenter = waypoints.length > 0 ? [waypoints[0].lat, waypoints[0].lng] : defaultCenter;
+
+  const entityMarkers = [];
+  orderedDestinations.forEach((dest) => {
+    dest.schedules.forEach((schedule) => {
+      const entityTypes = [
+        { type: 'hotel', data: schedule.hotel },
+        { type: 'guest_house', data: schedule.guest_house },
+        { type: 'restaurant', data: schedule.restaurant },
+        { type: 'activity', data: schedule.activity },
+        { type: 'museum', data: schedule.museum },
+        { type: 'festival', data: schedule.festival },
+        { type: 'archaeological_site', data: schedule.archaeological_site },
+      ];
+
+      entityTypes.forEach(({ type, data }) => {
+        if (data && Object.keys(data).length > 0) {
+          let lat = data.latitude || dest.latitude;
+          let lng = data.longitude || dest.longitude;
+
+          if (!data.latitude || !data.longitude) {
+            const offset = 0.005 * (entityMarkers.length % 5);
+            const angle = (entityMarkers.length % 5) * (Math.PI / 2);
+            lat += offset * Math.cos(angle);
+            lng += offset * Math.sin(angle);
+          }
+
+          if (lat && lng && !isNaN(lat) && !isNaN(lng)) {
+            entityMarkers.push({
+              lat,
+              lng,
+              type: type,
+              name: data.name,
+              address: data.address || 'N/A',
+              day: schedule.order,
+              icon: entityIcons[type],
+            });
+          }
+        }
+      });
     });
   });
 
-  let globalDay = 1;
+  console.log('Entity Markers:', entityMarkers);
 
   return (
-    <div className="max-w-7xl mx-auto p-6">
-      <button
-        onClick={() => navigate('/')}
-        className="mb-6 px-6 py-3 bg-gray-500 text-white rounded-md hover:bg-gray-600 transition"
-      >
-        Retour
-      </button>
-
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        exit={{ opacity: 0, y: -20 }}
-        transition={{ duration: 0.3 }}
-        className="flex flex-col md:flex-row space-y-6 md:space-y-0 md:space-x-6"
-      >
-        <div className="w-full md:w-1/2 h-96 md:h-[600px] circuit-wizard-map-container">
-          {isMapVisible && waypoints.length >= 1 ? (
-            <MapContainer
-              center={mapCenter}
-              zoom={6}
-              className="circuit-wizard-map"
-              key={waypoints.map((p) => `${p.lat}-${p.lng}`).join('-')}
-              whenReady={(map) => {
-                setTimeout(() => {
-                  map.target.invalidateSize();
-                }, 500);
-              }}
-            >
-              <TileLayer
-                url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-                attribution='© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-              />
-              <MapInitializer />
-              {waypoints.map((point, index) => (
-                <Marker key={index} position={[point.lat, point.lng]}>
-                  <Popup>
-                    <div className="text-center">
-                      <strong>{point.name}</strong>
-                      <p>
-                        Arrêt {index + 1} de {waypoints.length}
-                      </p>
-                    </div>
-                  </Popup>
-                </Marker>
-              ))}
-              {waypoints.length >= 2 && <RoutingMachine waypoints={waypoints} />}
-            </MapContainer>
-          ) : (
-            <p className="text-center text-gray-500 pt-40">
-              {isMapVisible
-                ? `Impossible d'afficher la carte : Besoin d'au moins une destination avec des coordonnées valides. (Nombre de waypoints : ${waypoints.length})`
-                : 'Chargement de la carte...'}
-            </p>
-          )}
-        </div>
-
-        <div className="w-full md:w-1/2 space-y-6 overflow-y-auto md:max-h-[600px]">
-          <h2 className="text-2xl font-bold text-gray-800">
-            Circuit {originDestName} to {destinationDestName}: {totalDays} Jour(s) / {nights} Nuit(s)
-          </h2>
-          {orderedDestinations.length === 0 ? (
-            <p className="text-gray-500">Aucune destination disponible à afficher.</p>
-          ) : (
-            <>
-              {orderedDestinations.map((dest) => (
-                <React.Fragment key={dest.id}>
-                  {Array.from({ length: dest.days }, (_, dayIndex) => {
-                    const localDay = dayIndex + 1;
-                    const entities = schedulesByDestination[dest.id]?.[localDay] || {};
-
-                    const hotel = entities.hotel || entities.guest_house;
-                    const restaurant = entities.restaurant;
-                    const activity =
-                      entities.activity ||
-                      entities.museum ||
-                      entities.festival ||
-                      entities.archaeological_site;
-
-                    const dayBlock = (
-                      <div
-                        key={`${dest.id}-${localDay}`}
-                        className="bg-white p-4 rounded-lg shadow-md"
-                      >
-                        <div className="flex justify-between items-center">
-                          <h3 className="text-lg font-semibold text-gray-700">
-                            Jour {globalDay} - {dest.name}
-                          </h3>
-                          <button className="text-blue-500 hover:text-blue-700">
-                            <svg
-                              className="w-5 h-5"
-                              fill="none"
-                              stroke="currentColor"
-                              viewBox="0 0 24 24"
-                              xmlns="http://www.w3.org/2000/svg"
-                            >
-                              <path
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                                strokeWidth="2"
-                                d="M12 4v16m8-8H4"
-                              />
-                            </svg>
-                          </button>
-                        </div>
-                        <div className="mt-4 space-y-4">
-                          <div>
-                            <h4 className="text-md font-medium text-gray-600">
-                              Hébergement
-                            </h4>
-                            {hotel ? (
-                              <div className="mt-2 bg-gray-100 p-3 rounded-md">
-                                <p className="text-gray-800">{hotel.name}</p>
-                                <p className="text-sm text-gray-600">
-                                  Adresse: {hotel.address || 'N/A'}
-                                </p>
-                                <p className="text-sm text-gray-600">
-                                  Prix: {hotel.price != null ? `${hotel.price} DT` : 'N/A'}
-                                </p>
-                                {hotel.stars && (
-                                  <p className="text-sm text-gray-600">
-                                    Étoiles: {hotel.stars}
-                                  </p>
-                                )}
-                                {hotel.category && (
-                                  <p className="text-sm text-gray-600">
-                                    Catégorie: {hotel.category}
-                                  </p>
-                                )}
-                                <p className="text-sm text-gray-600">
-                                  Note: {hotel.rating != null ? hotel.rating : 'N/A'}
-                                </p>
-                              </div>
-                            ) : (
-                              <p className="text-sm text-gray-500 italic">
-                                Aucun hébergement sélectionné.
-                              </p>
-                            )}
-                          </div>
-                          <div>
-                            <h4 className="text-md font-medium text-gray-600">
-                              Restaurants
-                            </h4>
-                            {restaurant ? (
-                              <div className="mt-2 bg-gray-100 p-3 rounded-md">
-                                <p className="text-gray-800">{restaurant.name}</p>
-                                <p className="text-sm text-gray-600">
-                                  Adresse: {restaurant.address || 'N/A'}
-                                </p>
-                                <p className="text-sm text-gray-600">
-                                  Prix: {restaurant.price != null ? `${restaurant.price} DT` : 'N/A'}
-                                </p>
-                                {restaurant.forks && (
-                                  <p className="text-sm text-gray-600">
-                                    Fourchettes: {restaurant.forks}
-                                  </p>
-                                )}
-                                <p className="text-sm text-gray-600">
-                                  Note: {restaurant.rating != null ? restaurant.rating : 'N/A'}
-                                </p>
-                              </div>
-                            ) : (
-                              <p className="text-sm text-gray-500 italic">
-                                Aucun restaurant sélectionné.
-                              </p>
-                            )}
-                          </div>
-                          <div>
-                            <h4 className="text-md font-medium text-gray-600">
-                              Activités
-                            </h4>
-                            {activity ? (
-                              <div className="mt-2 bg-gray-100 p-3 rounded-md">
-                                <p className="text-gray-800">{activity.name}</p>
-                                <p className="text-sm text-gray-600">
-                                  Adresse: {activity.address || 'N/A'}
-                                </p>
-                                <p className="text-sm text-gray-600">
-                                  Prix: {activity.price != null ? `${activity.price} DT` : 'N/A'}
-                                </p>
-                                {activity.category && (
-                                  <p className="text-sm text-gray-600">
-                                    Catégorie: {activity.category}
-                                  </p>
-                                )}
-                                {activity.exhibition && (
-                                  <p className="text-sm text-gray-600">
-                                    Exposition: {activity.exhibition}
-                                  </p>
-                                )}
-                                {activity.date && (
-                                  <p className="text-sm text-gray-600">
-                                    Date: {activity.date}
-                                  </p>
-                                )}
-                                {activity.historical_period && (
-                                  <p className="text-sm text-gray-600">
-                                    Période historique: {activity.historical_period}
-                                  </p>
-                                )}
-                                <p className="text-sm text-gray-600">
-                                  Note: {activity.rating != null ? activity.rating : 'N/A'}
-                                </p>
-                              </div>
-                            ) : (
-                              <p className="text-sm text-gray-500 italic">
-                                Aucune activité sélectionnée.
-                              </p>
-                            )}
-                          </div>
-                        </div>
-                      </div>
-                    );
-
-                    globalDay++;
-                    return dayBlock;
-                  })}
-                </React.Fragment>
-              ))}
-            </>
-          )}
-        </div>
-      </motion.div>
-
-      <div className="mt-6">
-        <h2 className="text-2xl font-bold text-gray-800">Avis sur ce circuit</h2>
-        <EntityReviews
-          reviews={reviews}
-          loading={reviewsLoading}
-          error={reviewsError}
-          entityType="circuit"
-          entityId={id}
+    <>
+      <div className="hero-container">
+        <HeroSection
+          title={`Circuit ${originDestName} à ${destinationDestName}`}
+          subtitle={`Explorez un voyage de ${totalDays} jour(s) / ${nights} nuit(s)`}
+          image={circuit.image || "https://lemag.promovacances.com/wp-content/uploads/2023/12/Circuit-3.jpg"}
         />
-        <Form onSubmit={handleReviewSubmit} className="mt-4">
-          <Form.Group className="mb-3">
-            <Form.Label>Note (1-5)</Form.Label>
-            <Form.Control
-              type="number"
-              min="1"
-              max="5"
-              value={rating}
-              onChange={(e) => setRating(parseInt(e.target.value))}
-              required
-            />
-          </Form.Group>
-          <Form.Group className="mb-3">
-            <Form.Label>Commentaire</Form.Label>
-            <Form.Control
-              as="textarea"
-              rows={3}
-              value={comment}
-              onChange={(e) => setComment(e.target.value)}
-              required
-            />
-          </Form.Group>
-          <Form.Group className="mb-3">
-            <Form.Label>Image (Base64)</Form.Label>
-            <Form.Control
-              type="text"
-              value={image || ''}
-              onChange={(e) => setImage(e.target.value)}
-            />
-          </Form.Group>
-          <Button variant="primary" type="submit" disabled={!userInfo}>
-            Soumettre l'avis
-          </Button>
-        </Form>
       </div>
-
-      <div className="mt-6 bg-white p-4 rounded-lg shadow-md sticky bottom-4 max-w-sm mx-auto">
-        <h3 className="text-lg font-semibold text-gray-800">Résumé</h3>
-        <p className="text-gray-600">
-          <strong>Prix:</strong> {circuit.price} DT /per
-        </p>
-        <p className="text-gray-600">
-          <strong>Durée:</strong> {circuit.duration} jours
-        </p>
+      <div className="container p-3.5 lg:px-16 xl:px-16 mx-auto my-2">
         <button
-          className="mt-4 w-full px-4 py-2 bg-indigo-500 text-white rounded-md hover:bg-indigo-600 transition"
+          onClick={() => navigate('/')}
+          className="mb-6 px-6 py-3 bg-gray-500 text-white rounded-md hover:bg-gray-600 transition"
         >
-          Réserver Maintenant
+          Retour
         </button>
+
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: -20 }}
+          transition={{ duration: 0.3 }}
+          className="flex flex-col md:flex-row space-y-6 md:space-y-0 md:space-x-6"
+        >
+          <div className="w-full md:w-1/2 h-96 circuit-wizard-map-container relative" style={{ zIndex: 0 }}>
+            {isMapVisible && waypoints.length >= 1 ? (
+              <MapContainer
+                center={mapCenter}
+                zoom={6}
+                className="circuit-wizard-map rounded-lg w-full h-full"
+                key={waypoints.map((p) => `${p.lat}-${p.lng}`).join('-')}
+                style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%' }}
+              >
+                <TileLayer
+                  url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                  attribution='© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                />
+                <MapInitializer />
+                {waypoints.map((point, index) => (
+                  <Marker key={index} position={[point.lat, point.lng]}>
+                    <Popup>
+                      <div className="text-center">
+                        <strong>{point.name}</strong>
+                        <p>
+                          Arrêt {index + 1} de {waypoints.length}
+                        </p>
+                      </div>
+                    </Popup>
+                  </Marker>
+                ))}
+                {entityMarkers.map((marker, index) => (
+                  <Marker key={`entity-${index}`} position={[marker.lat, marker.lng]} icon={marker.icon}>
+                    <Popup>
+                      <div className="text-center">
+                        <strong>{marker.name}</strong>
+                        <p>{marker.type.replace('_', ' ').toUpperCase()}</p>
+                        <p>Jour {marker.day}</p>
+                        <p>{marker.address}</p>
+                      </div>
+                    </Popup>
+                  </Marker>
+                ))}
+                {waypoints.length >= 2 && <RoutingMachine waypoints={waypoints} />}
+              </MapContainer>
+            ) : (
+              <p className="text-center text-gray-500 pt-40">
+                {isMapVisible
+                  ? `Impossible d'afficher la carte : Besoin d'au moins une destination avec des coordonnées valides. (Nombre de waypoints : ${waypoints.length})`
+                  : 'Chargement de la carte...'}
+              </p>
+            )}
+          </div>
+
+          <div className="w-full md:w-1/2 space-y-6">
+            <div className="flex flex-row">
+              <h1 className="font-bold text-md mr-1">
+                Circuit {originDestName} to {destinationDestName}
+              </h1>
+              <span>{totalDays} Jour(s) / {nights} Nuit(s)</span>
+            </div>
+            {orderedDestinations.length === 0 ? (
+              <p className="text-gray-500">Aucune destination disponible à afficher.</p>
+            ) : (
+              <>
+                {orderedDestinations.map((dest) => (
+                  <React.Fragment key={dest.id}>
+                    {dest.schedules.map((schedule) => {
+                      const entities = {
+                        hotel: schedule.hotel,
+                        guest_house: schedule.guest_house,
+                        restaurant: schedule.restaurant,
+                        activity: schedule.activity || schedule.museum || schedule.festival || schedule.archaeological_site,
+                      };
+                      const dayKey = `${dest.id}-${schedule.order}`;
+                      const isExpanded = expandedDays[dayKey] || false;
+
+                      return (
+                        <div key={dayKey} className="p-4 bg-white rounded-lg shadow-md border border-gray-200 relative">
+                          <div className="flex justify-between items-center">
+                            <h2 className="ml-3 text-lg font-semibold">
+                              Jour {schedule.order} - {dest.name}
+                            </h2>
+                            <button
+                              onClick={() => toggleDay(dayKey)}
+                              className="w-8 h-8 flex items-center justify-center text-white rounded-full bg-blue-500 hover:bg-[#2C5BA1]"
+                            >
+                              <span>
+                                <i className={`fas ${isExpanded ? 'fa-minus' : 'fa-plus'}`}></i>
+                              </span>
+                            </button>
+                          </div>
+                          {isExpanded && (
+                            <div className="mt-4 space-y-4">
+                              {(entities.hotel || entities.guest_house) && (
+                                <div>
+                                  <h1 className="text-blue-500 font-bold text-lg ltr:text-left my-2">Hébergement</h1>
+                                  <a className="block border group rounded-2xl overflow-hidden shadow-lg hover:cursor-pointer">
+                                    <div className="grid grid-cols-4">
+                                      <div
+                                        className="col-span-1 relative w-full h-full bg-no-repeat bg-cover grow flex flex-col-reverse pb-6 lg:pb-10 transition duration-300 group-hover:scale-110"
+                                        style={{
+                                          backgroundImage: `url(${(entities.hotel || entities.guest_house).image || 'https://via.placeholder.com/318x160'})`,
+                                          backgroundPosition: 'center center',
+                                          backgroundRepeat: 'no-repeat',
+                                        }}
+                                      />
+                                      <div className="col-span-3">
+                                        <div className="flex flex-col justify-between p-4">
+                                          <div className="flex flex-col">
+                                            <h3 className="font-semibold text-xs xl:text-lg flex items-start">
+                                              <span>{(entities.hotel || entities.guest_house).name}</span>
+                                            </h3>
+                                            <div className="bg-yellow-100 border-l-4 text-xs border-yellow-500 text-yellow-700 p-1 rounded">
+                                              <p>Cet hébergement n'est pas réservable.</p>
+                                            </div>
+                                          </div>
+                                          <div className="flex justify-between">
+                                            <div className="flex items-end">
+                                              <div className="flex items-center text-gray-600 text-sm">
+                                                <i className="fas fa-map-marker-alt text-blue-500 mr-1"></i>
+                                                <span>{(entities.hotel || entities.guest_house).address || 'N/A'}</span>
+                                              </div>
+                                            </div>
+                                            <div>
+                                              <p className="text-xs text-gray-500">à partir de</p>
+                                              <span className="text-blue-500 font-bold text-xl">
+                                                {(entities.hotel || entities.guest_house).price != null ? (entities.hotel || entities.guest_house).price : 'N/A'}<sup> DT</sup>
+                                              </span>
+                                            </div>
+                                          </div>
+                                        </div>
+                                      </div>
+                                    </div>
+                                  </a>
+                                </div>
+                              )}
+                              {entities.restaurant && (
+                                <div>
+                                  <hr className="my-2" />
+                                  <h1 className="text-blue-500 font-bold text-lg ltr:text-left my-2">Restaurants</h1>
+                                  <div className="mt-2" style={{ backgroundColor: 'rgb(240, 246, 255)' }}>
+                                    <div className="block border group rounded-2xl overflow-hidden shadow-lg hover:cursor-pointer">
+                                      <div className="grid grid-cols-4">
+                                        <div
+                                          className="col-span-1 relative w-full h-full bg-no-repeat bg-cover grow flex flex-col-reverse pb-6 lg:pb-10"
+                                          style={{
+                                            backgroundImage: `url(${entities.restaurant.image || 'https://via.placeholder.com/318x160'})`,
+                                            backgroundPosition: 'center center',
+                                            backgroundRepeat: 'no-repeat',
+                                          }}
+                                        />
+                                        <div className="col-span-3">
+                                          <div className="flex flex-col justify-between p-4">
+                                            <div className="flex flex-row justify-between">
+                                              <h3 className="font-semibold text-lg flex items-start">
+                                                <span>{entities.restaurant.name}</span>
+                                              </h3>
+                                            </div>
+                                            <div className="bg-yellow-100 text-xs border-l-4 border-yellow-500 text-yellow-700 p-1 rounded">
+                                              <p>Ce restaurant n'est pas réservable.</p>
+                                            </div>
+                                            <div className="flex justify-between">
+                                              <div className="flex items-end">
+                                                <div className="flex items-center text-gray-600 text-sm">
+                                                  <i className="fas fa-map-marker-alt text-blue-500 mr-1"></i>
+                                                  <span>{entities.restaurant.address || 'N/A'}</span>
+                                                </div>
+                                              </div>
+                                              <div>
+                                                <p className="text-xs text-gray-500">à partir de</p>
+                                                <span className="text-blue-500 font-bold text-xl">
+                                                  {entities.restaurant.price != null ? entities.restaurant.price : 'N/A'}<sup> DT</sup>
+                                                </span>
+                                              </div>
+                                            </div>
+                                          </div>
+                                        </div>
+                                      </div>
+                                    </div>
+                                  </div>
+                                </div>
+                              )}
+                              {entities.activity && (
+                                <div>
+                                  <hr className="my-2" />
+                                  <h1 className="text-blue-500 font-bold text-lg ltr:text-left my-2">Activités</h1>
+                                  <div className="mt-2" style={{ backgroundColor: 'rgb(240, 246, 255)' }}>
+                                    <div className="block border group rounded-2xl overflow-hidden shadow-lg hover:cursor-pointer">
+                                      <div className="grid grid-cols-4">
+                                        <div
+                                          className="col-span-1 relative w-full h-full bg-no-repeat bg-cover grow flex flex-col-reverse pb-6 lg:pb-10 transition duration-300 group-hover:scale-110"
+                                          style={{
+                                            backgroundImage: `url(${entities.activity.image || 'https://via.placeholder.com/318x160'})`,
+                                            backgroundPosition: 'center center',
+                                            backgroundRepeat: 'no-repeat',
+                                          }}
+                                        />
+                                        <div className="col-span-3">
+                                          <div className="flex flex-col justify-between p-4">
+                                            <div className="flex flex-col">
+                                              <h3 className="font-semibold text-lg flex items-start">
+                                                <span>{entities.activity.name}</span>
+                                              </h3>
+                                            </div>
+                                            <div className="flex justify-between">
+                                              <div className="flex items-end">
+                                                <div className="flex items-center text-gray-600 text-sm">
+                                                  <i className="fas fa-map-marker-alt text-blue-500 mr-1 truncate"></i>
+                                                  <span>{entities.activity.address || 'N/A'}</span>
+                                                </div>
+                                              </div>
+                                              <div>
+                                                {entities.activity.price != null && (
+                                                  <>
+                                                    <p className="text-xs text-gray-500">à partir de</p>
+                                                    <span className="text-blue-500 font-bold text-xl">
+                                                      {entities.activity.price}<sup> DT</sup>
+                                                    </span>
+                                                  </>
+                                                )}
+                                              </div>
+                                            </div>
+                                          </div>
+                                        </div>
+                                      </div>
+                                    </div>
+                                  </div>
+                                </div>
+                              )}
+                            </div>
+                          )}
+                        </div>
+                      );
+                    })}
+                  </React.Fragment>
+                ))}
+              </>
+            )}
+            <div className="flex flex-row justify-end items-end mt-2">
+              <button
+                aria-label="Confirmer circuit"
+                className="bg-[#F78D1E] py-2 px-4 rounded-2xl mt-2 text-md text-white"
+              >
+                Confirmer
+              </button>
+            </div>
+          </div>
+        </motion.div>
+
+        <div className="mt-6">
+          <EntityReviews
+            reviews={reviews}
+            loading={reviewsLoading}
+            error={reviewsError}
+            entityType="circuit"
+            entityId={id}
+          />
+          <div className="d-flex justify-content-center mb-3 mt-4">
+            <Button
+              variant="primary"
+              onClick={() => setShowReviewModal(true)}
+              className="submit-btn"
+            >
+              Ajouter un commentaire
+            </Button>
+          </div>
+
+          <Modal show={showReviewModal} onHide={() => setShowReviewModal(false)} centered>
+            <Modal.Header closeButton>
+              <Modal.Title>Ajouter un commentaire</Modal.Title>
+            </Modal.Header>
+            <Modal.Body>
+              <Form onSubmit={handleReviewSubmit}>
+                <Form.Group className="mb-3">
+                  <Form.Label>Note (1-5)</Form.Label>
+                  <Form.Control
+                    type="number"
+                    min="1"
+                    max="5"
+                    value={rating}
+                    onChange={(e) => setRating(parseInt(e.target.value))}
+                    required
+                  />
+                </Form.Group>
+                <Form.Group className="mb-3">
+                  <Form.Label>Commentaire</Form.Label>
+                  <Form.Control
+                    as="textarea"
+                    rows={3}
+                    value={comment}
+                    onChange={(e) => setComment(e.target.value)}
+                    required
+                  />
+                </Form.Group>
+                <Form.Group className="mb-3">
+                  <Form.Label>Image (Base64)</Form.Label>
+                  <Form.Control
+                    type="text"
+                    value={image || ''}
+                    onChange={(e) => setImage(e.target.value)}
+                  />
+                </Form.Group>
+                <Button
+                  variant="primary"
+                  type="submit"
+                  disabled={!userInfo}
+                  className="rounded-lg py-2 px-4 text-white bg-[#2C5BA1] font-semibold hover:bg-[#1e88e5] transition-colors"
+                >
+                  Soumettre l'avis
+                </Button>
+              </Form>
+            </Modal.Body>
+            <Modal.Footer>
+              <Button variant="secondary" onClick={() => setShowReviewModal(false)}>
+                Annuler
+              </Button>
+            </Modal.Footer>
+          </Modal>
+        </div>
       </div>
-    </div>
+    </>
   );
 };
 

@@ -1,6 +1,6 @@
-// src/components/EntityDescription.jsx
 import React from 'react';
-import { Row, Col, Card } from 'react-bootstrap';
+import { Row, Col } from 'react-bootstrap';
+import './entityDescription.css';
 
 const EntityDescription = ({ description }) => {
   if (!description) return null;
@@ -8,12 +8,10 @@ const EntityDescription = ({ description }) => {
   return (
     <Row className="mb-4">
       <Col>
-        <Card className="shadow-sm">
-          <Card.Body>
-            <Card.Title>Description</Card.Title>
-            <Card.Text>{description}</Card.Text>
-          </Card.Body>
-        </Card>
+        <div className="entity-description">
+          <h2 className="description-title">Description</h2>
+          <p className="description-text">{description}</p>
+        </div>
       </Col>
     </Row>
   );

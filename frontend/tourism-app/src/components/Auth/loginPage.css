@@ -1,0 +1,110 @@
+.login-container {
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.login-form {
+  background-color: #ffffff;
+  padding: 2rem;
+  border-radius: 0.75rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  max-width: 400px;
+  width: 100%;
+}
+
+.login-form h2 {
+  color: #2550ad;
+  font-family: 'Arial', sans-serif;
+  font-size: 1.5rem;
+  font-weight: 600;
+}
+
+.login-form .form-label {
+  color: #6b7280;
+  font-weight: 500;
+}
+
+.login-form .form-control {
+  border: 1px solid #d2dae2;
+  border-radius: 0.5rem;
+  padding: 0.75rem;
+  font-size: 1rem;
+  transition: border-color 0.3s ease;
+}
+
+.login-form .form-control:focus {
+  border-color: #2550ad;
+  box-shadow: none;
+}
+
+.login-form .btn-primary {
+  background-color: #2550ad;
+  border-color: #2550ad;
+  font-weight: 500;
+  padding: 0.75rem;
+  text-transform: uppercase;
+  transition: background-color 0.3s ease;
+}
+
+.login-form .btn-primary:hover {
+  background-color: #1e4291;
+  border-color: #1e4291;
+}
+
+.login-form .btn-primary:disabled {
+  background-color: #3b66c4;
+  border-color: #3b66c4;
+  opacity: 0.65;
+}
+
+.login-form .text-center a {
+  color: #2550ad;
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.login-form .text-center a:hover {
+  color: #1e4291;
+  text-decoration: underline;
+}
+
+/* Success notification styles */
+.success-notification {
+  position: fixed;
+  top: 1rem;
+  right: 1rem;
+  z-index: 9999;
+  width: 250px;
+  background-color: #d4edda !important;
+  border-left: 4px solid #28a745 !important;
+}
+
+/* Error notification styles */
+.error-notification {
+  position: fixed;
+  top: 1rem;
+  right: 1rem;
+  z-index: 9999;
+  width: 250px;
+  background-color: #f8d7da !important; /* Red theme background */
+  border-left: 4px solid #dc3545 !important; /* Red theme border */
+}
+
+/* Fade-out animation */
+@keyframes fade-out {
+  0% {
+    opacity: 1;
+  }
+  80% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+.animate-fade-out {
+  animation: fade-out 3s ease-in-out forwards;
+}

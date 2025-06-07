@@ -29,7 +29,7 @@ const DestinationDropdown = ({ onDestinationChange, className }) => {
 
   return (
     <div className={`tourism-destination-container ${className}`}>
-      <Form.Label className="tourism-destination-label">Recherche</Form.Label>
+      <Form.Label className="tourism-destination-label">Cherchez par destination</Form.Label>
       {loading && <p>Loading destinations...</p>}
       {error && <p>Error: {error}</p>}
       <Dropdown

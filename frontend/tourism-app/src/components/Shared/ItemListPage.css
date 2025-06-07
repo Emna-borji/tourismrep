@@ -24,6 +24,23 @@
 .custom-card-img {
   height: 200px;
   object-fit: cover;
+  position: relative;
+}
+
+/* --- Rating Badge on Image --- */
+.rating-badge-image {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  background: rgba(255, 255, 255, 0.8);
+  padding: 4px 8px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.9rem;
+  color: #343a40;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 /* --- Card Title --- */
@@ -35,28 +52,73 @@
 }
 
 /* --- Location & Region --- */
-.custom-location,
-.custom-region {
+.custom-location {
   font-size: 0.9rem;
   color: #6c757d;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 0.25rem;
+}
+
+.custom-location svg {
+  color: #2c5ba1;
+  width: 30px; /* Enforce consistent width */
+  height: 30px; /* Enforce consistent height */
+  font-size: unset; /* Prevent font-size interference */
+}
+
+.address-text {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  color: #4b5563; /* Equivalent to rgb(75, 85, 99) */
+}
+
+.custom-region {
+  font-size: 0.9rem;
+  color: #2c5ba1;
   display: flex;
   align-items: center;
   gap: 0.5rem;
   margin-bottom: 0.25rem;
 }
 
-/* --- Price & Button Row --- */
-.custom-price {
-  color: #007bff;
+/* --- Price Formatting --- */
+.price-stack {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.price-prefix {
+  font-size: 0.8rem;
+  color: #2c5ba1;
+  margin-bottom: 0.25rem;
+}
+
+.price-value {
+  color: #2c5ba1;
   font-weight: 600;
   font-size: 0.95rem;
 }
 
+/* --- Details Button --- */
 .custom-details-btn {
-  padding: 5px 10px;
+  padding: 5px 15px !important;
   font-size: 0.85rem;
   font-weight: 500;
   border-radius: 6px;
+  background-color: #254c8a !important;
+  border-color: #34495e !important;
+  color: white;
+}
+
+.custom-details-btn:hover {
+  background-color: #254c8a;
+  border-color: #254c8a;
 }
 
 /* --- Favorite Icon --- */

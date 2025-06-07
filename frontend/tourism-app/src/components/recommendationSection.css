@@ -1,39 +1,49 @@
+/* Import ItemListPage.css for consistent card styling */
+@import url('./Shared/ItemListPage.css');
+
 .section-container {
-    margin: 2rem 0;
-    padding: 0 1rem;
-  }
+  margin: 2rem 0;
+  padding: 0 1rem;
+}
+
+.section-title {
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: #2c5ba1;
+  text-align: center;
+  margin-bottom: 1.5rem;
+}
+
+.no-items {
+  font-size: 1rem;
+  color: #666;
+  text-align: center;
+}
+
+/* Remove horizontal scroll styles since we're using a grid */
+.cards-container {
+  display: flex;
+  gap: 1.5rem;
+}
+
+/* Ensure grid spacing aligns with react-bootstrap */
+.row {
+  margin-left: -15px;
+  margin-right: -15px;
+}
+
+.col-md-4 {
+  padding-left: 15px;
+  padding-right: 15px;
+}
+
+@media (max-width: 768px) {
   .section-title {
-    font-size: 1.75rem;
-    font-weight: 700;
-    color: #333;
-    text-align: center;
-    margin-bottom: 1.5rem;
+    font-size: 1.5rem;
   }
-  .no-items {
-    font-size: 1rem;
-    color: #666;
-    text-align: center;
-  }
-  .cards-container {
-    display: flex;
-    overflow-x: auto;
-    scroll-behavior: smooth;
-    padding-bottom: 1rem;
-    gap: 1.5rem;
-  }
-  .cards-container::-webkit-scrollbar {
-    height: 8px;
-  }
-  .cards-container::-webkit-scrollbar-thumb {
-    background: #ccc;
-    border-radius: 4px;
-  }
-  .cards-container::-webkit-scrollbar-track {
-    background: #f1f1f1;
-  }
-  
-  @media (max-width: 768px) {
-    .section-title {
-      font-size: 1.5rem;
-    }
-  }
+}
+
+
+.text-blue {
+  color: #2c5ba1; /* Bootstrap's default blue, adjust as needed */
+}

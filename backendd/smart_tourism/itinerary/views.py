@@ -1001,35 +1001,73 @@ class SuggestedPlacesView(APIView):
         }
 
         try:
-            # Fetch hotels
+            # Fetch hotels, annotated with average rating
             hotels = Hotel.objects.filter(
                 destination_id__in=destination_ids,
                 stars__gte=pref_data.get('stars', 0),
                 price__lte=budget
-            ).order_by('price')[:5]  # Limit to 5 per type
+            ).annotate(
+                avg_rating=Coalesce(
+                    Avg('review__rating', filter=F('review__entity_type') == 'hotel'),
+                    0.0,
+                    output_field=FloatField()
+                )
+            ).order_by('-avg_rating', 'price')[:5]  # Order by rating (desc), then price
             suggestions['hotels'] = [
-                {'id': h.id, 'name': h.name, 'destination_id': h.destination_id, 'price': float(h.price), 'stars': h.stars}
+                {
+                    'id': h.id,
+                    'name': h.name,
+                    'destination_id': h.destination_id,
+                    'price': float(h.price),
+                    'stars': h.stars,
+                    'rating': round(h.avg_rating, 1) if h.avg_rating > 0 else None
+                }
                 for h in hotels
             ]
 
-            # Fetch activities
+            # Fetch activities, annotated with average rating
             activities = Activity.objects.filter(
                 destination_id__in=destination_ids,
                 category_id=pref_data['activity_category_id'],
                 price__lte=budget
-            ).order_by('price')[:5]
+            ).annotate(
+                avg_rating=Coalesce(
+                    Avg('review__rating', filter=F('review__entity_type') == 'activity'),
+                    0.0,
+                    output_field=FloatField()
+                )
+            ).order_by('-avg_rating', 'price')[:5]
             suggestions['activities'] = [
-                {'id': a.id, 'name': a.name, 'destination_id': a.destination_id, 'price': float(a.price), 'category_id': a.category_id}
+                {
+                    'id': a.id,
+                    'name': a.name,
+                    'destination_id': a.destination_id,
+                    'price': float(a.price),
+                    'category_id': a.category_id,
+                    'rating': round(a.avg_rating, 1) if a.avg_rating > 0 else None
+                }
                 for a in activities
             ]
 
-            # Fetch museums
+            # Fetch museums, annotated with average rating
             museums = Museum.objects.filter(
                 destination_id__in=destination_ids,
                 price__lte=budget
-            ).order_by('price')[:5]
+            ).annotate(
+                avg_rating=Coalesce(
+                    Avg('review__rating', filter=F('review__entity_type') == 'museum'),
+                    0.0,
+                    output_field=FloatField()
+                )
+            ).order_by('-avg_rating', 'price')[:5]
             suggestions['museums'] = [
-                {'id': m.id, 'name': m.name, 'destination_id': m.destination_id, 'price': float(m.price)}
+                {
+                    'id': m.id,
+                    'name': m.name,
+                    'destination_id': m.destination_id,
+                    'price': float(m.price),
+                    'rating': round(m.avg_rating, 1) if m.avg_rating > 0 else None
+                }
                 for m in museums
             ]
 

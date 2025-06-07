@@ -29,7 +29,31 @@ import {
   CREATE_ENTITY_REQUEST, // New action type
   CREATE_ENTITY_SUCCESS, // New action type
   CREATE_ENTITY_FAIL,   // New action type
+  FETCH_BEST_RATED_ENTITIES_REQUEST,  
+  FETCH_BEST_RATED_ENTITIES_SUCCESS,  
+  FETCH_BEST_RATED_ENTITIES_FAILURE,  
 } from '../constants/entityConstants';
+
+
+export const fetchBestRatedEntities = () => async (dispatch) => {
+  try {
+    dispatch({ type: FETCH_BEST_RATED_ENTITIES_REQUEST });
+    const response = await axios.get('/api/tourism/best-rated-entities/');
+    console.log('API response for bestRatedEntities:', response.data); // Debug log
+    dispatch({
+      type: FETCH_BEST_RATED_ENTITIES_SUCCESS,
+      payload: response.data.best_rated_entities,
+    });
+  } catch (error) {
+    console.log('Error fetching bestRatedEntities:', error.message); // Debug log
+    dispatch({
+      type: FETCH_BEST_RATED_ENTITIES_FAILURE,
+      payload: error.message,
+    });
+  }
+};
+
+
 
 export const fetchEntities = (
   entityType,
@@ -233,5 +257,82 @@ export const createEntity = (entityType, entityData) => async (dispatch, getStat
       type: CREATE_ENTITY_FAIL,
       payload: error.response?.data?.error || `Failed to create ${entityType}`,
     });
+  }
+};
+
+
+
+export const fetchNearbyEntities = (entityType, lat, lon) => async (dispatch) => {
+  try {
+    dispatch({ type: 'NEARBY_ENTITY_FETCH_REQUEST' });
+    const response = await axios.get(`/api/nearby/${entityType}/`, {
+      params: { lat, lon, radius: 10 },
+    });
+    dispatch({
+      type: 'NEARBY_ENTITY_FETCH_SUCCESS',
+      payload: response.data.nearby_entities,
+    });
+  } catch (error) {
+    dispatch({
+      type: 'NEARBY_ENTITY_FETCH_FAIL',
+      payload: error.response?.data?.message || 'Failed to fetch nearby entities',
+    });
+  }
+};
+
+
+
+
+
+// In actions/entityActions.js
+export const fetchMapEntities = (
+  entityType,
+  { searchQuery = '', sortOption = '', destination_id = '', forks = '', stars = '', cuisine = '', category = '' } = {}
+) => async (dispatch) => {
+  if (entityType === 'destination') {
+    return;
+  }
+
+  dispatch({ type: FETCH_ENTITIES_REQUEST }); // Reuse existing request type
+  try {
+    const entityTypePlural = entityType === 'activity' ? 'activities' : `${entityType}s`;
+    let url = `/api/tourism/${entityTypePlural}/`;
+    const params = new URLSearchParams();
+
+    if (searchQuery) params.append('search', searchQuery);
+    if (sortOption && sortOption !== 'Choisissez le tri') {
+      params.append('sort_by', 'price');
+      params.append('sort_direction', sortOption === 'Prix croissant' ? 'asc' : 'desc');
+    }
+    if (destination_id) params.append('destination_id', destination_id);
+    if (category) params.append('category', category);
+    if (forks) params.append('forks', forks);
+    if (stars) params.append('stars', stars);
+    if (cuisine) params.append('cuisine', cuisine);
+
+    if (params.toString()) {
+      url += `?${params.toString()}`;
+    }
+    console.log(`Fetching ${entityType} for map with URL:`, url);
+    const response = await axios.get(url);
+    const data = response.data || [];
+    console.log(`Response for ${entityType} (map):`, data);
+
+    // Enrich data with entity_type
+    const enrichedData = data.map(entity => ({
+      ...entity,
+      entity_type: entityType,
+    }));
+
+    dispatch({ type: FETCH_ENTITIES_SUCCESS, payload: { entityType, data: enrichedData } });
+    return enrichedData;
+  } catch (error) {
+    console.error(`Error fetching ${entityType} for map:`, error);
+    const errorMessage = error.response?.data?.error || `Failed to fetch ${entityType}s for map`;
+    dispatch({
+      type: FETCH_ENTITIES_FAIL,
+      payload: errorMessage,
+    });
+    throw new Error(errorMessage);
   }
 };

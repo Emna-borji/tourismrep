@@ -1,9 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { Modal, Button, Form, Row, Col, Card, ListGroup, Alert } from 'react-bootstrap';
+import { Modal, Button, Form, Row, Col, Card, Alert } from 'react-bootstrap';
 import { fetchEntities, clearEntities } from '../redux/actions/entityActions';
 import { adminCreateCircuit } from '../redux/actions/circuitActions';
 import { fetchDestinations } from '../redux/actions/destinationActions';
+import './createCircuitForm.css';
+import '@fortawesome/fontawesome-free/css/all.min.css';
 
 const CreateCircuitForm = ({ show, onHide }) => {
   const dispatch = useDispatch();
@@ -21,12 +23,6 @@ const CreateCircuitForm = ({ show, onHide }) => {
   const [totalBudget, setTotalBudget] = useState(0);
   const [formError, setFormError] = useState(null);
   const [destinationEntities, setDestinationEntities] = useState({});
-
-  console.log('CreateCircuitForm props:', { show, onHide });
-  console.log('CreateCircuitForm userInfo:', userInfo);
-  console.log('Destinations from Redux:', destinations);
-  console.log('Circuit Entities from Redux:', circuitEntities);
-  console.log('Destination Entities (Local State):', destinationEntities);
 
   useEffect(() => {
     if (!destinations.length) {
@@ -68,7 +64,6 @@ const CreateCircuitForm = ({ show, onHide }) => {
     entityTypes.forEach(type => {
       dispatch(fetchEntities(type, { destination_id: id }))
         .then(data => {
-          console.log(`Entities fetched for ${type}:`, data);
           setDestinationEntities(prev => ({
             ...prev,
             [destinationId]: {
@@ -281,12 +276,17 @@ const CreateCircuitForm = ({ show, onHide }) => {
 
   if (destinationsLoading) {
     return (
-      <Modal show={show} onHide={handleClose} size="lg">
-        <Modal.Header closeButton>
-          <Modal.Title>Ajouter un Circuit</Modal.Title>
+      <Modal show={show} onHide={handleClose} size="lg" className="circuit-modal">
+        <Modal.Header>
+          <Modal.Title className="modal-title">
+            <i className="fas fa-map-marked-alt me-2"></i> Créer un Circuit
+          </Modal.Title>
+          <button className="tourism-modal-close-btn" onClick={handleClose}>
+            <i className="fas fa-times"></i>
+          </button>
         </Modal.Header>
         <Modal.Body>
-          <div>Loading destinations...</div>
+          <div className="loading-text">Chargement des destinations...</div>
         </Modal.Body>
       </Modal>
     );
@@ -294,19 +294,24 @@ const CreateCircuitForm = ({ show, onHide }) => {
 
   if (destinationsError) {
     return (
-      <Modal show={show} onHide={handleClose} size="lg">
-        <Modal.Header closeButton>
-          <Modal.Title>Ajouter un Circuit</Modal.Title>
+      <Modal show={show} onHide={handleClose} size="lg" className="circuit-modal">
+        <Modal.Header>
+          <Modal.Title className="modal-title">
+            <i className="fas fa-map-marked-alt me-2"></i> Créer un Circuit
+          </Modal.Title>
+          <button className="tourism-modal-close-btn" onClick={handleClose}>
+            <i className="fas fa-times"></i>
+          </button>
         </Modal.Header>
         <Modal.Body>
-          <Alert variant="danger">
-            Failed to load destinations: {destinationsError}
+          <Alert variant="danger" className="error-alert">
+            Échec du chargement des destinations : {destinationsError}
             <Button
               variant="link"
               onClick={() => dispatch(fetchDestinations())}
-              className="p-0 ms-2"
+              className="retry-button p-0 ms-2"
             >
-              Retry
+              Réessayer
             </Button>
           </Alert>
         </Modal.Body>
@@ -315,214 +320,275 @@ const CreateCircuitForm = ({ show, onHide }) => {
   }
 
   return (
-    <Modal show={show} onHide={handleClose} size="lg">
-      <Modal.Header closeButton>
-        <Modal.Title>Ajouter un Circuit</Modal.Title>
+    <Modal show={show} onHide={handleClose} size="lg" className="circuit-modal">
+      <Modal.Header>
+        <Modal.Title className="modal-title">
+          <i className="fas fa-map-marked-alt me-2"></i> Créer un Circuit
+        </Modal.Title>
+        <button className="tourism-modal-close-btn" onClick={handleClose}>
+          <i className="fas fa-times"></i>
+        </button>
       </Modal.Header>
       <Modal.Body>
-        {formError && <Alert variant="danger">{formError}</Alert>}
-        {entitiesError && <Alert variant="danger">{entitiesError}</Alert>}
-        {adminCreateLoading && <div>Creating circuit...</div>}
-        {adminCreateError && <Alert variant="danger">{adminCreateError}</Alert>}
+        {formError && <Alert variant="danger" className="error-alert">{formError}</Alert>}
+        {entitiesError && <Alert variant="danger" className="error-alert">{entitiesError}</Alert>}
+        {adminCreateLoading && <div className="loading-text">Création du circuit...</div>}
+        {adminCreateError && <Alert variant="danger" className="error-alert">{adminCreateError}</Alert>}
 
-        <Form onSubmit={handleSubmit}>
-          <Form.Group className="mb-3">
-            <Form.Label>Nom du Circuit</Form.Label>
-            <Form.Control
-              type="text"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-            />
-          </Form.Group>
+        <Form onSubmit={handleSubmit} className="circuit-form">
+          <div className="form-section">
+            <Form.Group className="mb-4">
+              <Form.Label className="form-label">Nom du Circuit</Form.Label>
+              <Form.Control
+                type="text"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                className="form-input"
+                placeholder="Entrez le nom du circuit..."
+              />
+            </Form.Group>
 
-          <Form.Group className="mb-3">
-            <Form.Label>Description</Form.Label>
-            <Form.Control
-              as="textarea"
-              rows={3}
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-            />
-          </Form.Group>
+            <Form.Group className="mb-4">
+              <Form.Label className="form-label">Description</Form.Label>
+              <Form.Control
+                as="textarea"
+                rows={3}
+                value={description}
+                onChange={(e) => setDescription(e.target.value)}
+                className="form-input"
+                placeholder="Décrivez le circuit..."
+              />
+            </Form.Group>
 
-          <Row className="mb-3">
-            <Col>
-              <Form.Group>
-                <Form.Label>Ville de Départ</Form.Label>
-                <Form.Control
-                  as="select"
-                  value={departureCity}
-                  onChange={(e) => {
-                    const newDepartureCity = e.target.value;
-                    setDepartureCity(newDepartureCity);
-                    if (itinerary.length > 0) {
-                      const updatedItinerary = [...itinerary];
-                      updatedItinerary[0].destination_id = newDepartureCity;
-                      setItinerary(calculateDistances(updatedItinerary));
-                      fetchEntitiesForDestination(newDepartureCity);
-                    }
-                  }}
-                >
-                  <option value="">Sélectionnez une ville</option>
-                  {destinations.length > 0 ? (
-                    destinations.map(dest => (
-                      <option key={dest.id} value={dest.id}>{dest.name}</option>
-                    ))
-                  ) : (
-                    <option disabled>No destinations available</option>
-                  )}
-                </Form.Control>
-              </Form.Group>
-            </Col>
-            <Col>
-              <Form.Group>
-                <Form.Label>Ville d'Arrivée</Form.Label>
-                <Form.Control
-                  as="select"
-                  value={arrivalCity}
-                  onChange={(e) => {
-                    const newArrivalCity = e.target.value;
-                    setArrivalCity(newArrivalCity);
-                    if (itinerary.length > 0) {
-                      const updatedItinerary = [...itinerary];
-                      updatedItinerary[updatedItinerary.length - 1].destination_id = newArrivalCity;
-                      setItinerary(calculateDistances(updatedItinerary));
-                      fetchEntitiesForDestination(newArrivalCity);
-                    }
-                  }}
-                >
-                  <option value="">Sélectionnez une ville</option>
-                  {destinations.length > 0 ? (
-                    destinations.map(dest => (
-                      <option key={dest.id} value={dest.id}>{dest.name}</option>
-                    ))
-                  ) : (
-                    <option disabled>No destinations available</option>
-                  )}
-                </Form.Control>
-              </Form.Group>
-            </Col>
-          </Row>
+            <Row className="mb-4">
+              <Col md={6}>
+                <Form.Group>
+                  <Form.Label className="form-label">Ville de Départ</Form.Label>
+                  <div className="input-icon-wrapper">
+                    <i className="fas fa-plane-departure input-icon"></i>
+                    <Form.Control
+                      as="select"
+                      value={departureCity}
+                      onChange={(e) => {
+                        const newDepartureCity = e.target.value;
+                        setDepartureCity(newDepartureCity);
+                        if (itinerary.length > 0) {
+                          const updatedItinerary = [...itinerary];
+                          updatedItinerary[0].destination_id = newDepartureCity;
+                          setItinerary(calculateDistances(updatedItinerary));
+                          fetchEntitiesForDestination(newDepartureCity);
+                        }
+                      }}
+                      className="form-input with-icon"
+                    >
+                      <option value="">Sélectionnez une ville</option>
+                      {destinations.length > 0 ? (
+                        destinations.map(dest => (
+                          <option key={dest.id} value={dest.id}>{dest.name}</option>
+                        ))
+                      ) : (
+                        <option disabled>Aucune destination disponible</option>
+                      )}
+                    </Form.Control>
+                  </div>
+                </Form.Group>
+              </Col>
+              <Col md={6}>
+                <Form.Group>
+                  <Form.Label className="form-label">Ville d'Arrivée</Form.Label>
+                  <div className="input-icon-wrapper">
+                    <i className="fas fa-plane-arrival input-icon"></i>
+                    <Form.Control
+                      as="select"
+                      value={arrivalCity}
+                      onChange={(e) => {
+                        const newArrivalCity = e.target.value;
+                        setArrivalCity(newArrivalCity);
+                        if (itinerary.length > 0) {
+                          const updatedItinerary = [...itinerary];
+                          updatedItinerary[updatedItinerary.length - 1].destination_id = newArrivalCity;
+                          setItinerary(calculateDistances(updatedItinerary));
+                          fetchEntitiesForDestination(newArrivalCity);
+                        }
+                      }}
+                      className="form-input with-icon"
+                    >
+                      <option value="">Sélectionnez une ville</option>
+                      {destinations.length > 0 ? (
+                        destinations.map(dest => (
+                          <option key={dest.id} value={dest.id}>{dest.name}</option>
+                        ))
+                      ) : (
+                        <option disabled>Aucune destination disponible</option>
+                      )}
+                    </Form.Control>
+                  </div>
+                </Form.Group>
+              </Col>
+            </Row>
+          </div>
 
-          <h5>Itinéraire</h5>
-          {itinerary.map((stop, index) => (
-            <Card key={index} className="mb-3">
+          <div className="form-section">
+            <h5 className="section-title">
+              <i className="fas fa-route me-2"></i> Itinéraire
+            </h5>
+            {itinerary.map((stop, index) => (
+              <Card key={index} className="stop-card mb-4">
+                <Card.Body>
+                  <Row className="mb-3">
+                    <Col md={4}>
+                      <Form.Group>
+                        <Form.Label className="form-label">Jour</Form.Label>
+                        <div className="input-icon-wrapper">
+                          <i className="fas fa-calendar-day input-icon"></i>
+                          <Form.Control
+                            type="number"
+                            value={stop.day}
+                            disabled
+                            className="form-input with-icon"
+                          />
+                        </div>
+                      </Form.Group>
+                    </Col>
+                    <Col md={4}>
+                      <Form.Group>
+                        <Form.Label className="form-label">Destination</Form.Label>
+                        <div className="input-icon-wrapper">
+                          <i className="fas fa-map-marker-alt input-icon"></i>
+                          <Form.Control
+                            as="select"
+                            value={stop.destination_id}
+                            onChange={(e) => updateStop(index, 'destination_id', e.target.value)}
+                            disabled={index === 0 || index === itinerary.length - 1}
+                            className="form-input with-icon"
+                          >
+                            <option value="">Sélectionnez une destination</option>
+                            {destinations.length > 0 ? (
+                              destinations.map(dest => (
+                                <option key={dest.id} value={dest.id}>{dest.name}</option>
+                              ))
+                            ) : (
+                              <option disabled>Aucune destination disponible</option>
+                            )}
+                          </Form.Control>
+                        </div>
+                      </Form.Group>
+                    </Col>
+                    <Col md={4}>
+                      <Form.Group>
+                        <Form.Label className="form-label">Distance (km)</Form.Label>
+                        <div className="input-icon-wrapper">
+                          <i className="fas fa-road input-icon"></i>
+                          <Form.Control
+                            type="number"
+                            value={stop.distance_km}
+                            disabled
+                            className="form-input with-icon"
+                          />
+                        </div>
+                      </Form.Group>
+                    </Col>
+                  </Row>
+
+                  <h6 className="subsection-title">
+                    <i className="fas fa-suitcase me-2"></i> Étapes Associées
+                  </h6>
+                  {entitiesLoading && <div className="loading-text">Chargement des étapes...</div>}
+                  <Row>
+                    {['hotel', 'guest_house'].map(type => {
+                      const entitiesForType = destinationEntities[stop.destination_id]?.[type] || [];
+                      const iconClass = type === 'hotel' ? 'fas fa-hotel' : 'fas fa-home';
+                      return (
+                        <Col md={6} key={type}>
+                          <Form.Group className="mb-3">
+                            <Form.Label className="form-label">{type.charAt(0).toUpperCase() + type.slice(1)}</Form.Label>
+                            <div className="input-icon-wrapper">
+                              <i className={`${iconClass} input-icon`}></i>
+                              <Form.Control
+                                as="select"
+                                value={stop.entities[type] || ''}
+                                onChange={(e) => updateStopEntities(index, type, e.target.value)}
+                                disabled={!stop.destination_id}
+                                className="form-input with-icon"
+                              >
+                                <option value="">Aucune</option>
+                                {entitiesForType.length > 0 ? (
+                                  entitiesForType.map(entity => (
+                                    <option key={entity.id} value={entity.id}>
+                                      {entity.name} ({entity.price || 0} DT)
+                                    </option>
+                                  ))
+                                ) : (
+                                  <option disabled>Aucune option disponible</option>
+                                )}
+                              </Form.Control>
+                            </div>
+                          </Form.Group>
+                        </Col>
+                      );
+                    })}
+                  </Row>
+                  {optionalEntityTypes.map(type => {
+                    const entitiesForType = destinationEntities[stop.destination_id]?.[type] || [];
+                    const iconClasses = {
+                      restaurant: 'fas fa-utensils',
+                      activity: 'fas fa-hiking',
+                      festival: 'fas fa-music',
+                      museum: 'fas fa-university',
+                      archaeological_site: 'fas fa-archway',
+                    };
+                    return (
+                      <Form.Group key={type} className="mb-3">
+                        <Form.Label className="form-label">{type.charAt(0).toUpperCase() + type.slice(1)} (Multiple)</Form.Label>
+                        <div className="input-icon-wrapper">
+                          <i className={`${iconClasses[type]} input-icon`}></i>
+                          <Form.Control
+                            as="select"
+                            multiple
+                            value={stop.optionalEntities[type] || []}
+                            onChange={(e) => {
+                              const selectedOptions = Array.from(e.target.selectedOptions).map(option => option.value);
+                              updateOptionalEntities(index, type, selectedOptions);
+                            }}
+                            disabled={!stop.destination_id}
+                            className="form-input with-icon multiple-select"
+                          >
+                            {entitiesForType.length > 0 ? (
+                              entitiesForType.map(entity => (
+                                <option key={entity.id} value={entity.id}>
+                                  {entity.name} ({entity.price || 0} DT)
+                                </option>
+                              ))
+                            ) : (
+                              <option disabled>Aucune option disponible</option>
+                            )}
+                          </Form.Control>
+                        </div>
+                      </Form.Group>
+                    );
+                  })}
+                </Card.Body>
+              </Card>
+            ))}
+          </div>
+
+          <div className="form-section">
+            <Button onClick={addStop} className="add-stop-button mb-4">
+              <i className="fas fa-plus-circle me-2"></i> Ajouter une Étape
+            </Button>
+
+            <Card className="budget-card mb-4">
               <Card.Body>
-                <Row>
-                  <Col md={3}>
-                    <Form.Group>
-                      <Form.Label>Jour</Form.Label>
-                      <Form.Control
-                        type="number"
-                        value={stop.day}
-                        disabled
-                      />
-                    </Form.Group>
-                  </Col>
-                  <Col md={3}>
-                    <Form.Group>
-                      <Form.Label>Destination</Form.Label>
-                      <Form.Control
-                        as="select"
-                        value={stop.destination_id}
-                        onChange={(e) => updateStop(index, 'destination_id', e.target.value)}
-                        disabled={index === 0 || index === itinerary.length - 1}
-                      >
-                        <option value="">Sélectionnez une destination</option>
-                        {destinations.length > 0 ? (
-                          destinations.map(dest => (
-                            <option key={dest.id} value={dest.id}>{dest.name}</option>
-                          ))
-                        ) : (
-                          <option disabled>No destinations available</option>
-                        )}
-                      </Form.Control>
-                    </Form.Group>
-                  </Col>
-                  <Col md={3}>
-                    <Form.Group>
-                      <Form.Label>Distance (km)</Form.Label>
-                      <Form.Control
-                        type="number"
-                        value={stop.distance_km}
-                        disabled
-                      />
-                    </Form.Group>
-                  </Col>
-                </Row>
-
-                <h6 className="mt-3">Entités Associées</h6>
-                {entitiesLoading && <div>Loading entities...</div>}
-                {['hotel', 'guest_house'].map(type => {
-                  const entitiesForType = destinationEntities[stop.destination_id]?.[type] || [];
-                  return (
-                    <Form.Group key={type} className="mb-2">
-                      <Form.Label>{type.charAt(0).toUpperCase() + type.slice(1)}</Form.Label>
-                      <Form.Control
-                        as="select"
-                        value={stop.entities[type] || ''}
-                        onChange={(e) => updateStopEntities(index, type, e.target.value)}
-                        disabled={!stop.destination_id}
-                      >
-                        <option value="">Aucune</option>
-                        {entitiesForType.length > 0 ? (
-                          entitiesForType.map(entity => (
-                            <option key={entity.id} value={entity.id}>
-                              {entity.name} ({entity.price || 0} DT)
-                            </option>
-                          ))
-                        ) : (
-                          <option disabled>No {type}s available</option>
-                        )}
-                      </Form.Control>
-                    </Form.Group>
-                  );
-                })}
-                {optionalEntityTypes.map(type => {
-                  const entitiesForType = destinationEntities[stop.destination_id]?.[type] || [];
-                  return (
-                    <Form.Group key={type} className="mb-2">
-                      <Form.Label>{type.charAt(0).toUpperCase() + type.slice(1)} (Multiple)</Form.Label>
-                      <Form.Control
-                        as="select"
-                        multiple
-                        value={stop.optionalEntities[type] || []}
-                        onChange={(e) => {
-                          const selectedOptions = Array.from(e.target.selectedOptions).map(option => option.value);
-                          updateOptionalEntities(index, type, selectedOptions);
-                        }}
-                        disabled={!stop.destination_id}
-                      >
-                        {entitiesForType.length > 0 ? (
-                          entitiesForType.map(entity => (
-                            <option key={entity.id} value={entity.id}>
-                              {entity.name} ({entity.price || 0} DT)
-                            </option>
-                          ))
-                        ) : (
-                          <option disabled>No {type}s available</option>
-                        )}
-                      </Form.Control>
-                    </Form.Group>
-                  );
-                })}
+                <Card.Title className="budget-title">
+                  <i className="fas fa-wallet me-2"></i> Budget Total : {totalBudget} DT
+                </Card.Title>
               </Card.Body>
             </Card>
-          ))}
 
-          <Button variant="secondary" onClick={addStop} className="mb-3">
-            Ajouter une Étape
-          </Button>
-
-          <Card className="mb-3">
-            <Card.Body>
-              <Card.Title>Budget Total: {totalBudget} DT</Card.Title>
-            </Card.Body>
-          </Card>
-
-          <Button variant="primary" type="submit" disabled={adminCreateLoading}>
-            Créer le Circuit
-          </Button>
+            <Button type="submit" disabled={adminCreateLoading} className="submit-button">
+              <i className="fas fa-save me-2"></i> Créer le Circuit
+            </Button>
+          </div>
         </Form>
       </Modal.Body>
     </Modal>

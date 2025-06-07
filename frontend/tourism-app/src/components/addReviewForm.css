@@ -1,0 +1,243 @@
+/* Container for the Add Review form */
+.add-review-form {
+  max-width: 416px !important; /* max-w-[26rem] = 416px */
+  margin: 0 auto !important; /* Centrer horizontalement */
+  background-color: #ffffff !important; /* Fond blanc */
+  border-radius: 12px !important; /* rounded-xl */
+  padding: 0 !important; /* Pas de padding direct */
+  box-shadow: none !important; /* shadow-none */
+}
+
+/* Style for the card body */
+.add-review-form .card-body {
+  padding: 0 24px 24px 24px !important; /* padding-bottom: 8 unités (32px), padding-left/right: 24px */
+}
+
+/* Style for the user section (photo + name + stars) */
+.add-review-form .user-section {
+  display: flex !important;
+  align-items: center !important; /* items-center */
+  gap: 16px !important; /* gap-4 */
+  padding-bottom: 32px !important; /* pb-8 */
+  margin-top: 16px !important; /* mt-4 */
+  overflow: hidden !important; /* overflow-hidden */
+}
+
+/* Style for the profile picture */
+.add-review-form .user-section img.profile-pic {
+  width: 58px !important; /* w-[58px] */
+  height: 58px !important; /* h-[58px] */
+  border-radius: 50% !important; /* rounded-full */
+  object-fit: cover !important; /* object-cover */
+  object-position: center !important; /* object-center */
+}
+
+/* Style for the user info (name + role) */
+.add-review-form .user-info {
+  display: flex !important;
+  flex-direction: column !important; /* flex-col */
+  gap: 2px !important; /* gap-0.5 */
+  flex: 1 !important; /* w-full */
+}
+
+/* Style for the name and stars row */
+.add-review-form .name-and-stars {
+  display: flex !important;
+  align-items: center !important; /* items-center */
+  justify-content: space-between !important; /* justify-between */
+}
+
+/* Style for the user name */
+.add-review-form .user-name {
+  font-family: 'Inter', sans-serif !important; /* font-sans */
+  font-size: 20px !important; /* text-xl */
+  font-weight: 600 !important; /* font-semibold */
+  color: #1e293b !important; /* text-blue-gray-900 */
+  line-height: 1.2 !important; /* leading-snug */
+}
+
+/* Style for the role (static text) */
+.add-review-form .user-role {
+  font-family: 'Inter', sans-serif !important; /* font-sans */
+  font-size: 16px !important; /* text-base */
+  font-weight: 300 !important; /* font-light */
+  color: #1e293b !important; /* text-blue-gray-900 */
+  line-height: 1.5 !important; /* leading-relaxed */
+}
+
+/* Style for the stars */
+.add-review-form .star-rating {
+  display: flex !important; /* Assure un alignement horizontal */
+  gap: 2px !important; /* gap-0.5 */
+  align-items: center !important; /* items-center */
+}
+
+/* Style for individual stars */
+.add-review-form .star-rating svg {
+  width: 20px !important; /* w-5 */
+  height: 20px !important; /* h-5 */
+  fill: #FFC107 !important; /* Bright yellow */
+  transition: transform 0.2s ease !important; /* Transition pour l'effet au survol */
+  cursor: pointer !important;
+}
+
+/* Hover effect for stars */
+.add-review-form .star-rating svg:hover,
+.add-review-form .star-rating svg:hover ~ svg {
+  transform: scale(1.1) !important; /* Agrandissement léger au survol */
+}
+
+/* Style for selected stars (override FaStar color) */
+.add-review-form .star-rating svg.active {
+  fill: #fcce44 !important; /* Bright yellow for selected stars */
+}
+
+/* Style for unselected stars */
+.add-review-form .star-rating svg:not(.active) {
+  fill: #d1d5db !important; /* Gris clair pour les étoiles non sélectionnées */
+}
+
+/* Style for form groups */
+.add-review-form .form-group {
+  margin-bottom: 24px !important; /* mb-6, plus d'espace pour correspondre au style */
+}
+
+/* Style for form labels */
+.add-review-form .form-label {
+  font-family: 'Inter', sans-serif !important; /* font-sans */
+  font-size: 16px !important; /* text-base */
+  font-weight: 500 !important; /* Légèrement plus gras pour les labels */
+  color: #1e293b !important; /* text-blue-gray-900 */
+  margin-bottom: 8px !important; /* Espacement sous le label */
+}
+
+/* Style for form inputs */
+.add-review-form .form-control {
+  font-family: 'Inter', sans-serif !important; /* font-sans */
+  font-size: 16px !important; /* text-base */
+  font-weight: 300 !important; /* font-light */
+  color: #1e293b !important; /* text-blue-gray-900 */
+  line-height: 1.5 !important; /* leading-relaxed */
+  border-radius: 6px !important; /* Légèrement arrondi */
+  border: 1px solid #d1d5db !important; /* Bordure gris clair */
+  transition: border-color 0.3s ease, box-shadow 0.3s ease !important; /* Transition fluide */
+}
+
+/* Style for form inputs on focus */
+.add-review-form .form-control:focus {
+  border-color: #1e293b !important; /* Bordure plus foncée au focus */
+  box-shadow: 0 0 5px rgba(30, 41, 59, 0.2) !important; /* Éclat subtil */
+}
+
+/* Style for form inputs on focus */
+.add-review-form .text-danger {
+  font-family: 'Inter', sans-serif !important; /* font-sans */
+  font-size: 14px !important; /* Légèrement plus petit */
+  font-weight: 300 !important; /* font-light */
+  line-height: 1.5 !important; /* leading-relaxed */
+}
+
+/* Style for the image preview */
+.add-review-form .image-preview img {
+  border-radius: 6px !important; /* Coins arrondis pour l'image */
+  max-width: 200px !important; /* Taille maximale */
+  height: auto !important; /* Hauteur proportionnelle */
+}
+
+/* Style for the button group (Submit and Cancel buttons) */
+.add-review-form .button-group {
+  display: flex !important;
+  gap: 8px !important; /* Space between buttons */
+}
+
+/* Style for the submit button */
+.add-review-form .submit-btn {
+  font-family: 'Inter', sans-serif !important; /* font-sans */
+  font-size: 16px !important; /* text-base */
+  font-weight: 500 !important; /* Légèrement plus gras */
+  color: #ffffff !important; /* Texte blanc */
+  background-color: #1e293b !important; /* text-blue-gray-900 */
+  border: none !important;
+  padding: 8px 16px !important; /* Espacement interne */
+  border-radius: 6px !important; /* Coins arrondis */
+  transition: background-color 0.3s ease !important; /* Transition fluide */
+}
+
+/* Hover effect for the submit button */
+.add-review-form .submit-btn:hover {
+  background-color: #374151 !important; /* Légèrement plus clair au survol */
+}
+
+/* Style for the submit button when disabled */
+.add-review-form .submit-btn:disabled {
+  background-color: #d1d5db !important; /* Gris clair pour désactivé */
+  cursor: not-allowed !important;
+}
+
+/* Style for the cancel button */
+.add-review-form .cancel-btn {
+  font-family: 'Inter', sans-serif !important; /* font-sans */
+  font-size: 16px !important; /* text-base */
+  font-weight: 500 !important; /* Légèrement plus gras */
+  color: #1e293b !important; /* Texte gris foncé */
+  border-color: #1e293b !important; /* Bordure gris foncé */
+  padding: 8px 16px !important; /* Espacement interne */
+  border-radius: 6px !important; /* Coins arrondis */
+  transition: background-color 0.3s ease, color 0.3s ease !important; /* Transition fluide */
+}
+
+/* Hover effect for the cancel button */
+.add-review-form .cancel-btn:hover {
+  background-color: #1e293b !important; /* Fond gris foncé au survol */
+  color: #ffffff !important; /* Texte blanc au survol */
+}
+
+/* Style for error alerts */
+.add-review-form .alert {
+  font-family: 'Inter', sans-serif !important; /* font-sans */
+  font-size: 16px !important; /* text-base */
+  font-weight: 300 !important; /* font-light */
+  line-height: 1.5 !important; /* leading-relaxed */
+  border-radius: 6px !important; /* Coins arrondis */
+  margin-bottom: 24px !important; /* mb-6 */
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .add-review-form {
+    max-width: 100% !important; /* Pleine largeur sur mobile */
+    padding: 0 16px !important; /* Padding ajusté pour mobile */
+  }
+
+  .add-review-form .star-rating svg {
+    width: 18px !important; /* Étoiles légèrement plus petites sur mobile */
+    height: 18px !important;
+  }
+
+  .add-review-form .image-preview img {
+    max-width: 150px !important; /* Image plus petite sur mobile */
+  }
+
+  .add-review-form .user-section img.profile-pic {
+    width: 48px !important; /* Image de profil plus petite sur mobile */
+    height: 48px !important;
+  }
+
+  .add-review-form .user-name {
+    font-size: 18px !important; /* Nom plus petit sur mobile */
+  }
+
+  .add-review-form .user-role {
+    font-size: 14px !important; /* Rôle plus petit sur mobile */
+  }
+
+  .add-review-form .button-group {
+    flex-direction: column !important; /* Stack buttons vertically on mobile */
+    gap: 8px !important;
+  }
+
+  .add-review-form .submit-btn,
+  .add-review-form .cancel-btn {
+    width: 100% !important; /* Full width on mobile */
+  }
+}

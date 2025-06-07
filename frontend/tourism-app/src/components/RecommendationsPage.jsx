@@ -1,90 +1,104 @@
 import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchRecommendations } from '../redux/actions/recommendationsActions';
-import { default as RecommendationSection } from './RecommendationSection';
-import { default as LoadingSpinner } from './LoadingSpinner';
-import { default as ErrorAlert } from './ErrorAlert';
+import { fetchBestRatedEntities } from '../redux/actions/entityActions';
+import RecommendationSection from './RecommendationSection';
+import LoadingSpinner from './LoadingSpinner';
+import ErrorAlert from './ErrorAlert';
 import './recommendationsPage.css';
+import HeroSection from './Shared/HeroSection';
 
 // Debug: Confirm imports
 console.log('Imported RecommendationSection:', RecommendationSection, typeof RecommendationSection);
 console.log('Imported LoadingSpinner:', LoadingSpinner, typeof LoadingSpinner);
 console.log('Imported ErrorAlert:', ErrorAlert, typeof ErrorAlert);
+console.log('Imported HeroSection:', HeroSection, typeof HeroSection);
 console.log('RecommendationsPage component loaded');
 
 const RecommendationsPage = () => {
   const dispatch = useDispatch();
-  // Select recommendations with fallback
-  const { recommendations = {}, loading = false, error = null } =
+  const { recommendations = {}, loading: recLoading, error: recError } =
     useSelector((state) => state.recommendations || {});
-
-  // Debug: Log the state
-  useEffect(() => {
-    console.log('Selected recommendations state:', { recommendations, loading, error });
-  }, [recommendations, loading, error]);
+  const { bestRatedEntities = {}, loading: bestLoading, error: bestError } =
+    useSelector((state) => state.entities || {});
+  const { userInfo } = useSelector((state) => state.auth || {});
 
   useEffect(() => {
-    dispatch(fetchRecommendations());
-  }, [dispatch]);
+    console.log('Recommendations state:', recommendations);
+    console.log('BestRatedEntities state:', bestRatedEntities);
+    if (userInfo) {
+      dispatch(fetchRecommendations());
+    } else {
+      dispatch(fetchBestRatedEntities());
+    }
+  }, [dispatch, userInfo]);
+
+  const loading = recLoading || bestLoading;
+  const error = recError || bestError;
 
   if (loading) return <LoadingSpinner />;
   if (error) return <ErrorAlert error={error} />;
 
-  // Ensure recommendations is defined before rendering sections
-  if (!recommendations || Object.keys(recommendations).length === 0) {
-    return <ErrorAlert error="No recommendations available." />;
+  const dataToUse = userInfo ? recommendations : bestRatedEntities;
+  console.log('Data to use:', dataToUse);
+
+  // Check if dataToUse is missing or completely empty
+  const expectedKeys = ['circuit', 'hotel', 'guest_house', 'restaurant', 'activity', 'museum', 'festival', 'archaeological_site'];
+  if (!dataToUse || !expectedKeys.some(key => dataToUse[key])) {
+    return <ErrorAlert error="No recommendations or best-rated entities available." />;
   }
 
   return (
-    <div className="container py-5">
-      <h1 className="text-center mb-5" style={{ color: '#1a3c34' }}>
-        Your Personalized Recommendations
-      </h1>
-      <RecommendationSection
-        title="Recommended Circuits"
-        items={recommendations.circuit || []}
-        entityType="circuit"
+    <>
+      <HeroSection
+        image="https://images.unsplash.com/photo-1501785888041-af3ef285b470?ixlib=rb-4.0.3&auto=format&fit=crop&w=1350&q=80" // Scenic Tunisian landscape
+        title={userInfo ? 'Vos Recommandations Personnalisées' : 'Entités les Mieux Notées'}
+        subtitle="Découvrez le meilleur de la Tunisie, rien que pour vous"
       />
-      <RecommendationSection
-        title="Recommended Hotels"
-        items={recommendations.hotel || []}
-        entityType="hotel"
-      />
-      <RecommendationSection
-        title="Recommended Guest Houses"
-        items={recommendations.guest_house || []}
-        entityType="guest_house"
-      />
-      <RecommendationSection
-        title="Recommended Restaurants"
-        items={recommendations.restaurant || []}
-        entityType="restaurant"
-      />
-      <RecommendationSection
-        title="Recommended Activities"
-        items={recommendations.activity || []}
-        entityType="activity"
-      />
-      <RecommendationSection
-        title="Recommended Museums"
-        items={recommendations.museum || []}
-        entityType="museum"
-      />
-      <RecommendationSection
-        title="Recommended Festivals"
-        items={recommendations.festival || []}
-        entityType="festival"
-      />
-      <RecommendationSection
-        title="Recommended Archaeological Sites"
-        items={recommendations.archaeological_site || []}
-        entityType="archaeological_site"
-      />
-    </div>
+      <div className="container py-5">
+        <RecommendationSection
+          title="Circuits"
+          items={dataToUse.circuit || []}
+          entityType="circuit"
+        />
+        <RecommendationSection
+          title="Hôtels"
+          items={dataToUse.hotel || []}
+          entityType="hotel"
+        />
+        <RecommendationSection
+          title="Maisons d'Hôtes"
+          items={dataToUse.guest_house || []}
+          entityType="guest_house"
+        />
+        <RecommendationSection
+          title="Restaurants"
+          items={dataToUse.restaurant || []}
+          entityType="restaurant"
+        />
+        <RecommendationSection
+          title="Activités"
+          items={dataToUse.activity || []}
+          entityType="activity"
+        />
+        <RecommendationSection
+          title="Musées"
+          items={dataToUse.museum || []}
+          entityType="museum"
+        />
+        <RecommendationSection
+          title="Festivals"
+          items={dataToUse.festival || []}
+          entityType="festival"
+        />
+        <RecommendationSection
+          title="Sites Archéologiques"
+          items={dataToUse.archaeological_site || []}
+          entityType="archaeological_site"
+        />
+      </div>
+    </>
   );
 };
-
-// Debug: Confirm export
-console.log('Exporting RecommendationsPage:', RecommendationsPage, typeof RecommendationsPage);
 
 export default RecommendationsPage;

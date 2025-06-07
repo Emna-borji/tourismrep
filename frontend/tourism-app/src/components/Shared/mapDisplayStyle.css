@@ -2,11 +2,52 @@
   margin: 20px 0;
   border-radius: 12px;
   overflow: hidden;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  height: 20rem;
+  width: 100%;
+  background-color: #ffffff;
+  position: relative;
+  cursor: pointer; /* Indicate the map is clickable */
 }
 
-.map-image {
+/* Add a semi-transparent overlay to indicate the map is non-interactive */
+.map-container::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
   width: 100%;
-  height: auto;
-  display: block;
-  border: 1px solid #ccc;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.1); /* Light gray overlay */
+  z-index: 1;
+  pointer-events: none; /* Allow clicks to pass through the overlay */
+}
+
+/* Style the Leaflet map container */
+.leaflet-container {
+  width: 100%;
+  height: 100%;
+  border-radius: 12px;
+}
+
+/* Style the map inside the modal */
+.map-container-modal {
+  height: 400px; /* Fixed height for the modal map */
+  width: 100%;
+  border-radius: 8px;
+  overflow: hidden;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+/* Style the modal itself */
+.map-navigation-modal .modal-content {
+  border-radius: 12px;
+  background-color: #ffffff;
+}
+
+/* Remove the old map-image class */
+.map-image {
+  display: none;
 }

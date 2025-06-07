@@ -10,15 +10,179 @@ from django.utils import timezone
 from .models import Hotel, Restaurant, Activity, Museum, ArchaeologicalSite, Festival, GuestHouse, Destination, Review, Favorite, Equipment, Cuisine, ActivityCategory
 from .serializers import HotelSerializer, RestaurantSerializer, ActivitySerializer, MuseumSerializer, ArchaeologicalSiteSerializer, FestivalSerializer, GuestHouseSerializer, DestinationSerializer, ReviewSerializer, FavoriteSerializer, CuisineSerializer, ActivityCategorySerializer
 from users.permissions import IsAdmin, IsReviewOwnerOrAdmin, IsAdminOrCreateOnly
-from rest_framework.permissions import IsAuthenticatedOrReadOnly, IsAuthenticated
+from rest_framework.permissions import IsAuthenticatedOrReadOnly, IsAuthenticated, AllowAny
 from rest_framework.decorators import action
 from .services import RecommendationService
 from itinerary.models import Circuit
 from itinerary.serializers import CircuitCreateSerializer
 import logging
+from django.http import JsonResponse
 from rest_framework import serializers
+from django.views.decorators.http import require_GET
+from utils.geo_utils import calculate_distance
+from django.db.models import Avg, F
 
 logger = logging.getLogger(__name__)
+
+
+
+@require_GET
+def nearby_entities(request, entity_type):
+    try:
+        lat = request.GET.get('lat')
+        lon = request.GET.get('lon')
+        radius = float(request.GET.get('radius', 10))  # Default radius of 10 km
+
+        if not lat or not lon or not all(isinstance(float(x), (int, float)) for x in (lat, lon)):
+            return JsonResponse({'error': 'Latitude and longitude are required and must be numbers'}, status=400)
+
+        lat, lon = float(lat), float(lon)
+
+        # Map entity_type to the appropriate model
+        model_map = {
+            'hotel': Hotel,
+            'restaurant': Restaurant,
+            'guest_house': GuestHouse,
+            # Add other entity types as needed
+        }
+        model = model_map.get(entity_type.lower())
+        if not model:
+            return JsonResponse({'error': 'Invalid entity type'}, status=400)
+
+        # Fetch all entities and calculate distances
+        all_entities = model.objects.all()
+        nearby_entities = []
+        for entity in all_entities:
+            distance = calculate_distance(lat, lon, entity.latitude, entity.longitude)
+            if distance <= radius:
+                nearby_entities.append({
+                    'id': entity.id,
+                    'name': entity.name,
+                    'description': getattr(entity, 'description', 'No description'),
+                    'rating': getattr(entity, 'rating', 0),
+                    'image': getattr(entity, 'image', ''),
+                    'latitude': entity.latitude,
+                    'longitude': entity.longitude,
+                    'distance': round(distance, 2),
+                })
+
+        # Sort by distance
+        nearby_entities.sort(key=lambda x: x['distance'])
+
+        return JsonResponse({'nearby_entities': nearby_entities})
+
+    except Exception as e:
+        logger.error(f"Error fetching nearby entities: {str(e)}")
+        return JsonResponse({'error': 'Failed to fetch nearby entities'}, status=500)
+    
+
+class BestRatedEntitiesView(APIView):
+    permission_classes = []  # Public access
+
+    def get(self, request):
+        logger.info("Received GET request for BestRatedEntitiesView with params: %s", request.query_params)
+        try:
+            top_n = int(request.query_params.get('top_n', 3))
+            logger.info("Using top_n: %d", top_n)
+
+            entity_types = {
+                'circuit': (Circuit, CircuitCreateSerializer),
+                'hotel': (Hotel, HotelSerializer),
+                'guest_house': (GuestHouse, GuestHouseSerializer),
+                'restaurant': (Restaurant, RestaurantSerializer),
+                'activity': (Activity, ActivitySerializer),
+                'museum': (Museum, MuseumSerializer),
+                'festival': (Festival, FestivalSerializer),
+                'archaeological_site': (ArchaeologicalSite, ArchaeologicalSiteSerializer),
+            }
+
+            best_rated = {}
+            for entity_type, (model, serializer_class) in entity_types.items():
+                logger.debug("Processing best-rated entities for type: %s", entity_type)
+                try:
+                    # Fetch all entities
+                    entities = model.objects.all()
+                    logger.debug("Total entities in database for %s: %d", entity_type, entities.count())
+                    if not entities.exists():
+                        logger.warning("No entities found in database for %s", entity_type)
+                        best_rated[entity_type] = []
+                        continue
+
+                    # Log sample entity to verify fields
+                    if entities:
+                        sample_entity = entities[0]
+                        logger.debug("Sample entity for %s: %s", entity_type, {
+                            'id': sample_entity.id,
+                            'name': getattr(sample_entity, 'name', 'N/A'),
+                        })
+
+                    # Serialize entities to get the ratings
+                    serialized = serializer_class(entities, many=True).data
+                    logger.debug("Serialized data for %s (raw): %s", entity_type, serialized)
+
+                    # Check if serialization returned any data
+                    if not serialized:
+                        logger.warning("Serialization returned no data for %s", entity_type)
+                        best_rated[entity_type] = []
+                        continue
+
+                    # Sort by rating if available, otherwise take first N by ID descending
+                    entities_with_ratings = [entity for entity in serialized if entity.get('rating') is not None]
+                    if entities_with_ratings:
+                        sorted_entities = sorted(
+                            serialized,
+                            key=lambda x: x.get('rating', None) if x.get('rating') is not None else -float('inf'),
+                            reverse=True
+                        )[:top_n]
+                        logger.info("Entities with ratings found for %s, sorted top %d: %s", entity_type, top_n, sorted_entities)
+                    else:
+                        logger.info("No entities with ratings for %s, falling back to default ordering", entity_type)
+                        entities = model.objects.all().order_by('-id')[:top_n]
+                        sorted_entities = serializer_class(entities, many=True).data
+                        logger.info("Fallback top %d entities for %s: %s", top_n, entity_type, sorted_entities)
+
+                    best_rated[entity_type] = sorted_entities
+                except Exception as e:
+                    logger.error("Error processing best-rated entities for %s: %s", entity_type, str(e), exc_info=True)
+                    best_rated[entity_type] = []
+                    continue
+
+            logger.info("Successfully prepared response with %d entity types", len(best_rated))
+            logger.info("Best rated entities response: %s", best_rated)
+
+            # Check if all entity types are empty
+            has_data = any(len(entities) > 0 for entities in best_rated.values())
+            if not has_data:
+                logger.warning("All entity types are empty in best_rated_entities")
+
+            return Response({
+                'status': 'success',
+                'best_rated_entities': best_rated
+            }, status=status.HTTP_200_OK)
+
+        except Exception as e:
+            logger.error("Unexpected error in BestRatedEntitiesView: %s", str(e), exc_info=True)
+            return Response({
+                'status': 'error',
+                'message': str(e)
+            }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+
+# class CuisineViewSet(viewsets.ModelViewSet):
+#     queryset = Cuisine.objects.all()
+#     serializer_class = CuisineSerializer
+
+#     def get_permissions(self):
+#         """
+#         Allow authenticated users to view (GET), but restrict create/update/delete to admins or create-only users.
+#         """
+#         if self.action in ['list', 'retrieve']:
+#             return [IsAuthenticated()]
+#         return [IsAdminOrCreateOnly()]
+
+#     def get_queryset(self):
+#         return Cuisine.objects.all()
 
 class CuisineViewSet(viewsets.ModelViewSet):
     queryset = Cuisine.objects.all()
@@ -26,10 +190,10 @@ class CuisineViewSet(viewsets.ModelViewSet):
 
     def get_permissions(self):
         """
-        Allow authenticated users to view (GET), but restrict create/update/delete to admins or create-only users.
+        Allow anyone to view cuisines (GET), but restrict create/update/delete to admins or create-only users.
         """
         if self.action in ['list', 'retrieve']:
-            return [IsAuthenticated()]
+            return [AllowAny()]
         return [IsAdminOrCreateOnly()]
 
     def get_queryset(self):

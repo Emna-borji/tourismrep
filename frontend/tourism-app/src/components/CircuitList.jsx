@@ -1,11 +1,20 @@
 import React, { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { Container, Row, Col, Pagination, Button, Alert } from 'react-bootstrap';
+import { Container, Row, Col, Pagination, Button } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
 import CircuitCard from './CircuitCard';
 import CreateCircuitForm from './CreateCircuitForm';
-import Search from './Shared/Search'; // Import the Search component
+import Search from './Shared/Search';
 import { fetchCircuits } from '../redux/actions/circuitActions';
+import HeroSection from './Shared/HeroSection.jsx';
+import './circuitListStyle.css';
+
+// Hero section configuration for circuits
+const circuitHeroConfig = {
+  image: 'https://static.vecteezy.com/ti/photos-gratuite/p1/9759081-plan-de-voyage-et-de-voyage-tourisme-vacances-maquette-sur-une-table-en-bois-vue-de-dessus-ete-accessoires-et-articles-planification-concept-gratuit-photo.jpg',
+  title: 'Découvrez Nos Circuits en Tunisie',
+  subtitle: 'Explorez des itinéraires uniques et mémorables',
+};
 
 const CircuitList = () => {
   const dispatch = useDispatch();
@@ -15,19 +24,19 @@ const CircuitList = () => {
   const { userInfo } = useSelector(state => state.auth || {});
   const [currentPage, setCurrentPage] = useState(1);
   const [showCreateModal, setShowCreateModal] = useState(false);
-  const [searchQuery, setSearchQuery] = useState(''); // State for search query
+  const [searchQuery, setSearchQuery] = useState('');
 
   useEffect(() => {
     console.log('showCreateModal state:', showCreateModal);
   }, [showCreateModal]);
 
   useEffect(() => {
-    dispatch(fetchCircuits(searchQuery)); // Fetch circuits with the search query
+    dispatch(fetchCircuits(searchQuery));
   }, [dispatch, searchQuery]);
 
   const handleSearch = (query) => {
-    setSearchQuery(query); // Update the search query
-    setCurrentPage(1); // Reset to the first page on new search
+    setSearchQuery(query);
+    setCurrentPage(1);
   };
 
   if (loading) return <div>Loading...</div>;
@@ -39,69 +48,68 @@ const CircuitList = () => {
 
   const indexOfLastCircuit = currentPage * circuitsPerPage;
   const indexOfFirstCircuit = indexOfLastCircuit - circuitsPerPage;
-  const currentCircuits = circuitList.slice(indexOfFirstCircuit, indexOfLastCircuit).map(circuit => ({
-    ...circuit,
-    image: circuit.image || 'https://via.placeholder.com/300x200',
-  }));
+  const currentCircuits = circuitList.slice(indexOfFirstCircuit, indexOfLastCircuit);
 
   const isAdmin = userInfo && userInfo.role === 'admin';
   console.log('userInfo:', userInfo, 'isAdmin:', isAdmin);
 
   return (
-    <Container className="circuit-list-container py-5">
-      <div className="d-flex justify-content-between align-items-center mb-5">
-        <h1 className="text-center">Nos Circuits</h1>
-        {isAdmin ? (
-          <Button
-            variant="success"
-            onClick={() => {
-              console.log('Ajouter Circuit button clicked');
-              setShowCreateModal(true);
-            }}
-          >
-            Ajouter Circuit
-          </Button>
+    <>
+      <HeroSection
+        image={circuitHeroConfig.image}
+        title={circuitHeroConfig.title}
+        subtitle={circuitHeroConfig.subtitle}
+      />
+      <Container className="circuit-list-container py-5">
+        <div className="d-flex justify-content-between align-items-center mb-5">
+          <h1 className="text-center">Nos Circuits</h1>
+          {isAdmin && (
+            <Button
+              variant="success"
+              onClick={() => {
+                console.log('Ajouter Circuit button clicked');
+                setShowCreateModal(true);
+              }}
+            >
+              Ajouter Circuit
+            </Button>
+          )}
+        </div>
+
+        <Search onSearch={handleSearch} entityType="circuit" className="mb-5" />
+
+        {circuitList.length === 0 ? (
+          <div className="text-center">Aucun circuit disponible.</div>
         ) : (
-          <Alert variant="info" className="mb-0">
-            {userInfo ? 'You must be an admin to add a circuit.' : <Link to="/login">Log in</Link>} to add a circuit.
-          </Alert>
+          <>
+            <Row>
+              {currentCircuits.map(circuit => (
+                <Col key={circuit.id} md={12}>
+                  <CircuitCard circuit={circuit} />
+                </Col>
+              ))}
+            </Row>
+            <div className="pagination-container d-flex justify-content-center mt-4">
+              <Pagination>
+                <Pagination.Prev
+                  onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+                  disabled={currentPage === 1}
+                />
+                <Pagination.Item active>{`page ${currentPage} de ${totalPages}`}</Pagination.Item>
+                <Pagination.Next
+                  onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+                  disabled={currentPage === totalPages}
+                />
+              </Pagination>
+            </div>
+          </>
         )}
-      </div>
 
-      {/* Add the Search component */}
-      <Search onSearch={handleSearch} entityType="circuit" />
-
-      {circuitList.length === 0 ? (
-        <div className="text-center">Aucun circuit disponible.</div>
-      ) : (
-        <>
-          <Row>
-            {currentCircuits.map(circuit => (
-              <Col key={circuit.id} md={12}>
-                <CircuitCard circuit={circuit} />
-              </Col>
-            ))}
-          </Row>
-          <div className="pagination-container d-flex justify-content-center mt-4">
-            <Pagination>
-              <Pagination.Prev
-                onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
-                disabled={currentPage === 1}
-              />
-              <Pagination.Item active>{`page ${currentPage} de ${totalPages}`}</Pagination.Item>
-              <Pagination.Next
-                onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
-                disabled={currentPage === totalPages}
-              />
-            </Pagination>
-          </div>
-        </>
-      )}
-
-      {showCreateModal && (
-        <CreateCircuitForm show={showCreateModal} onHide={() => setShowCreateModal(false)} />
-      )}
-    </Container>
+        {showCreateModal && (
+          <CreateCircuitForm show={showCreateModal} onHide={() => setShowCreateModal(false)} />
+        )}
+      </Container>
+    </>
   );
 };
 

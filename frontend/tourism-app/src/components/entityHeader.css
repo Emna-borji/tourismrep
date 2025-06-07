@@ -1,55 +1,241 @@
-/* src/components/EntityHeader.css */
-.entity-details-container {
-    padding: 0;
-  }
-  
-  .entity-main-image-container {
-    position: relative;
-    width: 100%;
-    height: 400px;
-  }
-  
-  .entity-overlay {
-    background: rgba(0, 0, 0, 0.5);
-    padding: 20px;
-    border-radius: 8px;
-  }
-  
-  .entity-title {
-    font-size: 2.5rem;
-    font-weight: bold;
-    margin: 0;
-  }
-  
-  .entity-info-card {
-    border-radius: 10px;
-    padding: 20px;
-  }
-  
-  .additional-images {
-    display: flex;
-    overflow-x: auto;
-    gap: 10px;
-  }
-  
-  .equipments-section h5 {
-    font-size: 1.2rem;
-    font-weight: bold;
-    margin-bottom: 10px;
-    border-bottom: 2px solid #007bff;
-    padding-bottom: 5px;
-  }
-  
-  .equipments-list {
-    columns: 2;
-    -webkit-columns: 2;
-    -moz-columns: 2;
-  }
-  
-  .equipments-list li {
-    margin-bottom: 8px;
-    font-size: 0.9rem;
-  }
+.entity-header-container {
+  padding: 0;
+  position: relative !important; /* Establish new stacking context */
+}
 
+.entity-header-top {
+  display: flex !important;
+  justify-content: space-between !important;
+  align-items: center !important;
+  margin-bottom: 20px !important;
+}
 
-  
+.entity-favorite-icon {
+  margin-left: 15px !important;
+  background: #fff !important;
+  border-radius: 50% !important;
+  padding: 6px !important;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15) !important;
+  transition: background 0.2s ease !important;
+  cursor: pointer !important;
+}
+
+.entity-favorite-icon:hover {
+  background-color: #ffeded !important;
+}
+
+.entity-header-left {
+  flex: 1 !important;
+}
+
+.entity-name {
+  font-size: 1.75rem !important; /* text-xl */
+  font-weight: 700 !important; /* font-bold */
+  color: #333 !important; /* Ensure the text color is applied */
+  text-align: center !important; /* text-center from original */
+  position: relative !important;
+  display: inline-block !important; /* inline-block to apply background gradient properly */
+  padding-bottom: 0.25rem !important; /* pb-1 */
+  background: linear-gradient(to right, #15A5DF, #15A5DF) !important; /* from-[#15A5DF] to-[#15A5DF] */
+  background-size: 60% 2.5px !important; /* bg-[length:60%_2.5px] */
+  background-position: left bottom !important; /* bg-left-bottom */
+  background-repeat: no-repeat !important;
+  min-width: 100px !important;
+  margin-bottom: 0 !important; /* Removed original margin-bottom */
+  white-space: nowrap !important; /* Preserve from original to prevent wrapping */
+  overflow: hidden !important; /* Preserve from original to hide overflow */
+  text-overflow: ellipsis !important; /* Preserve from original for ellipsis on long names */
+  max-width: 100% !important; /* Preserve from original to respect container width */
+}
+
+.entity-name-underline {
+  width: 15% !important; /* Slightly more than half the name */
+  height: 3px !important;
+  background-color: #007bff !important;
+  margin-top: 5px !important;
+  margin-bottom: 0 !important;
+}
+
+.entity-details-left {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 10px !important;
+}
+
+.entity-cuisine {
+  font-size: 1.1rem !important;
+  color: #6c757d !important;
+  display: flex !important;
+  align-items: center !important;
+}
+
+.entity-cuisine svg {
+  color: #2c5ba1 !important;
+  width: 15px !important;
+  height: 30px !important;
+  font-size: unset;
+}
+
+.entity-address {
+  font-size: 1.1rem !important;
+  color: #6c757d !important;
+  display: flex !important;
+  align-items: center !important;
+}
+
+.entity-address svg {
+  color: #2c5ba1 !important;
+  width: 15px !important;
+  height: 30px !important;
+  font-size: unset;
+}
+
+.address-text {
+  color: #4b5563 !important; /* Matching ItemListPage */
+}
+
+.entity-header-right {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: flex-end !important;
+  gap: 10px !important;
+  padding: 0 !important;
+}
+
+.entity-stars,
+.entity-forks,
+.entity-rating {
+  font-size: 1.1rem !important;
+  text-align: right !important;
+}
+
+.entity-forks svg,
+.entity-rating span {
+  font-size: 1rem !important;
+}
+
+.entity-details-below {
+  padding: 20px 0 !important;
+  border-top: 1px solid #e9ecef !important;
+}
+
+.entity-detail-item {
+  font-size: 1rem !important;
+  color: #6c757d !important;
+  display: flex !important;
+  align-items: center !important;
+  margin-bottom: 10px !important;
+}
+
+.entity-detail-item svg {
+  width: 16px !important;
+  height: 16px !important;
+  font-size: unset;
+}
+
+.additional-images {
+  display: flex !important;
+  overflow-x: auto !important;
+  gap: 10px !important;
+}
+
+.equipments-section h5 {
+  font-size: 1.2rem !important;
+  font-weight: bold !important;
+  margin-bottom: 10px !important;
+  border-bottom: 2px solid #007bff !important;
+  padding-bottom: 5px !important;
+}
+
+.equipments-list {
+  columns: 2 !important;
+  -webkit-columns: 2 !important;
+  -moz-columns: 2 !important;
+}
+
+.equipments-list li {
+  margin-bottom: 8px !important;
+  font-size: 0.9rem !important;
+}
+
+.itinerary-btn {
+  background-color: #2c5ba1 !important;
+  border-color: #2c5ba1 !important;
+  font-size: 0.9rem !important;
+  padding: 8px 12px !important; /* Increased padding for taller button */
+  height: 40px !important; /* Explicit height for taller button */
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important; /* Center icon and text horizontally */
+}
+
+.itinerary-btn:hover {
+  background-color: #254c8a !important;
+  border-color: #254c8a !important;
+}
+
+.itinerary-btn svg.me-1,
+.itinerary-btn svg {
+  color: #ffffff !important; /* Ensure FaMap icon is white */
+  fill: #ffffff !important; /* Fallback for SVG fill */
+  font-size: 1rem !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+  margin-right: 6px !important; /* Adjust spacing between icon and text */
+}
+
+.admin-actions {
+  display: flex !important;
+  gap: 10px !important;
+}
+
+.admin-btn {
+  font-size: 0.9rem !important;
+}
+
+/* New Section Above Map */
+.entity-details-above-map {
+  padding: 20px 0 !important;
+  margin-top: 20px !important;
+  margin-bottom: 20px !important;
+}
+
+.entity-details-above-map .entity-detail-item {
+  font-size: 1rem !important;
+  color: #6c757d !important;
+  display: flex !important;
+  align-items: center !important;
+  margin-bottom: 10px !important;
+}
+
+.entity-details-above-map .entity-detail-item svg {
+  color: #2c5ba1 !important;
+  width: 16px !important;
+  height: 16px !important;
+  font-size: unset;
+  margin-right: 10px !important;
+}
+
+.entity-details-above-map .website-link {
+  color: #2c5ba1 !important;
+  text-decoration: none !important;
+  transition: color 0.3s ease !important;
+}
+
+.entity-details-above-map .website-link:hover {
+  color: #254c8a !important;
+  text-decoration: underline !important;
+}
+
+/* Style for the destination row to align destination and button */
+.entity-details-above-map .destination-row {
+  display: flex !important;
+  justify-content: space-between !important; /* Space between destination and button */
+  align-items: center !important;
+  flex-wrap: nowrap !important; /* Prevent wrapping */
+}
+
+.entity-details-above-map .destination-row .destination-text {
+  display: flex !important;
+  align-items: center !important;
+}

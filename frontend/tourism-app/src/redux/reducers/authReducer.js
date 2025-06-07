@@ -24,6 +24,7 @@ import {
   DELETE_USER_REQUEST,
   DELETE_USER_SUCCESS,
   DELETE_USER_FAIL,
+  EMAIL_EXISTS,
 } from '../constants/authConstants';
 
 const initialState = {
@@ -31,6 +32,7 @@ const initialState = {
   users: [], // Store the list of users
   loading: false,
   error: null,
+  message: null,
 };
 
 export const authReducer = (state = initialState, action) => {
@@ -44,7 +46,7 @@ export const authReducer = (state = initialState, action) => {
     case FETCH_USERS_REQUEST:
     case BLOCK_USER_REQUEST:
     case DELETE_USER_REQUEST:
-      return { ...state, loading: true, error: null };
+      return { ...state, loading: true, error: null, message: null };
 
     case REGISTER_USER_SUCCESS:
     case LOGIN_USER_SUCCESS:
@@ -66,6 +68,9 @@ export const authReducer = (state = initialState, action) => {
         users: state.users.filter((user) => user.id !== action.payload),
         error: null,
       };
+
+      case EMAIL_EXISTS:
+      return { ...state, loading: false, error: null, message: action.payload };
 
     case REGISTER_USER_FAIL:
     case LOGIN_USER_FAIL:

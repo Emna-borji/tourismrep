@@ -18,4 +18,15 @@ axios.interceptors.request.use(
   }
 );
 
+axios.interceptors.response.use(
+  (response) => response, // Pass through successful responses
+  (error) => {
+    if (error.response && error.response.status === 409) {
+      console.log('Interceptor: Resolving 409 response', error.response); // Debug log
+      return Promise.resolve(error.response); // Treat 409 as a success
+    }
+    return Promise.reject(error); // Reject other errors
+  }
+);
+
 export default axios;

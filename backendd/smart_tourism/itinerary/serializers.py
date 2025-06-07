@@ -1,6 +1,8 @@
 from rest_framework import serializers
 from .models import Circuit, CircuitSchedule, Guide
 from .models import CircuitHistory
+from django.db.models import Avg  # Add this import for calculating the average rating
+from tourism.models import Review
 import logging
 
 from tourism.serializers import (

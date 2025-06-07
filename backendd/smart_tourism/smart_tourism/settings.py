@@ -34,7 +34,11 @@ ALLOWED_HOSTS = []
 
 AUTH_USER_MODEL = 'users.CustomUser'
 
+# OWER_BI_CLIENT_ID (ID d’application (client)): a9e1f7b4-3c5d-4e2f-8a9b-6c7d8e9f0a1b
+# POWER_BI_TENANT_ID (ID de répertoire (locataire)): f1g2h3i4-5j6k-7l8m-9n0o-1p2q3r4s5t6u
 
+POWER_BI_WORKSPACE_ID = "dedc7100-b6c7-4f94-84b9-270429956e19"
+POWER_BI_REPORT_ID = "ce99b2f0-b56d-4d67-a13a-7f63e6d1fecd"
 
 # JWT settings
 SIMPLE_JWT = {
@@ -59,9 +63,11 @@ REST_FRAMEWORK = {
 
 
 CORS_ALLOWED_ORIGINS = [
-    "http://localhost:3000",  # React development server
+    "http://localhost:3000",
+    "http://127.0.0.1:3000",
 ]
 
+CORS_ALLOW_CREDENTIALS = True
 # Application definition
 
 INSTALLED_APPS = [

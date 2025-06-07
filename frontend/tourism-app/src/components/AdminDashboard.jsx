@@ -3,12 +3,13 @@ import { useDispatch, useSelector } from 'react-redux';
 import { Container, Table, Button, Modal, Form, Navbar, Nav, FormControl } from 'react-bootstrap';
 import { fetchUsers, blockUser, deleteUser, logout } from '../redux/actions/authActions';
 import { FaTrash, FaLock, FaUnlock } from 'react-icons/fa';
+import './adminDashboard.css';
 
 const AdminDashboard = () => {
   const dispatch = useDispatch();
   const { users, loading: fetchLoading, error } = useSelector((state) => state.auth);
 
-  // State for modals
+  // State for modals and view toggle
   const [showBlockModal, setShowBlockModal] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [selectedUser, setSelectedUser] = useState(null);
@@ -16,10 +17,13 @@ const AdminDashboard = () => {
   const [blockEndDate, setBlockEndDate] = useState('');
   const [searchTerm, setSearchTerm] = useState('');
   const [actionLoading, setActionLoading] = useState(false);
+  const [view, setView] = useState('users'); // 'users' or 'statistics'
 
   useEffect(() => {
-    dispatch(fetchUsers());
-  }, [dispatch]);
+    if (view === 'users') {
+      dispatch(fetchUsers());
+    }
+  }, [dispatch, view]);
 
   // Determine if a user is currently blocked
   const isUserBlocked = (user) => {
@@ -74,14 +78,11 @@ const AdminDashboard = () => {
   const handleBlockUser = (user) => {
     setSelectedUser(user);
     setShowBlockModal(true);
-    // Prefill dates if the user is not currently blocked but has a future block, or if we're setting new block dates
     if (!isUserBlocked(user)) {
       if (willUserBeBlocked(user)) {
-        // Prefill with existing future block dates
         setBlockStartDate(user.blockstartdate.split('T')[0]);
         setBlockEndDate(user.blockenddate.split('T')[0]);
       } else {
-        // No block dates, start fresh
         setBlockStartDate('');
         setBlockEndDate('');
       }
@@ -92,8 +93,8 @@ const AdminDashboard = () => {
     try {
       setActionLoading(true);
       const blockData = isUserBlocked(selectedUser)
-        ? { blockstartdate: null, blockenddate: null } // Unblock case
-        : { blockstartdate: blockStartDate || null, blockenddate: blockEndDate || null }; // Block case
+        ? { blockstartdate: null, blockenddate: null }
+        : { blockstartdate: blockStartDate || null, blockenddate: blockEndDate || null };
       console.log('Confirming block/unblock for user:', selectedUser.id, blockData);
       await dispatch(blockUser(selectedUser.id, blockData));
       console.log('Block/unblock action completed successfully');
@@ -142,113 +143,140 @@ const AdminDashboard = () => {
     dispatch(logout());
   };
 
-  if (fetchLoading || actionLoading) return <div>Loading...</div>;
-  if (error) return <div>Error: {error}</div>;
+  // Toggle between views
+  const handleViewChange = (newView) => {
+    setView(newView);
+  };
+
+  if (fetchLoading || actionLoading) return <div>Chargement...</div>;
+  if (error) return <div>Erreur : {error}</div>;
 
   return (
-    <div>
+    <div className="admin-dashboard"> {/* Add unique wrapper class */}
       {/* Navbar */}
       <Navbar bg="light" expand="lg">
         <Container>
           <Navbar.Brand>ONTT</Navbar.Brand>
           <Nav className="me-auto">
-            <Nav.Link>Dashboard</Nav.Link>
-            <Nav.Link active>Users</Nav.Link>
+            <Nav.Link active={view === 'dashboard'} onClick={() => handleViewChange('dashboard')}>
+              Tableau de bord
+            </Nav.Link>
+            <Nav.Link active={view === 'users'} onClick={() => handleViewChange('users')}>
+              Utilisateurs
+            </Nav.Link>
+            <Nav.Link active={view === 'statistics'} onClick={() => handleViewChange('statistics')}>
+              Statistiques
+            </Nav.Link>
           </Nav>
           <Nav>
-            <Nav.Link>Hello, Admin</Nav.Link>
-            <Nav.Link onClick={handleLogout}>Logout</Nav.Link>
+            <Nav.Link>Bonjour, Administrateur</Nav.Link>
+            <Nav.Link onClick={handleLogout}>Déconnexion</Nav.Link>
           </Nav>
         </Container>
       </Navbar>
 
       <Container className="mt-4">
-        <h2>Users Dashboard</h2>
-        <div className="d-flex justify-content-between mb-3">
-          <FormControl
-            type="text"
-            placeholder="Search"
-            style={{ width: '200px' }}
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-          />
-          <div>
-            <Button variant="outline-primary" className="me-2">
-              Sort by
-            </Button>
-            <Button variant="outline-secondary">Saved search</Button>
-          </div>
-        </div>
+        {view === 'users' && (
+          <>
+            <h2 className="dashboard-heading">Tableau de bord des utilisateurs</h2>
+            <div className="d-flex justify-content-between mb-3">
+              <FormControl
+                type="text"
+                placeholder="Rechercher"
+                style={{ width: '200px' }}
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+              />
+            </div>
 
-        <h4>List Users</h4>
-        <Table striped bordered hover key={users.map(u => u.id).join('-')}>
-          <thead>
-            <tr>
-              <th>Name</th>
-              <th>Create Date</th>
-              <th>Role</th>
-              <th>Action</th>
-            </tr>
-          </thead>
-          <tbody>
-            {filteredUsers.map((user) => (
-              <tr key={user.id}>
-                <td>
-                  {user.firstname} {user.lastname}
-                  <br />
-                  <small>{user.email}</small>
-                </td>
-                <td>{new Date(user.created_at).toLocaleDateString()}</td>
-                <td>{user.role}</td>
-                <td>
-                  <Button
-                    variant={isUserBlocked(user) ? 'warning' : 'success'}
-                    size="sm"
-                    className="me-2"
-                    onClick={() => handleBlockUser(user)}
-                    disabled={actionLoading}
-                  >
-                    {isUserBlocked(user) ? <FaUnlock /> : <FaLock />}
-                    {isUserBlocked(user) ? ' Unblock' : ' Block'}
-                  </Button>
-                  <Button
-                    variant="danger"
-                    size="sm"
-                    onClick={() => handleDeleteUser(user)}
-                    disabled={actionLoading}
-                  >
-                    <FaTrash />
-                  </Button>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </Table>
+            <Table striped bordered hover key={users.map(u => u.id).join('-')}>
+              <thead>
+                <tr>
+                  <th>Nom</th>
+                  <th>Date de création</th>
+                  <th>Rôle</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                {filteredUsers.map((user) => (
+                  <tr key={user.id}>
+                    <td>
+                      {user.firstname} {user.lastname}
+                      <br />
+                      <small>{user.email}</small>
+                    </td>
+                    <td>{new Date(user.created_at).toLocaleDateString()}</td>
+                    <td>{user.role}</td>
+                    <td>
+                      <Button
+                        variant={isUserBlocked(user) ? 'warning' : 'success'}
+                        size="sm"
+                        className="button-with-icon"
+                        onClick={() => handleBlockUser(user)}
+                        disabled={actionLoading}
+                      >
+                        <span className="button-content">
+                          {isUserBlocked(user) ? <FaUnlock /> : <FaLock />}
+                          {isUserBlocked(user) ? ' Débloquer' : ' Bloquer'}
+                        </span>
+                      </Button>
+                      <Button
+                        variant="danger"
+                        size="sm"
+                        onClick={() => handleDeleteUser(user)}
+                        disabled={actionLoading}
+                      >
+                        <FaTrash />
+                      </Button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </Table>
+          </>
+        )}
+
+        {view === 'statistics' && (
+          <>
+            <h2 className="dashboard-heading">Tableau de bord des statistiques</h2>
+            <div style={{ height: '600px', width: '100%' }}>
+              <iframe
+                title="smart_2 (1)"
+                width="1140"
+                height="541.25"
+                src="https://app.powerbi.com/reportEmbed?reportId=ce99b2f0-b56d-4d67-a13a-7f63e6d1fecd&autoAuth=true&ctid=db257991-9b77-4cc1-9bba-a6ecd882e286"
+                frameBorder="0"
+                allowFullScreen="true"
+              ></iframe>
+            </div>
+          </>
+        )}
       </Container>
 
       {/* Block/Unblock Modal */}
       {selectedUser && (
         <Modal show={showBlockModal} onHide={() => setShowBlockModal(false)}>
           <Modal.Header closeButton>
-            <Modal.Title>{isUserBlocked(selectedUser) ? 'Unblock User' : 'Block User'}</Modal.Title>
+            <Modal.Title>{isUserBlocked(selectedUser) ? 'Débloquer l\'utilisateur' : 'Bloquer l\'utilisateur'}</Modal.Title>
           </Modal.Header>
           <Modal.Body>
             {isUserBlocked(selectedUser) ? (
-              <p>Are you sure you want to unblock {selectedUser?.firstname} {selectedUser?.lastname}?</p>
+              <p>Êtes-vous sûr de vouloir débloquer {selectedUser?.firstname} {selectedUser?.lastname} ?</p>
             ) : (
               <>
                 {willUserBeBlocked(selectedUser) ? (
                   <p>
-                    Are you sure you want to change the blocking date for {selectedUser?.firstname} {selectedUser?.lastname} from{' '}
-                    {formatDateForDisplay(selectedUser?.blockstartdate)} to {formatDateForDisplay(selectedUser?.blockenddate)} to{' '}
-                    {blockStartDate || 'not set'} to {blockEndDate || 'not set'}?
+                    Êtes-vous sûr de vouloir modifier la date de blocage pour {selectedUser?.firstname} {selectedUser?.lastname} de{' '}
+                    {formatDateForDisplay(selectedUser?.blockstartdate)} à {formatDateForDisplay(selectedUser?.blockenddate)} à{' '}
+                    {blockStartDate || 'non défini'} à {blockEndDate || 'non défini'} ?
                   </p>
                 ) : (
-                  <p>Are you sure you want to block {selectedUser?.firstname} {selectedUser?.lastname}?</p>
+                  <p>Êtes-vous sûr de vouloir bloquer {selectedUser?.firstname} {selectedUser?.lastname} ?</p>
                 )}
                 <Form>
                   <Form.Group className="mb-3">
-                    <Form.Label>Block Start Date</Form.Label>
+                    <Form.Label>Date de début de blocage</Form.Label>
                     <Form.Control
                       type="date"
                       value={blockStartDate}
@@ -257,7 +285,7 @@ const AdminDashboard = () => {
                     />
                   </Form.Group>
                   <Form.Group className="mb-3">
-                    <Form.Label>Block End Date</Form.Label>
+                    <Form.Label>Date de fin de blocage</Form.Label>
                     <Form.Control
                       type="date"
                       value={blockEndDate}
@@ -271,10 +299,10 @@ const AdminDashboard = () => {
           </Modal.Body>
           <Modal.Footer>
             <Button variant="secondary" onClick={() => setShowBlockModal(false)} disabled={actionLoading}>
-              Cancel
+              Annuler
             </Button>
             <Button variant="primary" onClick={confirmBlockUser} disabled={actionLoading}>
-              {isUserBlocked(selectedUser) ? 'Unblock' : 'Block'}
+              {isUserBlocked(selectedUser) ? 'Débloquer' : 'Bloquer'}
             </Button>
           </Modal.Footer>
         </Modal>
@@ -284,17 +312,17 @@ const AdminDashboard = () => {
       {selectedUser && (
         <Modal show={showDeleteModal} onHide={() => setShowDeleteModal(false)}>
           <Modal.Header closeButton>
-            <Modal.Title>Confirm Delete</Modal.Title>
+            <Modal.Title>Confirmer la suppression</Modal.Title>
           </Modal.Header>
           <Modal.Body>
-            Are you sure you want to delete {selectedUser?.firstname} {selectedUser?.lastname}?
+            Êtes-vous sûr de vouloir supprimer {selectedUser?.firstname} {selectedUser?.lastname} ?
           </Modal.Body>
           <Modal.Footer>
             <Button variant="secondary" onClick={() => setShowDeleteModal(false)} disabled={actionLoading}>
-              Cancel
+              Annuler
             </Button>
             <Button variant="danger" onClick={confirmDeleteUser} disabled={actionLoading}>
-              Delete
+              Supprimer
             </Button>
           </Modal.Footer>
         </Modal>

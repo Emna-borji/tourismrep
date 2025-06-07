@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import { Form, InputGroup, FormControl, Button } from 'react-bootstrap';
 import { FaSearch } from 'react-icons/fa';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
@@ -39,33 +38,25 @@ const Search = ({ onSearch, entityType, className }) => {
     }
   };
 
+  const handleChange = (e) => {
+    // Remove numbers from the input value
+    const value = e.target.value.replace(/[0-9]/g, '');
+    setQuery(value);
+  };
+
   return (
-    <div className={`tourism-search-container ${className}`}>
-      <Form className="tourism-search-form" onSubmit={handleSearch}>
-        <InputGroup className={`tourism-search-group ${isFocused ? 'tourism-focused' : ''}`}>
-          <FormControl
-            placeholder={`Rechercher par nom de ${entityType || 'entité'}`}
-            aria-label="Search"
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
-            onKeyPress={handleKeyPress}
-            className="tourism-search-input"
-            onFocus={() => setIsFocused(true)}
-            onBlur={() => setIsFocused(false)}
-          />
-          <InputGroup.Text className="tourism-search-icon">
-            <FaSearch />
-          </InputGroup.Text>
-          <Button
-            variant="primary"
-            type="submit"
-            className="tourism-search-button"
-            disabled={saveSearchLoading}
-          >
-            {saveSearchLoading ? 'Chargement...' : 'Rechercher'}
-          </Button>
-        </InputGroup>
-      </Form>
+    <div className={`tourism-search-container ${className} ${isFocused ? 'focused' : ''}`}>
+      <input
+        type="text"
+        placeholder={`Rechercher par nom de ${entityType || 'entité'}`}
+        value={query}
+        onChange={handleChange}
+        onKeyPress={handleKeyPress}
+        onFocus={() => setIsFocused(true)}
+        onBlur={() => setIsFocused(false)}
+        className="tourism-search-input"
+      />
+      <FaSearch className="tourism-search-icon" onClick={handleSearch} />
     </div>
   );
 };

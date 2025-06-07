@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
 import { Card, Spinner, Alert, Button, Form } from 'react-bootstrap';
-import { FaStar } from 'react-icons/fa';
+import { FaStar, FaStarHalfAlt, FaRegStar } from 'react-icons/fa';
 import { useSelector, useDispatch } from 'react-redux';
 import { deleteReview, updateReview } from '../redux/actions/reviewActions';
+import './entityReviews.css';
 
 const EntityReviews = ({ reviews, loading, error, entityType, entityId }) => {
   const dispatch = useDispatch();
@@ -12,8 +13,9 @@ const EntityReviews = ({ reviews, loading, error, entityType, entityId }) => {
 
   const [editingReviewId, setEditingReviewId] = useState(null);
   const [editForm, setEditForm] = useState({ rating: 0, comment: '', image: '' });
+  const [visibleReviews, setVisibleReviews] = useState(15);
+  const reviewsPerPage = 15;
 
-  // Debugging: Log userInfo and review user IDs
   console.log('userInfo:', userInfo);
   reviews.forEach(review => {
     console.log(`Review ${review.id} user:`, review.user);
@@ -32,10 +34,9 @@ const EntityReviews = ({ reviews, loading, error, entityType, entityId }) => {
 
   const handleEditSubmit = (reviewId) => {
     if (editForm.rating < 1 || editForm.rating > 5) {
-      alert('Rating must be between 1 and 5.');
+      alert('La note doit être entre 1 et 5.');
       return;
     }
-    // Ensure image is null if empty to avoid validation error
     const updatedForm = {
       ...editForm,
       image: editForm.image === '' ? null : editForm.image,
@@ -45,38 +46,64 @@ const EntityReviews = ({ reviews, loading, error, entityType, entityId }) => {
         setEditingReviewId(null);
       })
       .catch((error) => {
-        console.error('Update review failed:', error);
+        console.error('Échec de la mise à jour du commentaire :', error);
       });
   };
 
   const handleDelete = (reviewId) => {
-    if (window.confirm('Are you sure you want to delete this review?')) {
+    if (window.confirm('Êtes-vous sûr de vouloir supprimer ce commentaire ?')) {
       dispatch(deleteReview(reviewId, entityType, entityId))
         .catch((error) => {
-          console.error('Delete review failed:', error);
+          console.error('Échec de la suppression du commentaire :', error);
         });
     }
   };
 
+  const renderStars = (rating) => {
+    const stars = [];
+    for (let i = 1; i <= 5; i++) {
+      if (i <= Math.floor(rating)) {
+        stars.push(<FaStar key={i} className="star" />);
+      } else if (i === Math.ceil(rating) && rating % 1 !== 0) {
+        stars.push(<FaStarHalfAlt key={i} className="star" />);
+      } else {
+        stars.push(<FaRegStar key={i} className="star" />);
+      }
+    }
+    return stars;
+  };
+
+  const handleShowMore = () => {
+    setVisibleReviews(prev => prev + reviewsPerPage);
+  };
+
+  const handleShowLess = () => {
+    setVisibleReviews(reviewsPerPage);
+  };
+
   return (
-    <Card className="shadow-sm">
-      <Card.Body>
-        <Card.Title>Reviews</Card.Title>
-        {loading ? (
-          <Spinner animation="border" role="status" />
-        ) : error ? (
-          <Alert variant="danger">Error: {error}</Alert>
-        ) : reviews.length === 0 ? (
-          <p>No reviews yet.</p>
-        ) : (
-          reviews.map((review) => (
+    <div className="entity-reviews-container">
+      <div className="title-container">
+        <h3 className="main-title">Commentaires clients</h3>
+      </div>
+      {loading ? (
+        <Spinner animation="border" role="status" />
+      ) : error ? (
+        <Alert variant="danger">Erreur : {error}</Alert>
+      ) : reviews.length === 0 ? (
+        <div className="flex justify-center items-center w-full mb-4">
+          <i className="text-6xl text-gray-400 fas fa-comment-slash"></i>
+        </div>
+      ) : (
+        <>
+          {reviews.slice(0, visibleReviews).map((review) => (
             <Card key={review.id} className="mb-3 review-card">
               <Card.Body>
                 {editingReviewId === review.id ? (
                   <div>
                     <Form>
                       <Form.Group className="mb-3">
-                        <Form.Label>Rating</Form.Label>
+                        <Form.Label>Note</Form.Label>
                         <Form.Control
                           type="number"
                           min="1"
@@ -86,7 +113,7 @@ const EntityReviews = ({ reviews, loading, error, entityType, entityId }) => {
                         />
                       </Form.Group>
                       <Form.Group className="mb-3">
-                        <Form.Label>Comment</Form.Label>
+                        <Form.Label>Commentaire</Form.Label>
                         <Form.Control
                           as="textarea"
                           rows={3}
@@ -107,44 +134,38 @@ const EntityReviews = ({ reviews, loading, error, entityType, entityId }) => {
                         onClick={() => handleEditSubmit(review.id)}
                         disabled={updateLoading}
                       >
-                        Save
+                        Enregistrer
                       </Button>
-                      <Button
-                        variant="secondary"
-                        onClick={() => setEditingReviewId(null)}
-                        className="ms-2"
-                      >
-                        Cancel
-                      </Button>
+                      
                       {updateError && <Alert variant="danger" className="mt-2">{updateError}</Alert>}
                     </Form>
                   </div>
                 ) : (
                   <>
-                    <Card.Title>
-                      {Array(review.rating).fill().map((_, i) => (
-                        <FaStar key={i} color="gold" />
-                      ))}
-                      <span className="ms-2">by {review.user.firstname}</span>
-                    </Card.Title>
-                    <Card.Text>{review.comment}</Card.Text>
+                    <div className="stars">
+                      {renderStars(review.rating)}
+                    </div>
+                    <div className="infos">
+                      <p className="date-time">
+                        Posté le {new Date(review.created_at).toLocaleDateString('fr-FR')}
+                      </p>
+                      <p className="description">{review.comment}</p>
+                    </div>
+                    <div className="author">
+                      — {review.user.firstname}
+                    </div>
                     {review.image && (
                       <img
                         src={review.image}
-                        alt="Review"
+                        alt="Commentaire"
                         className="img-fluid rounded mb-2"
                         style={{ maxWidth: '200px' }}
                       />
                     )}
-                    <Card.Text>
-                      <small className="text-muted">
-                        Posted on {new Date(review.created_at).toLocaleDateString()}
-                      </small>
-                    </Card.Text>
                     {userInfo && String(userInfo.id) === String(review.user.id) && (
                       <Button
                         variant="warning"
-                        className="me-2"
+                        className="me-2 mt-2"
                         onClick={() => handleEditClick(review)}
                       >
                         Modifier
@@ -153,6 +174,7 @@ const EntityReviews = ({ reviews, loading, error, entityType, entityId }) => {
                     {(userInfo && (String(userInfo.id) === String(review.user.id) || isAdmin)) && (
                       <Button
                         variant="danger"
+                        className="mt-2"
                         onClick={() => handleDelete(review.id)}
                         disabled={deleteLoading}
                       >
@@ -164,10 +186,24 @@ const EntityReviews = ({ reviews, loading, error, entityType, entityId }) => {
                 )}
               </Card.Body>
             </Card>
-          ))
-        )}
-      </Card.Body>
-    </Card>
+          ))}
+          {reviews.length > reviewsPerPage && (
+            <div className="pagination-buttons">
+              {visibleReviews < reviews.length && (
+                <Button variant="primary" onClick={handleShowMore} className="me-2">
+                  Afficher plus
+                </Button>
+              )}
+              {visibleReviews > reviewsPerPage && (
+                <Button variant="secondary" onClick={handleShowLess}>
+                  Afficher moins
+                </Button>
+              )}
+            </div>
+          )}
+        </>
+      )}
+    </div>
   );
 };
 

@@ -1,0 +1,39 @@
+/* Container for the description section */
+
+
+/* Style for the "Description" title */
+.entity-description .description-title {
+  font-size: 1.25rem !important; /* text-xl */
+  font-weight: 700 !important; /* font-bold */
+  color: #333 !important; /* Ensure the text color is applied */
+  text-align: center !important; /* text-center from original */
+  position: relative !important;
+  display: inline-block !important; /* inline-block to apply background gradient properly */
+  padding-bottom: 0.25rem !important; /* pb-1 */
+  background: linear-gradient(to right, #15A5DF, #15A5DF) !important; /* from-[#15A5DF] to-[#15A5DF] */
+  background-size: 60% 2.5px !important; /* bg-[length:60%_2.5px] */
+  background-position: left bottom !important; /* bg-left-bottom */
+  background-repeat: no-repeat !important;
+  min-width: 100px !important; /* Pour la ligne bleue */
+  margin-bottom: 20px;
+  margin-top: 30px;
+}
+
+
+
+/* Style for the description text */
+.entity-description .description-text {
+  font-size: 1rem !important; /* Taille de police standard */
+  color: #6c757d !important; /* Gris moyen pour le texte */
+}
+
+/* Responsive adjustments */
+@media (max-width: 800px) {
+  .entity-description .description-title {
+    font-size: 1.5rem !important; /* Taille de titre plus petite sur mobile */
+  }
+
+  .entity-description .description-title::after {
+    width: 30% !important; /* Ligne plus large sur mobile pour l'équilibre */
+  }
+}

@@ -1,0 +1,143 @@
+.circuit-history-container {
+  padding: 0;
+  background-color: #f8f9fa !important;
+  min-height: 100vh;
+  padding-top: 60px; /* Add padding to push content below the navbar (match navbar height) */
+}
+
+.circuit-history-content {
+  padding: 40px;
+  background: #fff !important;
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  margin: 20px auto; /* Center the content horizontally with margin */
+  max-width: 1200px; /* Optional: Limit the maximum width for better readability */
+}
+
+.circuit-history-content h1 {
+  font-size: 1.25rem !important; /* text-xl */
+  font-weight: 700 !important; /* font-bold */
+  color: #333 !important; /* Ensure the text color is applied */
+  text-align: center !important; /* text-center from original */
+  position: relative !important;
+  display: inline-block !important; /* inline-block to apply background gradient properly */
+  padding-bottom: 0.25rem !important; /* pb-1 */
+  background: linear-gradient(to right, #15A5DF, #15A5DF) !important; /* from-[#15A5DF] to-[#15A5DF] */
+  background-size: 60% 2.5px !important; /* bg-[length:60%_2.5px] */
+  background-position: left bottom !important; /* bg-left-bottom */
+  background-repeat: no-repeat !important;
+  min-width: 100px !important; /* Ensure the element has enough width for the gradient */
+}
+
+.circuit-history-list {
+  margin-top: 20px;
+}
+
+.circuit-card {
+  border: none;
+  border-radius: 8px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+  transition: transform 0.2s ease, box-shadow 0.3s ease;
+}
+
+.circuit-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+}
+
+.circuit-header {
+  width: 100%;
+}
+
+.circuit-header h5 {
+  font-size: 1.25rem;
+  color: #333 !important;
+  margin-bottom: 5px;
+}
+
+.circuit-header .text-muted {
+  font-size: 0.9rem;
+  color: #6c757d !important;
+}
+
+.accordion-button {
+  background-color: #f8f9fa !important;
+  color: #333 !important;
+  padding: 15px;
+  border-radius: 8px 8px 0 0 !important;
+}
+
+.accordion-button:not(.collapsed) {
+  background-color: #e9ecef !important;
+  color: #007bff !important;
+}
+
+.accordion-button:focus {
+  box-shadow: none;
+}
+
+.circuit-details {
+  padding: 15px;
+  background-color: #fff !important;
+  border-radius: 0 0 8px 8px;
+}
+
+.circuit-details p {
+  margin: 5px 0;
+  font-size: 0.95rem;
+  color: #555 !important;
+}
+
+.circuit-details h6 {
+  font-size: 1.1rem;
+  color: #333 !important;
+  margin-bottom: 10px;
+}
+
+.schedule-list {
+  list-style: none;
+  padding: 0;
+}
+
+.schedule-item {
+  margin-bottom: 15px;
+  padding: 10px;
+  background-color: #f9f9f9 !important;
+  border-radius: 5px;
+}
+
+.schedule-item strong {
+  display: block;
+  font-size: 1rem;
+  color: #333 !important;
+}
+
+.schedule-item ul {
+  list-style: none;
+  padding-left: 15px;
+  margin-top: 5px;
+}
+
+.schedule-item ul li {
+  font-size: 0.9rem;
+  color: #666 !important;
+  margin: 3px 0;
+}
+
+.schedule-item ul li strong {
+  display: inline;
+  margin-right: 5px;
+}
+
+/* Styling for clickable entity links */
+.entity-link {
+  color: #007bff !important;
+  text-decoration: none; /* Remove the underline */
+  cursor: pointer;
+  transition: color 0.3s ease;
+}
+
+.entity-link:hover {
+  color: #0056b3 !important;
+  text-decoration: none; /* Ensure no underline on hover */
+}

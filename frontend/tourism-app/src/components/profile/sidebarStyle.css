@@ -1,61 +1,79 @@
 .sidebar {
-  width: 250px;
-  height: 100vh;
-  background-color: #f8f9fa;
-  padding: 20px;
-  border-right: 1px solid #dee2e6;
-  position: fixed; /* Ensures the sidebar stays in place */
-  top: 0;
-  left: 0;
-  overflow-y: auto; /* Allows scrolling if content overflows */
+  width: 250px !important;
+  height: calc(100vh - 60px) !important; /* Adjust height to account for navbar height */
+  background-color: #f8f9fa !important;
+  padding: 20px !important;
+  border-right: 1px solid #dee2e6 !important;
+  position: fixed !important; /* Still fixed to stay in place while scrolling */
+  top: 60px !important; /* Offset to push the sidebar below the navbar */
+  left: 0 !important;
+  overflow-y: auto !important; /* Allows scrolling if content overflows */
+  display: flex !important; /* Use flexbox for the sidebar layout */
+  flex-direction: column !important; /* Stack header and nav vertically */
+  align-items: center !important; /* Center all content horizontally */
 }
 
 .sidebar-header {
-  text-align: center;
-  margin-bottom: 30px;
+  text-align: center !important;
+  margin-bottom: 30px !important;
+  display: flex !important; /* Use flexbox for the header */
+  justify-content: center !important; /* Center the image horizontally */
+  align-items: center !important; /* Center vertically within the header */
+  width: 100% !important; /* Ensure it takes full width of the sidebar */
 }
 
 .sidebar-profile-img {
-  width: 100px;
-  height: 100px;
-  border-radius: 50%;
-  object-fit: cover;
-  border: 2px solid #dee2e6; /* Subtle border for the profile image */
-  transition: transform 0.3s ease; /* Smooth hover effect */
+  width: 100px !important;
+  height: 100px !important;
+  border-radius: 50% !important;
+  object-fit: cover !important;
+  border: 2px solid #dee2e6 !important; /* Subtle border for the profile image */
+  transition: transform 0.3s ease !important; /* Smooth hover effect */
 }
 
 .sidebar-profile-img:hover {
-  transform: scale(1.05); /* Slight zoom on hover */
+  transform: scale(1.05) !important; /* Slight zoom on hover */
 }
 
 .nav-link {
-  display: flex;
-  align-items: center;
-  padding: 10px 15px;
-  color: #495057;
-  font-size: 16px;
-  text-decoration: none;
-  border-radius: 5px;
-  margin-bottom: 5px; /* Spacing between links */
-  transition: all 0.3s ease; /* Smooth transition for hover and active states */
+  display: flex !important;
+  flex-direction: row !important; /* Ensure horizontal layout for icon and text */
+  align-items: center !important; /* Vertically center the icon and text */
+  padding: 10px 15px !important;
+  color: #495057 !important;
+  font-size: 16px !important;
+  text-decoration: none !important;
+  border-radius: 5px !important;
+  margin-bottom: 5px !important; /* Spacing between links */
+  transition: all 0.3s ease !important; /* Smooth transition for hover and active states */
+  line-height: 1 !important; /* Ensure consistent line height */
+  width: 100% !important; /* Ensure full width for proper alignment */
 }
 
 .nav-link:hover {
-  background-color: #e9ecef;
-  color: #007bff;
+  background-color: #e9ecef !important;
+  color: #007bff !important;
 }
 
 .nav-link.active {
-  background-color: #007bff;
+  background-color: #007bff !important;
   color: white !important;
-  border-radius: 5px;
+  border-radius: 5px !important;
 }
 
 .nav-icon {
-  margin-right: 10px;
-  transition: transform 0.3s ease; /* Smooth icon animation on hover */
+  margin-right: 10px !important; /* Space between icon and text */
+  font-size: 18px !important; /* Consistent icon size */
+  flex-shrink: 0 !important; /* Prevent icon from shrinking */
+  transition: transform 0.3s ease !important; /* Smooth icon animation on hover */
 }
 
 .nav-link:hover .nav-icon {
-  transform: translateX(5px); /* Slight icon movement on hover */
+  transform: translateX(5px) !important; /* Slight icon movement on hover */
+}
+
+/* Ensure the text doesn't stack or wrap unnecessarily */
+.nav-link span {
+  flex-grow: 1 !important; /* Allow text to take up remaining space */
+  line-height: 1 !important; /* Match the line height to prevent vertical offset */
 }

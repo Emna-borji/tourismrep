@@ -1,129 +1,58 @@
 import React from 'react';
 import { Card, Button } from 'react-bootstrap';
+import { FaStar, FaStarHalfAlt, FaRegStar, FaHeart, FaRegHeart } from 'react-icons/fa';
+import { Link } from 'react-router-dom';
 import './recommendationCard.css';
 
-// Custom CSS for enhanced styling
-const cardStyles = `
-  .recommendation-card {
-    border: none;
-    border-radius: 12px;
-    overflow: hidden;
-    transition: transform 0.2s, box-shadow 0.2s;
-    background: #fff;
-  }
-  .recommendation-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
-  }
-  .recommendation-card img {
-    object-fit: cover;
-    height: 200px;
-    width: 100%;
-  }
-  .placeholder-img {
-    height: 200px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: #f0f0f0;
-    color: #666;
-    font-size: 1rem;
-    font-weight: 500;
-  }
-  .card-body {
-    padding: 1.5rem;
-  }
-  .card-title {
-    font-size: 1.25rem;
-    font-weight: 600;
-    color: #1a3c34;
-    margin-bottom: 1rem;
-  }
-  .card-text {
-    font-size: 0.95rem;
-    color: #333;
-    margin-bottom: 0.75rem;
-  }
-  .card-text strong {
-    color: #1a3c34;
-    font-weight: 500;
-  }
-  .rating-stars {
-    color: #f4c107;
-    font-size: 1rem;
-  }
-  .rating-stars + span {
-    color: #ccc;
-  }
-  .view-details-btn {
-    background: #1a3c34;
-    border: none;
-    border-radius: 8px;
-    padding: 0.5rem 1.5rem;
-    font-size: 0.9rem;
-    transition: background 0.2s;
-  }
-  .view-details-btn:hover {
-    background: #2a5c4a;
-  }
-`;
-
-// Inject styles into the document
-const styleSheet = document.createElement('style');
-styleSheet.type = 'text/css';
-styleSheet.innerText = cardStyles;
-document.head.appendChild(styleSheet);
-
-// Debug: Confirm component is defined
-console.log('RecommendationCard component loaded');
+// Débogage : Confirmer que le composant est défini
+console.log('Composant RecommendationCard chargé');
 
 const RecommendationCard = ({ item, entityType }) => {
-  // Debug: Log item and price to inspect data
-  console.log('RecommendationCard item:', item);
-  console.log('item.price:', item?.price, typeof item?.price);
+  // Débogage : Journaliser les données de l'item et du prix
+  console.log('Item RecommendationCard :', item);
+  console.log('Prix de l’item :', item?.price, typeof item?.price);
 
   const getImageUrl = () => {
-    if (item?.image) return item.image;
-    if (item?.image_url) return item.image_url;
-    if (entityType === 'restaurant' && item?.additional_images?.length > 0) {
-      return item.additional_images[0].image_url;
-    }
-    return null;
-  };
+  // If entityType is 'circuit', return the specified image URL
+  if (entityType === 'circuit') {
+    return 'https://levoyageur-organise.com/wp-content/uploads/2023/09/czNmcy1wcml2YXRlL3Jhd3BpeGVsX2ltYWdlcy93ZWJzaXRlX2NvbnRlbnQvbHIvcHg5NTI3NDEtaW1hZ2Uta3d2eDhja3IuanBn.jpg';
+  }
+  // Existing logic for other entity types
+  if (item?.image) return item.image;
+  if (item?.images) return item.images;
+  if (item?.image_url) return item.image_url;
+  if (entityType === 'restaurant' && item?.additional_images?.length > 0) {
+    return item.additional_images[0].image_url;
+  }
+  // Fallback placeholder for non-circuit entities
+  return 'https://tunisie.co/uploads/images/content/inspiring-220416-1.jpg'; // Placeholder cohérent
+};
 
   const renderSpecificFields = () => {
     if (entityType === 'hotel') {
-      return (
-        <p className="card-text">
-          <strong>Stars:</strong> {item?.stars ? `${item.stars} ⭐` : 'N/A'}
-        </p>
-      );
+      return null; // Pas d'étoiles en bas pour les hôtels
     }
     if (entityType === 'restaurant') {
-      return (
-        <p className="card-text">
-          <strong>Forks:</strong> {item?.forks ? `${item.forks} 🍴` : 'N/A'}
-        </p>
-      );
+      return null; // Suppression des fourchettes en bas pour les restaurants
     }
     if (entityType === 'festival') {
       return (
-        <p className="card-text">
-          <strong>Date:</strong> {item?.date || 'N/A'}
+        <p className="card-text custom-location">
+          <strong>Date :</strong> {item?.date || 'N/A'}
         </p>
       );
     }
     if (entityType === 'circuit') {
       return (
         <>
-          <p className="card-text">
-            <strong>Departure:</strong> {item?.departure_city || 'N/A'}
+          <p className="card-text custom-location">
+            <strong>Départ :</strong> {item?.departure_city || 'N/A'}
           </p>
-          <p className="card-text">
-            <strong>Arrival:</strong> {item?.arrival_city || 'N/A'}
+          <p className="card-text custom-location">
+            <strong>Arrivée :</strong> {item?.arrival_city || 'N/A'}
           </p>
-          <p className="card-text">
-            <strong>Duration:</strong> {item?.duration ? `${item.duration} days` : 'N/A'}
+          <p className="card-text custom-location">
+            <strong>Durée :</strong> {item?.duration ? `${item.duration} jours` : 'N/A'}
           </p>
         </>
       );
@@ -131,66 +60,109 @@ const RecommendationCard = ({ item, entityType }) => {
     return null;
   };
 
-  // Safely handle price
-  const formatPrice = (price) => {
-    if (typeof price === 'number' && !isNaN(price)) {
-      return `$${price.toFixed(2)}`;
-    }
-    if (typeof price === 'string') {
-      const parsedPrice = parseFloat(price);
-      if (!isNaN(parsedPrice)) {
-        return `$${parsedPrice.toFixed(2)}`;
+  const renderStars = (rating) => {
+    const stars = [];
+    for (let i = 1; i <= 5; i++) {
+      if (i <= Math.floor(rating)) {
+        stars.push(<FaStar key={i} className="star" />);
+      } else if (i === Math.ceil(rating) && rating % 1 !== 0) {
+        stars.push(<FaStarHalfAlt key={i} className="star" />);
+      } else {
+        stars.push(<FaRegStar key={i} className="star" />);
       }
     }
-    return 'N/A';
+    return stars;
   };
 
+  const renderForks = (forks) => {
+    return Array.from({ length: forks }, (_, i) => (
+      <span key={i} className="fork">🍴</span>
+    ));
+  };
+
+  // État fictif pour les favoris (remplacer par une logique réelle si nécessaire)
+  const isFavorited = false; // Placeholder ; intégrer votre système de favoris
+
   return (
-    <div className="col-md-4 mb-4">
-      <Card className="recommendation-card shadow-sm">
-        {getImageUrl() ? (
-          <Card.Img
-            variant="top"
-            src={getImageUrl()}
-            alt={item?.name}
-          />
-        ) : (
-          <div className="placeholder-img">No Image Available</div>
-        )}
-        <Card.Body>
-          <Card.Title>{item?.name || 'Unnamed'}</Card.Title>
-          <p className="card-text">
-            <strong>Destination:</strong> {item?.destination || 'N/A'}
+    <Card className="custom-card h-100 shadow-sm position-relative mb-3">
+      <Card.Img
+        variant="top"
+        src={getImageUrl()}
+        alt={item?.name}
+        className="custom-card-img"
+      />
+      {(item?.forks || item?.stars) && (
+        <div className="rating-badge-image">
+          {entityType === 'restaurant' && item?.forks && renderForks(item.forks)}
+          {entityType === 'hotel' && item?.stars && renderStars(item.stars)}
+        </div>
+      )}
+      <Card.Body className="d-flex flex-column justify-content-between">
+        <div>
+          <Card.Title className="custom-title">{item?.name || 'Sans nom'}</Card.Title>
+          {item.address && (
+            <Card.Text className="custom-location">
+              <span className="address-text">{item.address}</span>
+            </Card.Text>
+          )}
+          {item.destination && (
+            <Card.Text className="custom-region">
+              {item.destination}
+            </Card.Text>
+          )}
+          {entityType === 'guest_house' && item.category && (
+            <Card.Text>
+              Catégorie : {item.category}
+            </Card.Text>
+          )}
+          {entityType === 'festival' && item.date && (
+            <Card.Text>
+              Date : {item.date}
+            </Card.Text>
+          )}
+          <p className="card-text custom-location">
+            <strong>Prix :</strong> {item?.price ? `${item.price} DT` : 'N/A'}
           </p>
-          <p className="card-text">
-            <strong>Price:</strong> {formatPrice(item?.price)}
-          </p>
-          <p className="card-text">
-            <strong>Rating:</strong>{' '}
+          <p className="card-text custom-location">
+            <strong>Note :</strong>{' '}
             {item?.rating ? (
               <span className="rating-stars">
-                {'★'.repeat(Math.round(item.rating))}
-                <span>{'☆'.repeat(5 - Math.round(item.rating))}</span>
+                <FaStar className="rating-star" /> {item.rating}
               </span>
             ) : (
-              'No ratings'
+              'Aucune note'
             )}
           </p>
           {renderSpecificFields()}
+        </div>
+        <div className="d-flex justify-content-between align-items-center mt-3">
+          {item.price && (
+            <div className="price-stack">
+              <div className="price-prefix">à partir de</div>
+              <div className="price-value"><strong>{item.price} DT</strong></div>
+            </div>
+          )}
           <Button
-            className="view-details-btn"
-            size="sm"
-            href={`/details/${entityType}/${item?.id}`}
+            as={Link}
+            to={`/details/${entityType}/${item?.id}`}
+            className="custom-details-btn"
           >
-            View Details
+            Plus de détails
           </Button>
-        </Card.Body>
-      </Card>
-    </div>
+        </div>
+      </Card.Body>
+      <div className="favorite-icon" onClick={() => console.log('Favori basculé pour', item?.id)}>
+        {isFavorited ? (
+          <FaHeart color="red" size={24} />
+        ) : (
+          <FaRegHeart color="gray" size={24} />
+        )}
+      </div>
+    </Card>
   );
 };
 
-// Debug: Confirm export
-console.log('Exporting RecommendationCard:', RecommendationCard, typeof RecommendationCard);
+// Débogage : Confirmer l’exportation
+console.log('Exportation de RecommendationCard :', RecommendationCard, typeof RecommendationCard);
 
 export default RecommendationCard;

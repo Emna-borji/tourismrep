@@ -8,7 +8,8 @@ from .models import Preference, PreferenceActivityCategory, PreferenceCuisine
 from tourism.models import Destination
 from tourism.models import ActivityCategory
 from tourism.models import Cuisine
-
+import re
+from datetime import datetime
 from tourism.serializers import DestinationSerializer
 
 
@@ -53,19 +54,77 @@ class CustomUserSerializer(serializers.ModelSerializer):
             'is_blocked': {'read_only': True},
         }
 
+    def validate_email(self, value):
+        if not value:
+            raise serializers.ValidationError("L'email est requis.")
+        if CustomUser.objects.filter(email=value).exists():
+            raise serializers.ValidationError("Cet email est déjà utilisé.")
+        return value
+
+    def validate_firstname(self, value):
+        if not value:
+            raise serializers.ValidationError("Le prénom est requis.")
+        if not re.match(r"^[a-zA-Z\s'-]+$", value):
+            raise serializers.ValidationError("Le prénom ne doit contenir que des lettres, espaces, tirets ou apostrophes.")
+        return value
+
+    def validate_lastname(self, value):
+        if not value:
+            raise serializers.ValidationError("Le nom est requis.")
+        if not re.match(r"^[a-zA-Z\s'-]+$", value):
+            raise serializers.ValidationError("Le nom ne doit contenir que des lettres, espaces, tirets ou apostrophes.")
+        return value
+
+    def validate_phonenumber(self, value):
+        if not value:
+            raise serializers.ValidationError("Le numéro de téléphone est requis.")
+        if not re.match(r"^\+216\d{8}$", value):
+            raise serializers.ValidationError("Le numéro de téléphone doit être au format +21612345678.")
+        return value
+
+    def validate_gender(self, value):
+        if not value:
+            raise serializers.ValidationError("Le genre est requis.")
+        if value not in ['male', 'female']:
+            raise serializers.ValidationError("Le genre doit être 'male' ou 'female'.")
+        return value
+
+    def validate_dateofbirth(self, value):
+        if not value:
+            raise serializers.ValidationError("La date de naissance est requise.")
+        today = datetime.strptime("2025-06-03", "%Y-%m-%d").date()  # Current date is June 03, 2025
+        age = today.year - value.year - ((today.month, today.day) < (value.month, value.day))
+        if age < 18:
+            raise serializers.ValidationError("Vous devez avoir au moins 18 ans.")
+        return value
+
+    def validate_profilepic(self, value):
+        if not value:
+            raise serializers.ValidationError("L'URL de la photo de profil est requis.")
+        if not re.match(r'^(https?://[^\s+])', value):
+            raise serializers.ValidationError("L'URL doit être valide pour la photo de profil.")
+        return value
+
     def validate_password(self, value):
         if not value:
             raise serializers.ValidationError("Le mot de passe est requis.")
-        
+        if not re.match(r'^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$', value):
+            raise serializers.ValidationError("Le mot de passe doit contenir au moins 8 caractères, une majuscule, une minuscule, un caractère chiffre et un caractère spécial.")
         return value
 
     def create(self, validated_data):
-        password = validated_data.pop('password')
-        user = CustomUser(**validated_data)
-        if password:
-            user.password = make_password(password)
-        user.save()
-        return user
+        try:
+            password = validated_data.pop('password')
+            location_id = validated_data.pop('location_id', None)
+            user = CustomUser(**validated_data)
+            if location_id:
+                user.location = location_id  # Assign the location object
+            if password:
+                user.set_password(password)
+            user.save()
+            return user
+        except Exception as e:
+            raise serializers.ValidationError(f"Erreur lors de la création de l'utilisateur : {str(e)}")
 
 
 
@@ -77,7 +136,7 @@ class LoginSerializer(serializers.Serializer):
     def validate(self, data):
         user = authenticate(email=data['email'], password=data['password'])
         if user is None:
-            raise serializers.ValidationError('Invalid credentials')
+            raise serializers.ValidationError('Identifiants invalides')  # Changed to French
         return {'user': user}
     
 

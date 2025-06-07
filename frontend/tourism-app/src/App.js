@@ -36,6 +36,9 @@ import GuidesPage from "./components/pages/GuidesPage";
 import RecommendationsPage from "./components/RecommendationsPage";
 import CircuitList from "./components/CircuitList";
 import CircuitDetail from "./components/CircuitDetail";
+import Navbar from "./components/Shared/Navbar";
+import CircuitHistory from "./components/pages/CircuitHistory";
+import TouristMap from "./components/TouristMap";
 // import EntityDetailPage from "./components/pages/EntityDetailPage";
 
 const App = () => {
@@ -47,41 +50,35 @@ const App = () => {
   return (
     
     <Router>
-      <Routes>
-        <Route path="/login" element={<LoginPage />} />
-        <Route path="/register" element={<RegisterPage />} /> 
-        {/* <Route path="/restaurants" element={<RestaurantsPage />} /> */}
-        {/* <Route path="/restaurant/:id" element={<RestaurantDetailsPage />} /> */}
-        {/* <Route path="/hotels" element={<HotelsPage />} />
-        <Route path="/hotel/:id" element={<HotelDetailsPage />} />
-        <Route path="/museums" element={<MuseumsPage />} />
-        <Route path="/festivals" element={<FestivalsPage />} /> */}
-        {/* <Route path="/festival/:festivalId" element={<FestivalDetailsPage />} /> */}
-        {/* <Route path="/guest-houses" element={<GuestHousesPage />} /> */}
-        {/* <Route path="/guest-house/:guestHouseId" element={<GuestHouseDetailsPage />} /> */}
-
-        <Route path="/restaurants" element={<RestaurantsPage />} />
-        <Route path="/hotels" element={<HotelsPage />} />
-        <Route path="/guest_houses" element={<GuestHousesPage />} />
-        <Route path="/festivals" element={<FestivalsPage />} />
-        <Route path="/archaeological_sites" element={<ArchaeologicalSitesPage />} />
-        <Route path="/activities" element={<ActivitiesPage />} />
-        <Route path="/museums" element={<MuseumsPage />} />
-        {/* <Route path="/:entityType/:id" element={<EntityDetailPage />} /> */}
-        <Route path="/:entityType/:id" element={<EntityDetailPage />} />
-
-
-        <Route path="/account-settings" element={<AccountSettings />} />
-        <Route path="/change-password" element={<ChangePassword />} />
-        <Route path="/admin" element={<AdminDashboard />} />
-        <Route path="/favorites" element={<FavoritesPage />} />
-        <Route path="/circuit-wizard" element={<CircuitWizard />} />
-        <Route path="/circuit/summary/:id" element={<CircuitSummary />} />
-        <Route path="/guides" element={<GuidesPage />} />
-        <Route path="/recommandations" element={<RecommendationsPage />} />
-        <Route path="/" element={<CircuitList />} />
-        <Route path="/circuit/:id" element={<CircuitDetail />} />
-      </Routes>
+      <div className="min-h-screen flex flex-col">
+        <Navbar /> {/* Navbar placée en haut de la page */}
+        <div className="flex-1 mt-0"> {/* Ajustement de la marge pour éviter le chevauchement avec la Navbar */}
+          <Routes>
+            <Route path="/login" element={<LoginPage />} />
+            <Route path="/register" element={<RegisterPage />} />
+            <Route path="/restaurants" element={<RestaurantsPage />} />
+            <Route path="/hotels" element={<HotelsPage />} />
+            <Route path="/guest_houses" element={<GuestHousesPage />} />
+            <Route path="/festivals" element={<FestivalsPage />} />
+            <Route path="/archaeological_sites" element={<ArchaeologicalSitesPage />} />
+            <Route path="/activities" element={<ActivitiesPage />} />
+            <Route path="/museums" element={<MuseumsPage />} />
+            <Route path="/:entityType/:id" element={<EntityDetailPage />} />
+            <Route path="/account-settings" element={<AccountSettings />} />
+            <Route path="/change-password" element={<ChangePassword />} />
+            <Route path="/admin" element={<AdminDashboard />} />
+            <Route path="/favorites" element={<FavoritesPage />} />
+            <Route path="/circuit-wizard" element={<CircuitWizard />} />
+            <Route path="/circuit/summary/:id" element={<CircuitSummary />} />
+            <Route path="/guides" element={<GuidesPage />} />
+            <Route path="/" element={<RecommendationsPage />} />
+            <Route path="/predefined-circuits" element={<CircuitList />} />
+            <Route path="/circuit/:id" element={<CircuitDetail />} />
+            <Route path="/circuit-history" element={<CircuitHistory />} />
+            <Route path="/tourist-map" element={<TouristMap />} />
+          </Routes>
+        </div>
+      </div>
     </Router>
   );
 };

@@ -104,18 +104,27 @@ class UserViewSet(viewsets.ModelViewSet):
 @permission_classes([AllowAny])
 def register(request):
     if request.method == 'POST':
-        # Use the serializer to validate the data
         serializer = CustomUserSerializer(data=request.data)
-
         if serializer.is_valid():
-            # Save the user and return a response
-            serializer.save()
-            return JsonResponse({"message": "User registered successfully!"}, status=201)
+            # Save the user
+            user = serializer.save()
+            # Serialize the created user
+            user_serializer = CustomUserSerializer(user)
+            # Generate JWT tokens
+            refresh = RefreshToken.for_user(user)
+            access_token = str(refresh.access_token)
 
-        # If validation fails, return error messages
-        return JsonResponse({"error": serializer.errors}, status=400)
+            return Response({
+                "message": "User registered successfully!",
+                "user": user_serializer.data,
+                "access_token": access_token,
+                "refresh_token": str(refresh)
+            }, status=status.HTTP_201_CREATED)
+        
+        # If validation fails (including email exists), return errors
+        return Response({"error": serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
 
-    return JsonResponse({"error": "Invalid method. Use POST."}, status=405)
+    return Response({"error": "Invalid method. Use POST."}, status=status.HTTP_405_METHOD_NOT_ALLOWED)
 
 
 

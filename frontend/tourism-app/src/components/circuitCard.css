@@ -1,0 +1,199 @@
+/* Importing Tailwind CSS via CDN (ensure this matches your project setup) */
+@import url('https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css');
+
+/* Root variables for consistent theming */
+:root {
+  --primary-color: #1e88e5; /* Ocean blue */
+  --secondary-color: #2c5ba1; /* Darker blue */
+  --accent-color: #ffffff; /* White */
+  --text-color: #2d3748; /* Dark gray */
+  --card-bg: #ffffff; /* White background for cards */
+  --shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+  --border-radius: 8px; /* Rounded corners */
+  --transition: all 0.3s ease; /* Smooth transitions */
+}
+
+/* Hero Section Styling */
+.hero-section {
+  position: relative;
+  width: 100%;
+  height: 400px; /* Fixed height for hero section */
+  background-size: cover;
+  background-position: center;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden;
+}
+
+.hero-section::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.5), transparent); /* Subtle gradient overlay */
+  z-index: 1;
+}
+
+.hero-section .hero-content {
+  position: relative;
+  z-index: 2;
+  text-align: center;
+  color: var(--accent-color);
+  padding: 20px;
+}
+
+.hero-section .hero-content h1 {
+  font-size: 2.5rem;
+  font-weight: 700;
+  margin-bottom: 10px;
+  text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.5);
+}
+
+.hero-section .hero-content p {
+  font-size: 1.25rem;
+  font-weight: 400;
+  text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.5);
+}
+
+/* Circuit List Container */
+.circuit-list-container {
+  padding: 2rem 1rem;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.circuit-list-container h1 {
+  font-size: 2rem;
+  font-weight: 600;
+  color: var(--text-color);
+}
+
+.circuit-list-container .d-flex {
+  align-items: center;
+  gap: 1rem;
+}
+
+.circuit-list-container .alert-info {
+  background-color: #e6f0fa;
+  border-color: #b3d4fc;
+  color: var(--text-color);
+  padding: 0.5rem 1rem;
+  border-radius: var(--border-radius);
+}
+
+.circuit-list-container .btn-success {
+  background-color: var(--primary-color);
+  border-color: var(--primary-color);
+  padding: 0.5rem 1.5rem;
+  font-weight: 500;
+}
+
+.circuit-list-container .btn-success:hover {
+  background-color: var(--secondary-color);
+  border-color: var(--secondary-color);
+}
+
+/* Circuit Card Styling */
+.circuit-card {
+  display: none; /* Override default Bootstrap card styling */
+}
+
+.p-4.bg-white.rounded-lg.mt-4.shadow-md.border.border-gray-200 {
+  padding: 1rem;
+  background-color: var(--card-bg);
+  border-radius: var(--border-radius);
+  margin-top: 1rem;
+  box-shadow: var(--shadow);
+  border: 1px solid #e5e7eb;
+  position: relative;
+}
+
+/* Delete Button Styling */
+.btn-danger {
+  background-color: var(--primary-color) !important;
+  border-color: #dc3545;
+  padding: 0.5rem 1rem;
+  border-radius: var(--border-radius);
+  font-weight: 500;
+}
+
+.btn-danger:hover {
+  background-color: var(--secondary-color) !important;
+  border-color: var(--secondary-color) !important;
+}
+
+/* Pagination Styling */
+.pagination-container {
+  margin-top: 2rem;
+}
+
+.pagination .page-item .page-link {
+  color: var(--text-color);
+  background-color: var(--accent-color);
+  border: 1px solid #dee2e6;
+  border-radius: var(--border-radius);
+  padding: 0.5rem 1rem;
+}
+
+.pagination .page-item.active .page-link {
+  background-color: var(--primary-color);
+  border-color: var(--primary-color);
+  color: var(--accent-color);
+}
+
+.pagination .page-item.disabled .page-link {
+  color: #6c757d;
+  background-color: #e9ecef;
+  border-color: #dee2e6;
+}
+
+.pagination .page-item:not(.disabled):hover .page-link {
+  background-color: var(--secondary-color);
+  border-color: var(--secondary-color);
+  color: var(--accent-color);
+}
+
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+  .hero-section {
+    height: 300px;
+  }
+
+  .hero-section .hero-content h1 {
+    font-size: 2rem;
+  }
+
+  .hero-section .hero-content p {
+    font-size: 1rem;
+  }
+
+  .circuit-list-container h1 {
+    font-size: 1.5rem;
+  }
+
+  .p-4.bg-white.rounded-lg.mt-4.shadow-md.border.border-gray-200 {
+    padding: 0.75rem;
+  }
+}
+
+@media (max-width: 576px) {
+  .circuit-list-container .d-flex {
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .circuit-list-container .btn-success,
+  .circuit-list-container .alert-info {
+    width: 100%;
+  }
+}
+
+.price-container {
+    padding-top: 0.3rem;
+    padding-bottom: 0.3rem;
+    margin-right: 0rem !important;
+    padding-right: 0rem !important;
+  }

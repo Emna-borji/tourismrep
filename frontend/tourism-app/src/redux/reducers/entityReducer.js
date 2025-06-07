@@ -28,10 +28,14 @@ import {
   CREATE_ENTITY_REQUEST, // New action type
   CREATE_ENTITY_SUCCESS, // New action type
   CREATE_ENTITY_FAIL,   // New action type
+  FETCH_BEST_RATED_ENTITIES_REQUEST,
+  FETCH_BEST_RATED_ENTITIES_SUCCESS,
+  FETCH_BEST_RATED_ENTITIES_FAILURE,
 } from '../constants/entityConstants';
 
 
 const initialState = {
+  bestRatedEntities: {},
   entities: [],
   entity: null,
   loading: false,
@@ -171,6 +175,10 @@ export const entityReducer = (state = initialState, action) => {
       return { ...state, createEntityLoading: false, createEntityError: null };
     case CREATE_ENTITY_FAIL:
       return { ...state, createEntityLoading: false, createEntityError: action.payload };
+    case FETCH_BEST_RATED_ENTITIES_SUCCESS:
+      return { ...state, loading: false, bestRatedEntities: action.payload };
+    case FETCH_BEST_RATED_ENTITIES_FAILURE:
+      return { ...state, loading: false, error: action.payload };
     default:
       return state;
   }

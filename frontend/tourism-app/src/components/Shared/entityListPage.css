@@ -43,7 +43,7 @@
   flex-direction: column !important;
   gap: 1.5rem !important;
   background-color: #F0F6FF !important;
-  padding: 1.5rem !important;
+  padding: 1rem !important;
   border-radius: 0.5rem !important;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1) !important;
   flex: 1 !important;
@@ -51,8 +51,8 @@
 
 @media (min-width: 1024px) {
   .tourism-left-column {
-    flex: 0 0 30% !important;
-    max-width: 400px !important;
+    flex: 0 0 25% !important;
+    max-width: 300px !important;
   }
 }
 
@@ -71,42 +71,72 @@
   gap: 1rem !important;
 }
 
-/* Search and filter group (search, cuisine, price) */
+/* Search and filter group (remove the "frame") */
 .tourism-search-filter-group {
   display: flex !important;
   flex-direction: column !important;
   gap: 1rem !important;
-  background-color: #ffffff !important;
-  padding: 1.5rem !important;
-  border-radius: 0.5rem !important;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1) !important;
-  border: 1px solid rgba(0, 0, 0, 0.1) !important;
+  background: none !important;
+  padding: 0 !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  border: none !important;
+}
+
+/* Horizontal group for search and sort */
+.tourism-search-sort-group {
+  display: flex !important;
+  flex-direction: row !important;
+  gap: 2rem !important; /* Large gap as previously set */
+  align-items: center !important;
+}
+
+/* Adjust Search component to take 2/3 of the space */
+.tourism-search-bar {
+  flex: 2 !important; /* Takes 2/3 of the space */
+  min-width: 200px !important; /* Ensure it doesn't shrink too much */
+}
+
+/* Adjust SortDropDown to take 1/3 of the space */
+.tourism-sort-dropdown {
+  flex: 1 !important; /* Takes 1/3 of the space */
+  min-width: 150px !important; /* Ensure it doesn't shrink too much */
 }
 
 /* Cuisine filter styling */
 .tourism-cuisine-filter {
-  position: relative !important;
+  width: 100% !important;
+}
+
+/* Add a label for the cuisine filter */
+.tourism-cuisine-filter::before {
+  content: "Choisissez une cuisine";
+  display: block !important;
+  font-size: 1.1rem !important;
+  font-weight: 500 !important;
+  color: var(--secondary-color) !important;
+  margin-bottom: 0.5rem !important;
 }
 
 .tourism-cuisine-filter-select {
   appearance: none !important;
   width: 100% !important;
   padding: 0.75rem !important;
-  background-color: #ffffff !important;
   border: 1px solid #d1d5db !important;
-  border-radius: 0.5rem !important;
-  color: var(--text-color) !important;
+  border-radius: var(--border-radius) !important;
+  background-color: #ffffff !important;
+  color: var(--secondary-color) !important;
   outline: none !important;
   transition: var(--transition) !important;
-  background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20width%3D%2220%22%20height%3D%2220%22%20viewBox%3D%220%200%2020%2020%22%20fill%3D%22none%22%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%3E%3Cpath%20d%3D%22M6%208L10%2012L14%208%22%20stroke%3D%22%234B5563%22%20stroke-width%3D%222%22/%3E%3C/svg%3E') !important;
+  background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20width%3D%2216%22%20height%3D%2216%22%20viewBox%3D%220%200%2016%2016%22%20fill%3D%22none%22%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%3E%3Cpath%20d%3D%22M4%206L8%2010L12%206%22%20stroke%3D%22%232d3748%22%20stroke-width%3D%222%22/%3E%3C/svg%3E') !important;
   background-repeat: no-repeat !important;
   background-position: right 1rem center !important;
-  background-size: 1.2em !important;
+  background-size: 1em !important;
   padding-right: 2.5rem !important;
 }
 
 .tourism-cuisine-filter-select:hover {
-  background-color: #f7fafc !important;
+  border-color: var(--secondary-color) !important;
 }
 
 .tourism-cuisine-filter-select:focus {
@@ -139,10 +169,11 @@
 /* Map display styling */
 .tourism-map-display {
   height: 20rem !important;
-  border-radius: 0.5rem !important;
+  border-radius: 12px !important;
   overflow: hidden !important;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1) !important;
   border: 1px solid rgba(0, 0, 0, 0.1) !important;
+  background-color: #ffffff !important;
 }
 
 /* Guest house category filter */
@@ -162,7 +193,7 @@
   box-shadow: 0 0 0 2px var(--primary-color) !important;
 }
 
-/* Hotel class filter (placeholder) */
+/* Hotel class filter */
 .tourism-hotel-class-filter {
   display: flex !important;
   flex-direction: column !important;
@@ -223,9 +254,9 @@
 /* Pagination button styling */
 .tourism-pagination-btn {
   padding: 0.5rem 1rem !important;
-  background-color: var(--accent-color) !important; /* White background */
-  color: var(--text-color) !important; /* Dark gray text */
-  border: 1px solid #d1d5db !important; /* Light gray border */
+  background-color: var(--accent-color) !important;
+  color: var(--text-color) !important;
+  border: 1px solid #d1d5db !important;
   border-radius: var(--border-radius) !important;
   font-size: 1rem !important;
   cursor: pointer !important;
@@ -233,8 +264,8 @@
 }
 
 .tourism-pagination-btn:hover:not(:disabled) {
-  background-color: var(--primary-color) !important; /* Ocean blue on hover */
-  color: var(--accent-color) !important; /* White text on hover */
+  background-color: var(--primary-color) !important;
+  color: var(--accent-color) !important;
   border-color: var(--primary-color) !important;
 }
 
@@ -245,8 +276,8 @@
 
 /* Active page styling */
 .tourism-pagination-active {
-  background-color: var(--secondary-color) !important; /* Darker blue for active page */
-  color: var(--accent-color) !important; /* White text */
+  background-color: var(--secondary-color) !important;
+  color: var(--accent-color) !important;
   border-color: var(--secondary-color) !important;
 }
 
@@ -255,6 +286,35 @@
 .tourism-price-filter select:hover,
 .tourism-guest-house-category-filter:hover {
   border-color: var(--secondary-color) !important;
+}
+
+/* Custom styling for the "Découvrir" button in the modal */
+.modal .btn-primary {
+  background-color: #1e88e5 !important; /* Match --secondary-color */
+  border-color: #1e88e5 !important;
+  color: #ffffff !important; /* Ensure text is white for contrast */
+  transition: var(--transition) !important;
+}
+
+.modal .btn-primary:hover {
+  background-color: #1e88e5 !important; /* Slightly darker for hover effect */
+  border-color: #1e88e5 !important;
+}
+
+/* Entity title styling */
+.entity-title {
+  font-size: 1.25rem !important; /* text-xl */
+  font-weight: 700 !important; /* font-bold */
+  color: #333 !important; /* Ensure the text color is applied */
+  text-align: center !important; /* text-center from original */
+  position: relative !important;
+  display: inline-block !important; /* inline-block to apply background gradient properly */
+  padding-bottom: 0.25rem !important; /* pb-1 */
+  background: linear-gradient(to right, #15A5DF, #15A5DF) !important; /* from-[#15A5DF] to-[#15A5DF] */
+  background-size: 60% 2.5px !important; /* bg-[length:60%_2.5px] */
+  background-position: left bottom !important; /* bg-left-bottom */
+  background-repeat: no-repeat !important;
+  min-width: 100px !important;
 }
 
 /* Responsive adjustments */
@@ -268,6 +328,17 @@
   .tourism-map-display {
     height: 16rem !important;
   }
+
+  /* Stack search and sort on smaller screens */
+  .tourism-search-sort-group {
+    flex-direction: column !important;
+    gap: 1rem !important;
+  }
+
+  .tourism-search-bar,
+  .tourism-sort-dropdown {
+    width: 100% !important;
+  }
 }
 
 @media (max-width: 768px) {
@@ -280,6 +351,10 @@
   .tourism-pagination-btn {
     padding: 0.4rem 0.8rem !important;
     font-size: 0.9rem !important;
+  }
+
+  .tourism-map-display {
+    height: 14rem !important;
   }
 }
 
@@ -299,4 +374,185 @@
 .tourism-right-column,
 .tourism-item-list-page {
   animation: tourism-fadeIn 0.5s ease-out !important;
+}
+
+/* Custom close button styling for the modal */
+.modal-header {
+  position: relative !important;
+  display: flex !important;
+  justify-content: space-between !important;
+  align-items: center !important;
+  padding: 1rem !important;
+}
+
+.tourism-modal-close-btn {
+  position: absolute !important;
+  top: 0.5rem !important;
+  right: 0.5rem !important;
+  background-color: var(--accent-color) !important;
+  border: 1px solid var(--secondary-color) !important;
+  border-radius: 50% !important;
+  width: 2rem !important;
+  height: 2rem !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  color: var(--secondary-color) !important;
+  font-size: 1.25rem !important;
+  cursor: pointer !important;
+  transition: var(--transition) !important;
+  padding: 0 !important;
+}
+
+.tourism-modal-close-btn:hover {
+  background-color: var(--secondary-color) !important;
+  color: var(--accent-color) !important;
+  border-color: var(--secondary-color) !important;
+}
+
+.tourism-modal-close-btn:focus {
+  outline: 2px solid var(--primary-color) !important;
+  outline-offset: 2px !important;
+}
+
+/* Form styling */
+.tourism-entity-form {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 1.5rem !important;
+}
+
+/* Custom modal width */
+.tourism-modal .modal-dialog {
+  max-width: 90vw !important; /* Use viewport width for larger modal */
+  width: 1200px !important; /* Fixed width for larger screens */
+}
+
+@media (max-width: 1200px) {
+  .tourism-modal .modal-dialog {
+    width: 90% !important; /* Responsive width for smaller screens */
+  }
+}
+
+/* Form sections container */
+.tourism-form-sections {
+  display: flex !important;
+  flex-wrap: wrap !important;
+  gap: 2rem !important; /* Increased gap for better spacing */
+  justify-content: space-between !important;
+}
+
+/* Form section styling */
+.tourism-form-section {
+  background-color: var(--accent-color) !important;
+  padding: 2rem !important; /* Increased padding for more internal space */
+  border-radius: var(--border-radius) !important;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1) !important;
+  border: 1px solid #e5e7eb !important;
+  flex: 1 !important;
+  min-width: 350px !important; /* Increased minimum width to reduce cramped look */
+  max-width: 450px !important; /* Optional: cap the max width to prevent over-stretching */
+}
+
+@media (max-width: 768px) {
+  .tourism-form-sections {
+    flex-direction: column !important; /* Stack vertically on small screens */
+  }
+
+  .tourism-form-section {
+    flex: 100% !important; /* Full width on small screens */
+    min-width: 100% !important; /* Ensure it takes full width */
+    max-width: 100% !important; /* Remove max-width constraint on small screens */
+  }
+}
+
+/* Form section title */
+.tourism-form-section-title {
+  font-size: 1.25rem !important;
+  font-weight: 600 !important;
+  color: var(--secondary-color) !important;
+  margin-bottom: 1rem !important;
+  border-bottom: 2px solid var(--primary-color) !important;
+  padding-bottom: 0.5rem !important;
+}
+
+/* Form group styling */
+.tourism-form-group {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 0.5rem !important;
+}
+
+/* Form input styling */
+.tourism-form-input {
+  padding: 0.75rem !important;
+  border: 1px solid #d1d5db !important;
+  border-radius: var(--border-radius) !important;
+  background-color: #f9fafb !important;
+  color: var(--text-color) !important;
+  transition: var(--transition) !important;
+  font-size: 1rem !important;
+  width: 100% !important; /* Ensure inputs take full width of their container */
+}
+
+.tourism-form-input:hover {
+  border-color: var(--secondary-color) !important;
+}
+
+.tourism-form-input:focus {
+  border-color: var(--primary-color) !important;
+  box-shadow: 0 0 0 2px var(--primary-color) !important;
+  outline: none !important;
+}
+
+/* Form select styling (for dropdowns) */
+.tourism-form-input[type="select"],
+.tourism-form-input select {
+  appearance: none !important;
+  background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20width%3D%2216%22%20height%3D%2216%22%20viewBox%3D%220%200%2016%2016%22%20fill%3D%22none%22%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%3E%3Cpath%20d%3D%22M4%206L8%2010L12%206%22%20stroke%3D%22%232d3748%22%20stroke-width%3D%222%22/%3E%3C/svg%3E') !important;
+  background-repeat: no-repeat !important;
+  background-position: right 1rem center !important;
+  background-size: 1em !important;
+  padding-right: 2.5rem !important;
+}
+
+/* Form error styling */
+.tourism-form-error {
+  font-size: 0.9rem !important;
+  padding: 0.75rem !important;
+  border-radius: var(--border-radius) !important;
+}
+
+/* Form actions (submit button) */
+.tourism-form-actions {
+  display: flex !important;
+  justify-content: center !important;
+  margin-top: 1rem !important;
+}
+
+/* Submit button styling */
+.tourism-form-submit-btn {
+  background-color: var(--primary-color) !important;
+  border-color: var(--primary-color) !important;
+  color: var(--accent-color) !important;
+  padding: 0.75rem 2rem !important;
+  font-size: 1.1rem !important;
+  font-weight: 500 !important;
+  border-radius: var(--border-radius) !important;
+  transition: var(--transition) !important;
+}
+
+.tourism-form-submit-btn:hover {
+  background-color: var(--secondary-color) !important;
+  border-color: var(--secondary-color) !important;
+}
+
+.tourism-form-submit-btn:disabled {
+  opacity: 0.5 !important;
+  cursor: not-allowed !important;
+}
+
+.tourism-form-submit-btn:focus {
+  box-shadow: 0 0 0 3px rgba(30, 136, 229, 0.3) !important;
+  outline: none !important;
 }

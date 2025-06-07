@@ -13,14 +13,12 @@
 /* Sort container */
 .tourism-sort-container {
   width: 100% !important;
+  max-width: 320px !important; /* Match the original cuisine filter width */
 }
 
-/* Sort label */
+/* Remove the label since the cuisine filter didn't have one */
 .tourism-sort-label {
-  font-size: 1.1rem !important;
-  font-weight: 500 !important;
-  color: var(--secondary-color) !important; /* Darker blue for "Trier par prix" */
-  margin-bottom: 0.5rem !important;
+  display: none !important; /* Hide the "Trier par prix" label */
 }
 
 /* Sort dropdown */
@@ -28,58 +26,66 @@
   width: 100% !important;
 }
 
-/* Sort toggle */
+/* Sort toggle (styled like the original cuisine filter select) */
 .tourism-sort-toggle {
+  appearance: none !important;
+  width: 100% !important;
+  padding: 0.75rem !important;
+  background-color: #ffffff !important;
+  border: 1px solid #d1d5db !important; /* Original cuisine filter border */
+  border-radius: 0.5rem !important; /* Original cuisine filter border-radius */
+  color: var(--text-color) !important;
+  outline: none !important;
+  transition: var(--transition) !important;
+  background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20width%3D%2220%22%20height%3D%2220%22%20viewBox%3D%220%200%2020%2020%22%20fill%3D%22none%22%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%3E%3Cpath%20d%3D%22M6%208L10%2012L14%208%22%20stroke%3D%22%234B5563%22%20stroke-width%3D%222%22/%3E%3C/svg%3E') !important;
+  background-repeat: no-repeat !important;
+  background-position: right 1rem center !important;
+  background-size: 1.2em !important;
+  padding-right: 2.5rem !important;
   display: flex !important;
   align-items: center !important;
   justify-content: space-between !important;
-  padding: 0.75rem !important;
-  border: 1px solid #d1d5db !important;
-  border-radius: var(--border-radius) !important;
-  background-color: #ffffff !important;
-  color: var(--secondary-color) !important; /* Darker blue for chosen item */
-  width: 100% !important;
-  transition: var(--transition) !important;
 }
 
 .tourism-sort-toggle:hover {
-  border-color: var(--secondary-color) !important;
+  background-color: #f7fafc !important; /* Original cuisine filter hover */
 }
 
 .tourism-sort-dropdown.tourism-focused .tourism-sort-toggle {
   border-color: var(--primary-color) !important;
-  box-shadow: 0 0 0 2px var(--primary-color) !important;
+  box-shadow: 0 0 0 2px var(--primary-color) !important; /* Original cuisine filter focus */
 }
 
-/* Chevron icon */
+/* Chevron icon (keep but style to match the original cuisine filter arrow) */
 .tourism-chevron-icon {
-  margin-left: 0.5rem !important;
-  color: var(--text-color) !important;
+  width: 20px !important;
+  height: 20px !important;
+  color: #4b5563 !important; /* Match the stroke color of the original cuisine filter arrow */
 }
 
 /* Sort menu */
 .tourism-sort-menu {
   width: 100% !important;
-  border-radius: var(--border-radius) !important;
+  border-radius: 0.5rem !important; /* Match original cuisine filter border-radius */
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1) !important;
 }
 
 /* Menu items */
 .tourism-sort-menu .dropdown-item {
   padding: 0.5rem 1rem !important;
-  color: var(--secondary-color) !important; /* Darker blue for sort items */
+  color: var(--text-color) !important;
   transition: var(--transition) !important;
 }
 
 .tourism-sort-menu .dropdown-item:hover {
-  background-color: #e3f2fd !important; /* Light blue background on hover */
-  color: var(--primary-color) !important; /* Ocean blue on hover */
+  background-color: #f7fafc !important; /* Match the hover effect */
+  color: var(--text-color) !important;
 }
 
 /* Selected item */
 .tourism-sort-menu .tourism-selected {
-  background-color: #e3f2fd !important;
-  color: var(--secondary-color) !important; /* Darker blue for selected item */
+  background-color: #f7fafc !important;
+  color: var(--text-color) !important;
   font-weight: 500 !important;
 }
 

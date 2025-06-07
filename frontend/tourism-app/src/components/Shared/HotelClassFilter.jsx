@@ -4,20 +4,20 @@ import { FaStar } from 'react-icons/fa';
 import './hotelClassFilterStyle.css';
 
 const HotelClassFilter = ({ onClassChange, className }) => {
-  const [selectedClasses, setSelectedClasses] = useState([]);
+  const [selectedClass, setSelectedClass] = useState(null);
 
   const handleChange = (e) => {
     const value = e.target.value;
-    let updatedClasses;
+    let updatedClass;
 
     if (e.target.checked) {
-      updatedClasses = [...selectedClasses, value];
+      updatedClass = value; // Set the new class, overwriting the previous one
     } else {
-      updatedClasses = selectedClasses.filter((item) => item !== value);
+      updatedClass = null; // If unchecked, clear the selection
     }
 
-    setSelectedClasses(updatedClasses);
-    onClassChange(updatedClasses);
+    setSelectedClass(updatedClass);
+    onClassChange(updatedClass ? [updatedClass] : []); // Pass an array to maintain compatibility with the parent component
   };
 
   return (
@@ -33,7 +33,7 @@ const HotelClassFilter = ({ onClassChange, className }) => {
           }
           value="oneStar"
           onChange={handleChange}
-          checked={selectedClasses.includes('oneStar')}
+          checked={selectedClass === 'oneStar'}
           className="tourism-class-checkbox"
         />
         <Form.Check
@@ -46,7 +46,7 @@ const HotelClassFilter = ({ onClassChange, className }) => {
           }
           value="twoStars"
           onChange={handleChange}
-          checked={selectedClasses.includes('twoStars')}
+          checked={selectedClass === 'twoStars'}
           className="tourism-class-checkbox"
         />
         <Form.Check
@@ -60,7 +60,7 @@ const HotelClassFilter = ({ onClassChange, className }) => {
           }
           value="threeStars"
           onChange={handleChange}
-          checked={selectedClasses.includes('threeStars')}
+          checked={selectedClass === 'threeStars'}
           className="tourism-class-checkbox"
         />
         <Form.Check
@@ -75,7 +75,7 @@ const HotelClassFilter = ({ onClassChange, className }) => {
           }
           value="fourStars"
           onChange={handleChange}
-          checked={selectedClasses.includes('fourStars')}
+          checked={selectedClass === 'fourStars'}
           className="tourism-class-checkbox"
         />
         <Form.Check
@@ -91,7 +91,7 @@ const HotelClassFilter = ({ onClassChange, className }) => {
           }
           value="fiveStars"
           onChange={handleChange}
-          checked={selectedClasses.includes('fiveStars')}
+          checked={selectedClass === 'fiveStars'}
           className="tourism-class-checkbox"
         />
       </div>

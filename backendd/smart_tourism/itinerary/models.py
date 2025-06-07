@@ -33,12 +33,18 @@ class Guide(models.Model):
 
     def __str__(self):
         return f"{self.pre_guide} {self.nom_gui}"
+    
+name_validator = RegexValidator(
+    regex=r'^[\w\s\-\u00A0-\u024F]+$',  # \w includes [a-zA-Z0-9_], \u00A0-\u024F covers Latin-1 Supplement to Latin Extended-B
+    message='Le nom du circuit doit contenir uniquement des lettres (y compris accentuées), des chiffres, des espaces et des tirets (-).',
+    code='invalid_name'
+)
 
 class Circuit(models.Model):
     name = models.CharField(
         max_length=255,
         unique=True,
-        validators=[alphanumeric_validator]
+        validators=[name_validator]
     )
     circuit_code = models.CharField(
         max_length=50,

@@ -29,27 +29,27 @@ const Sidebar = () => {
       <Nav className="flex-column">
         <Nav.Item>
           <Link to="/dashboard" className={`nav-link ${location.pathname === '/dashboard' ? 'active' : ''}`}>
-            <FaTachometerAlt className="nav-icon" /> Tableau de bord
+            <FaTachometerAlt className="nav-icon" />
+            <span>Tableau de bord</span>
           </Link>
         </Nav.Item>
         <Nav.Item>
           <Link to="/account-settings" className={`nav-link ${location.pathname === '/account-settings' && !location.search.includes('tab=history') ? 'active' : ''}`}>
-            <FaUser className="nav-icon" /> Détails du compte
+            <FaUser className="nav-icon" />
+            <span>Détails du compte</span>
           </Link>
         </Nav.Item>
-        <Nav.Item>
-          <Link to="/account-settings?tab=history" className={`nav-link ${location.search.includes('tab=history') ? 'active' : ''}`}>
-            <FaHistory className="nav-icon" /> Historique des circuits
-          </Link>
-        </Nav.Item>
+        
         <Nav.Item>
           <Link to="/change-password" className={`nav-link ${location.pathname === '/change-password' ? 'active' : ''}`}>
-            <FaLock className="nav-icon" /> Changer le mot de passe
+            <FaLock className="nav-icon" />
+            <span>Changer le mot de passe</span>
           </Link>
         </Nav.Item>
         <Nav.Item>
           <Nav.Link onClick={handleLogout} className={`nav-link ${location.pathname === '/logout' ? 'active' : ''}`}>
-            <FaSignOutAlt className="nav-icon" /> Déconnexion
+            <FaSignOutAlt className="nav-icon" />
+            <span>Déconnexion</span>
           </Nav.Link>
         </Nav.Item>
       </Nav>

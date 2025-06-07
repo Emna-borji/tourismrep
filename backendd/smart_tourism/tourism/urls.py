@@ -1,6 +1,6 @@
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
-from .views import RestaurantViewSet, HotelViewSet, ActivityViewSet,ArchaeologicalSiteViewSet,DestinationViewSet,MuseumViewSet,FestivalViewSet,GuestHouseViewSet,ReviewViewSet,FavoriteViewSet, CuisineViewSet, RecommendationView, ActivityCategoryViewSet
+from .views import RestaurantViewSet, HotelViewSet, ActivityViewSet,ArchaeologicalSiteViewSet,DestinationViewSet,MuseumViewSet,FestivalViewSet,GuestHouseViewSet,ReviewViewSet,FavoriteViewSet, CuisineViewSet, RecommendationView, ActivityCategoryViewSet, nearby_entities, BestRatedEntitiesView
 
 # Create a router and register the endpoints
 router = DefaultRouter()
@@ -22,6 +22,8 @@ router.register(r'activity-categories', ActivityCategoryViewSet, basename='activ
 
 # Define URL patterns for tourism app
 urlpatterns = [
+    path('best-rated-entities/', BestRatedEntitiesView.as_view(), name='best-rated-entities'),
+    path('nearby/<str:entity_type>/', nearby_entities, name='nearby_entities'),
     path('', include(router.urls)),  # Include all router URLs
     path('recommendations/', RecommendationView.as_view(), name='recommendations'),
 ]

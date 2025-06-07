@@ -116,26 +116,54 @@ export const ADMIN_CREATE_CIRCUIT_FAIL = 'ADMIN_CREATE_CIRCUIT_FAIL';
 //   }
 // };
 
+// export const fetchCircuits = (searchQuery = '') => async (dispatch, getState) => {
+//   try {
+//     dispatch({ type: FETCH_CIRCUITS_REQUEST });
+
+//     const { auth } = getState();
+//     let token = auth.userInfo?.token || auth.userInfo?.accessToken || auth.userInfo?.access_token || auth.userInfo?.jwt || auth.token;
+//     if (!token) {
+//       const localToken = localStorage.getItem('token') || localStorage.getItem('authToken');
+//       if (!localToken) {
+//         throw new Error('Authentication token is missing. Please log in again.');
+//       }
+//       token = localToken;
+//     }
+
+//     const config = {
+//       headers: {
+//         'Content-Type': 'application/json',
+//         Authorization: `Bearer ${token}`,
+//       },
+//     };
+
+//     // Construct the URL with the search query if provided
+//     const url = searchQuery ? `/api/itinerary/circuits/?search=${encodeURIComponent(searchQuery)}` : '/api/itinerary/circuits/';
+//     const response = await api.get(url, config);
+
+//     dispatch({
+//       type: FETCH_CIRCUITS_SUCCESS,
+//       payload: response.data,
+//     });
+//   } catch (error) {
+//     const errorMsg = error.response?.data?.message || error.response?.data?.detail || error.message || 'Failed to fetch circuits';
+//     dispatch({
+//       type: FETCH_CIRCUITS_FAIL,
+//       payload: errorMsg,
+//     });
+//     throw new Error(errorMsg);
+//   }
+// };
 export const fetchCircuits = (searchQuery = '') => async (dispatch, getState) => {
   try {
     dispatch({ type: FETCH_CIRCUITS_REQUEST });
 
+    // Optionally add token if available
     const { auth } = getState();
-    let token = auth.userInfo?.token || auth.userInfo?.accessToken || auth.userInfo?.access_token || auth.userInfo?.jwt || auth.token;
-    if (!token) {
-      const localToken = localStorage.getItem('token') || localStorage.getItem('authToken');
-      if (!localToken) {
-        throw new Error('Authentication token is missing. Please log in again.');
-      }
-      token = localToken;
-    }
-
-    const config = {
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${token}`,
-      },
-    };
+    const token = auth.userInfo?.token || auth.userInfo?.access_token || localStorage.getItem('token');
+    const config = token
+      ? { headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` } }
+      : { headers: { 'Content-Type': 'application/json' } };
 
     // Construct the URL with the search query if provided
     const url = searchQuery ? `/api/itinerary/circuits/?search=${encodeURIComponent(searchQuery)}` : '/api/itinerary/circuits/';
@@ -146,12 +174,11 @@ export const fetchCircuits = (searchQuery = '') => async (dispatch, getState) =>
       payload: response.data,
     });
   } catch (error) {
-    const errorMsg = error.response?.data?.message || error.response?.data?.detail || error.message || 'Failed to fetch circuits';
+    const errorMsg = error.response?.data?.message || error.response?.data?.detail || error.message || 'Échec du chargement des circuits';
     dispatch({
       type: FETCH_CIRCUITS_FAIL,
       payload: errorMsg,
     });
-    throw new Error(errorMsg);
   }
 };
 
@@ -159,40 +186,68 @@ export const fetchCircuits = (searchQuery = '') => async (dispatch, getState) =>
 
 
 // Thunk Action to Fetch Circuit Details
+// export const fetchCircuitDetails = (circuitId) => async (dispatch, getState) => {
+//   try {
+//     dispatch({ type: FETCH_CIRCUIT_DETAILS_REQUEST });
+
+//     const { auth } = getState();
+//     let token = auth.userInfo?.token || auth.userInfo?.accessToken || auth.userInfo?.access_token || auth.userInfo?.jwt || auth.token;
+//     if (!token) {
+//       const localToken = localStorage.getItem('token') || localStorage.getItem('authToken');
+//       if (!localToken) {
+//         throw new Error('Authentication token is missing. Please log in again.');
+//       }
+//       token = localToken;
+//     }
+
+//     const config = {
+//       headers: {
+//         'Content-Type': 'application/json',
+//         Authorization: `Bearer ${token}`,
+//       },
+//     };
+
+//     const response = await api.get(`/api/itinerary/circuits/${circuitId}/`, config);
+//     dispatch({
+//       type: FETCH_CIRCUIT_DETAILS_SUCCESS,
+//       payload: response.data,
+//     });
+//     console.log(response.data)
+//   } catch (error) {
+//     const errorMsg = error.response?.data?.message || error.response?.data?.detail || error.message || 'Failed to fetch circuit details';
+//     dispatch({
+//       type: FETCH_CIRCUIT_DETAILS_FAIL,
+//       payload: errorMsg,
+//     });
+//     throw new Error(errorMsg);
+//   }
+// };
+
+
 export const fetchCircuitDetails = (circuitId) => async (dispatch, getState) => {
   try {
     dispatch({ type: FETCH_CIRCUIT_DETAILS_REQUEST });
 
+    // Optionally add token if available
     const { auth } = getState();
-    let token = auth.userInfo?.token || auth.userInfo?.accessToken || auth.userInfo?.access_token || auth.userInfo?.jwt || auth.token;
-    if (!token) {
-      const localToken = localStorage.getItem('token') || localStorage.getItem('authToken');
-      if (!localToken) {
-        throw new Error('Authentication token is missing. Please log in again.');
-      }
-      token = localToken;
-    }
-
-    const config = {
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${token}`,
-      },
-    };
+    const token = auth.userInfo?.token || auth.userInfo?.access_token || localStorage.getItem('token');
+    const config = token
+      ? { headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` } }
+      : { headers: { 'Content-Type': 'application/json' } };
 
     const response = await api.get(`/api/itinerary/circuits/${circuitId}/`, config);
     dispatch({
       type: FETCH_CIRCUIT_DETAILS_SUCCESS,
       payload: response.data,
     });
-    console.log(response.data)
+    console.log(response.data); // Keep for debugging
   } catch (error) {
-    const errorMsg = error.response?.data?.message || error.response?.data?.detail || error.message || 'Failed to fetch circuit details';
+    const errorMsg = error.response?.data?.message || error.response?.data?.detail || error.message || 'Échec du chargement des détails du circuit';
     dispatch({
       type: FETCH_CIRCUIT_DETAILS_FAIL,
       payload: errorMsg,
     });
-    throw new Error(errorMsg);
+    // Removed throw to prevent uncaught error
   }
 };
 

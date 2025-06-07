@@ -26,6 +26,7 @@ import {
   DELETE_USER_REQUEST,
   DELETE_USER_SUCCESS,
   DELETE_USER_FAIL,
+  EMAIL_EXISTS,
 } from '../constants/authConstants';
 
 // Login
@@ -46,8 +47,10 @@ export const login = (userData) => async (dispatch) => {
     dispatch({ type: LOGIN_USER_SUCCESS, payload: data });
     return data;
   } catch (error) {
-    dispatch({ type: LOGIN_USER_FAIL, payload: error.response?.data?.error || 'Login failed' });
-    throw error;
+    console.log('Login error details:', error.response?.data, error.message); // Debug log
+    const errorMessage = error.response?.data?.error || error.response?.data?.non_field_errors || 'Échec de la connexion';
+    dispatch({ type: LOGIN_USER_FAIL, payload: errorMessage });
+    // Remove the throw statement to prevent uncaught error
   }
 };
 
@@ -56,12 +59,23 @@ export const register = (userData) => async (dispatch) => {
   dispatch({ type: REGISTER_USER_REQUEST });
   try {
     const response = await axios.post('/api/register/', userData);
+    // Check the response status after the request
+    if (response.status === 409) {
+      dispatch({ type: EMAIL_EXISTS, payload: response.data.message });
+      return response.data; // Return the response to avoid throwing
+    }
+
+    // Success case
+    console.log(response)
+    console.log(response.data)
     localStorage.setItem('token', response.data.access_token);
     localStorage.setItem('userInfo', JSON.stringify(response.data.user));
     dispatch({ type: REGISTER_USER_SUCCESS, payload: response.data.user });
     return response.data;
   } catch (error) {
-    dispatch({ type: REGISTER_USER_FAIL, payload: error.response?.data?.error || 'Registration failed' });
+    // Handle other errors (e.g., 400 for validation errors)
+    const errorMessage = error.response?.data?.error || error.response?.data?.message || 'Registration failed';
+    dispatch({ type: REGISTER_USER_FAIL, payload: errorMessage });
     throw error;
   }
 };
@@ -116,11 +130,7 @@ export const changePassword = (passwordData) => async (dispatch) => {
 };
 
 // Logout
-export const logout = () => (dispatch) => {
-  localStorage.removeItem('token');
-  localStorage.removeItem('userInfo');
-  dispatch({ type: LOGOUT });
-};
+
 
 // Check auth status on app load
 export const checkAuthStatus = () => async (dispatch) => {
@@ -198,4 +208,10 @@ export const deleteUser = (userId) => async (dispatch) => {
     });
     throw error;
   }
+};
+
+
+export const logout = () => (dispatch) => {
+  // Since localStorage is cleared in the Navbar, we just dispatch the LOGOUT action here
+  dispatch({ type: LOGOUT });
 };

@@ -1,0 +1,298 @@
+/* Original container styling with wider side margins */
+.entity-detail-container {
+  padding-left: 15px !important;
+  padding-right: 15px !important;
+  padding-top: 2rem !important;
+  padding-bottom: 2rem !important;
+  max-width: 1140px !important; /* Bootstrap's default lg container width */
+}
+
+/* Section titles (like "Entités à proximité" or "Entités à proximité sur la carte") */
+.tourism-section-title {
+  font-size: 1.25rem !important; /* text-xl */
+  font-weight: 700 !important; /* font-bold */
+  color: #333 !important; /* Ensure the text color is applied */
+  text-align: center !important; /* text-center from original */
+  position: relative !important;
+  display: inline-block !important; /* inline-block to apply background gradient properly */
+  padding-bottom: 0.25rem !important; /* pb-1 */
+  background: linear-gradient(to right, #15A5DF, #15A5DF) !important; /* from-[#15A5DF] to-[#15A5DF] */
+  background-size: 60% 2.5px !important; /* bg-[length:60%_2.5px] */
+  background-position: left bottom !important; /* bg-left-bottom */
+  background-repeat: no-repeat !important;
+  min-width: 100px !important;
+  margin-bottom: 50px;
+  margin-top: 50px;
+}
+
+
+
+/* Entity Reviews Container */
+.entity-reviews-container {
+  padding: 1rem 0 !important;
+  border: none !important;
+  box-shadow: none !important;
+  background: transparent !important;
+}
+
+/* Individual Review Styling */
+.entity-reviews-container .review {
+  padding: 1rem 0 !important;
+  border-bottom: 1px solid #e9ecef !important; /* Optional: subtle separator between reviews */
+}
+
+.entity-reviews-container .review:last-child {
+  border-bottom: none !important; /* Remove border for the last review */
+}
+
+/* Map display styling */
+
+
+/* Carousel styling for proximity cards (react-slick) */
+.proximity-carousel {
+  position: relative !important;
+  width: 100% !important;
+  overflow: hidden !important;
+}
+
+.proximity-carousel .slick-list {
+  overflow: hidden !important;
+}
+
+.proximity-carousel .slick-track {
+  display: flex !important;
+  align-items: stretch !important;
+}
+
+.carousel-card {
+  padding: 0 10px !important;
+  box-sizing: border-box !important;
+  height: 100% !important;
+}
+
+.proximity-carousel .slick-prev,
+.proximity-carousel .slick-next {
+  width: 40px !important;
+  height: 40px !important;
+  background: rgba(0, 0, 0, 0.2) !important;
+  border-radius: 50% !important;
+  top: 50% !important;
+  transform: translateY(-50%) !important;
+  z-index: 1 !important;
+}
+
+.proximity-carousel .slick-prev:hover,
+.proximity-carousel .slick-next:hover {
+  background: rgba(0, 0, 0, 0.4) !important;
+}
+
+.proximity-carousel .slick-prev:before,
+.proximity-carousel .slick-next:before {
+  color: #fff !important;
+  font-size: 20px !important;
+}
+
+.proximity-carousel .slick-prev {
+  left: 10px !important;
+}
+
+.proximity-carousel .slick-next {
+  right: 10px !important;
+}
+
+/* Card Styling */
+.custom-card {
+  border-radius: 20px !important;
+  overflow: hidden !important;
+  position: relative !important;
+  transition: all 0.3s ease-in-out !important;
+  border: none !important;
+}
+
+.custom-card:hover {
+  transform: scale(1.02) !important;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1) !important;
+}
+
+/* Card Image */
+.custom-card-img {
+  height: 200px !important;
+  object-fit: cover !important;
+  position: relative !important;
+}
+
+/* Rating Badge on Image */
+.rating-badge-image {
+  position: absolute !important;
+  top: 10px !important;
+  left: 10px !important;
+  background: rgba(255, 255, 255, 0.8) !important;
+  padding: 4px 8px !important;
+  border-radius: 12px !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 4px !important;
+  font-size: 0.9rem !important;
+  color: #343a40 !important;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1) !important;
+}
+
+/* Card Title */
+.custom-title {
+  font-size: 1.2rem !important;
+  font-weight: bold !important;
+  color: #343a40 !important;
+  margin-bottom: 0.5rem !important;
+}
+
+/* Location & Region */
+.custom-location {
+  font-size: 0.9rem !important;
+  color: #6c757d !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 0.75rem !important;
+  margin-bottom: 0.25rem !important;
+}
+
+.custom-location svg {
+  color: #2c5ba1 !important;
+  width: 30px !important;
+  height: 30px !important;
+  font-size: unset !important;
+}
+
+.address-text {
+  display: -webkit-box !important;
+  -webkit-line-clamp: 2 !important;
+  -webkit-box-orient: vertical !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  color: #4b5563 !important;
+}
+
+.custom-region {
+  font-size: 0.9rem !important;
+  color: #2c5ba1 !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 0.5rem !important;
+  margin-bottom: 0.25rem !important;
+}
+
+/* Price Formatting */
+.price-stack {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: flex-start !important;
+}
+
+.price-prefix {
+  font-size: 0.8rem !important;
+  color: #2c5ba1 !important;
+  margin-bottom: 0.25rem !important;
+}
+
+.price-value {
+  color: #2c5ba1 !important;
+  font-weight: 600 !important;
+  font-size: 0.95rem !important;
+}
+
+/* Details Button */
+.custom-details-btn {
+  padding: 5px 10px !important;
+  font-size: 0.85rem !important;
+  font-weight: 500 !important;
+  border-radius: 6px !important;
+  background-color: #34495e !important;
+  border-color: #34495e !important;
+  color: white !important;
+}
+
+.custom-details-btn:hover {
+  background-color: #254c8a !important;
+  border-color: #254c8a !important;
+}
+
+/* Favorite Icon */
+.favorite-icon {
+  position: absolute !important;
+  top: 12px !important;
+  right: 12px !important;
+  z-index: 2 !important;
+  background: #fff !important;
+  border-radius: 50% !important;
+  padding: 6px !important;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15) !important;
+  transition: background 0.2s ease !important;
+}
+
+.favorite-icon:hover {
+  background-color: #ffeded !important;
+  cursor: pointer !important;
+}
+
+/* Stars */
+.star {
+  margin-right: 2px !important;
+}
+
+/* Buttons inside popups */
+.leaflet-popup-content-wrapper .btn-link {
+  padding: 0 !important;
+  color: #1e88e5 !important;
+  text-decoration: none !important;
+}
+
+.leaflet-popup-content-wrapper .btn-link:hover {
+  text-decoration: underline !important;
+}
+
+/* Submit Button (Ajouter un commentaire) */
+.submit-btn {
+  background-color: #ffffff !important; /* White background */
+  border: 1px solid  var(--primary-color) !important; /* 2px width, solid style, blue border */
+  color: var(--primary-color) !important; /* Blue text (#1e88e5) */
+  padding: 0.5rem 1.5rem !important; /* Consistent padding */
+  font-size: 1rem !important; /* Consistent font size */
+  border-radius: 6px !important; /* Slightly rounded corners */
+  transition: all 0.3s ease !important; /* Smooth transition */
+}
+
+.submit-btn:hover {
+  background-color: #e6f0fa !important; /* Light blue hover effect */
+  border-color: var(--secondary-color) !important; /* Darker blue border on hover (#2c5ba1) */
+  color: var(--secondary-color) !important; /* Darker blue text on hover */
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .tourism-section-title {
+    font-size: 1.5rem !important;
+  }
+
+  .tourism-map-display {
+    height: 24rem !important; /* Increased from 16rem to 24rem (384px) */
+  }
+
+  .proximity-carousel .slick-prev,
+  .proximity-carousel .slick-next {
+    width: 35px !important;
+    height: 35px !important;
+  }
+}
+
+@media (max-width: 576px) {
+  .proximity-carousel .slick-prev,
+  .proximity-carousel .slick-next {
+    width: 30px !important;
+    height: 30px !important;
+  }
+}
+
+/* Accessibility improvements */
+:focus-visible {
+  outline: 2px solid #1e88e5 !important;
+  outline-offset: 2px !important;
+}
